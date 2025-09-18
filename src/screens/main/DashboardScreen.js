@@ -50,9 +50,6 @@ export default function DashboardScreen({ navigation }) {
     navigation.navigate(screen);
   };
 
-  const handlePaywallPress = () => {
-    navigation.navigate('Paywall');
-  };
 
   return (
     <>
@@ -78,12 +75,11 @@ export default function DashboardScreen({ navigation }) {
               {reminderTypes.map((type) => (
                 <TouchableOpacity
                   key={type.id}
-                  style={[styles.reminderCard, { borderLeftColor: type.color }]}
+                  style={styles.reminderCard}
                   onPress={() => handleReminderPress(type.screen)}
                 >
                   <View style={styles.reminderCardHeader}>
                     <Text style={styles.reminderIcon}>{type.icon}</Text>
-                    <View style={[styles.reminderBadge, { backgroundColor: type.color }]} />
                   </View>
                   <Text style={styles.reminderTitle}>{type.title}</Text>
                   <Text style={styles.reminderDescription}>{type.description}</Text>
@@ -92,16 +88,6 @@ export default function DashboardScreen({ navigation }) {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.premiumBanner} onPress={handlePaywallPress}>
-            <View style={styles.premiumContent}>
-              <Text style={styles.premiumIcon}>✨</Text>
-              <View style={styles.premiumText}>
-                <Text style={styles.premiumTitle}>Premium Özellikler</Text>
-                <Text style={styles.premiumSubtitle}>Sınırsız hatırlatıcı ve daha fazlası</Text>
-              </View>
-              <Text style={styles.premiumArrow}>→</Text>
-            </View>
-          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     </>
@@ -171,74 +157,39 @@ const styles = StyleSheet.create({
     width: cardSizes.reminderCard.width,
     minHeight: cardSizes.reminderCard.minHeight,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: spacing.md,
+    borderRadius: 16,
+    padding: spacing.lg,
     marginBottom: spacing.md,
-    borderLeftWidth: 4,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   reminderCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   reminderIcon: {
-    fontSize: 24,
-  },
-  reminderBadge: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    fontSize: 32,
+    marginBottom: spacing.sm,
   },
   reminderTitle: {
-    fontSize: fontSizes.small,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: fontSizes.medium,
+    fontWeight: '600',
+    color: '#1a1a1a',
     marginBottom: spacing.xs,
+    textAlign: 'center',
   },
   reminderDescription: {
-    fontSize: 12,
-    color: '#666',
-    lineHeight: 16,
-  },
-  premiumBanner: {
-    margin: spacing.lg,
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  premiumContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.lg,
-  },
-  premiumIcon: {
-    fontSize: 24,
-    marginRight: spacing.md,
-  },
-  premiumText: {
-    flex: 1,
-  },
-  premiumTitle: {
-    fontSize: fontSizes.medium,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 2,
-  },
-  premiumSubtitle: {
     fontSize: fontSizes.small,
-    color: '#B3D9FF',
-  },
-  premiumArrow: {
-    fontSize: 20,
-    color: '#fff',
+    color: '#666',
+    lineHeight: 18,
+    textAlign: 'center',
   },
 });

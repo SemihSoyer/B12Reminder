@@ -38,7 +38,7 @@ export const spacing = {
 export const cardSizes = {
   reminderCard: {
     width: deviceSizes.small ? '48%' : '48%',
-    minHeight: deviceSizes.small ? 120 : 140,
+    minHeight: deviceSizes.small ? 140 : 160,
   },
 };
 

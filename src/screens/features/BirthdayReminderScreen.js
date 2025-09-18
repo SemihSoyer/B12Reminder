@@ -1,37 +1,119 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   TextInput,
   Alert,
+  Image,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useFocusEffect } from '@react-navigation/native';
+import CustomHeader from '../../components/common/CustomHeader';
+import { fontSizes, spacing } from '../../constants/responsive';
+import { BirthdayService } from '../../utils/storage';
+import '../../utils/debugStorage'; // Debug fonksiyonları
 
 export default function BirthdayReminderScreen({ navigation }) {
-  const [birthdays, setBirthdays] = useState([
-    {
-      id: 1,
-      name: 'Ahmet Yılmaz',
-      date: '15 Ocak',
-      daysLeft: 5,
-      year: 1990
-    },
-    {
-      id: 2,
-      name: 'Ayşe Demir',
-      date: '22 Şubat',
-      daysLeft: 38,
-      year: 1985
-    }
-  ]);
-
+  const [birthdays, setBirthdays] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
 
+  // Sayfa odaklandığında verileri yükle
+  useFocusEffect(
+    React.useCallback(() => {
+      loadBirthdays();
+    }, [])
+  );
+
+  const loadBirthdays = async () => {
+    try {
+      setLoading(true);
+      const data = await BirthdayService.getBirthdays();
+      
+      // Veriyi görüntüleme formatına çevir
+      const formattedData = data.map(birthday => {
+        console.log('Processing birthday:', birthday);
+        console.log('Birthday name:', birthday.name);
+        console.log('Birthday name type:', typeof birthday.name);
+        console.log('Birthday name length:', birthday.name ? birthday.name.length : 'undefined/null');
+        
+        if (!birthday.birthDate) {
+          console.error('Birthday missing birthDate:', birthday);
+          return {
+            ...birthday,
+            date: 'Tarih belirtilmemiş',
+            daysLeft: 999,
+            year: 2000
+          };
+        }
+        
+        const [year, month, day] = birthday.birthDate.split('-');
+        console.log('Date parts:', { year, month, day });
+        
+        if (!year || !month || !day) {
+          console.error('Invalid date format:', birthday.birthDate);
+          return {
+            ...birthday,
+            date: 'Geçersiz tarih',
+            daysLeft: 999,
+            year: 2000
+          };
+        }
+        
+        const months = [
+          'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+          'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+        ];
+        
+        // Yaklaşan doğum gününü hesapla
+        const today = new Date();
+        const thisYear = today.getFullYear();
+        const monthIndex = parseInt(month) - 1;
+        const dayNum = parseInt(day);
+        
+        if (monthIndex < 0 || monthIndex > 11 || dayNum < 1 || dayNum > 31) {
+          console.error('Invalid month or day:', { month: monthIndex, day: dayNum });
+          return {
+            ...birthday,
+            date: 'Geçersiz tarih',
+            daysLeft: 999,
+            year: 2000
+          };
+        }
+        
+        let nextBirthday = new Date(thisYear, monthIndex, dayNum);
+        
+        if (nextBirthday < today) {
+          nextBirthday = new Date(thisYear + 1, monthIndex, dayNum);
+        }
+        
+        const daysLeft = Math.ceil((nextBirthday - today) / (1000 * 60 * 60 * 24));
+        
+        const formattedDate = `${dayNum} ${months[monthIndex]}`;
+        console.log('Formatted date:', formattedDate);
+        
+        return {
+          ...birthday,
+          date: formattedDate,
+          daysLeft,
+          year: parseInt(year)
+        };
+      });
+      
+      setBirthdays(formattedData);
+    } catch (error) {
+      console.error('Error loading birthdays:', error);
+      Alert.alert('Hata', 'Doğum günleri yüklenirken bir hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddBirthday = () => {
-    Alert.alert('Yeni Doğum Günü', 'Doğum günü ekleme özelliği yakında eklenecek');
+    navigation.navigate('AddBirthday');
   };
 
   const handleEditBirthday = (id) => {
@@ -47,7 +129,20 @@ export default function BirthdayReminderScreen({ navigation }) {
         { 
           text: 'Sil', 
           style: 'destructive',
-          onPress: () => setBirthdays(birthdays.filter(b => b.id !== id))
+          onPress: async () => {
+            try {
+              const result = await BirthdayService.deleteBirthday(id);
+              if (result.success) {
+                loadBirthdays(); // Listeyi yenile
+                Alert.alert('Başarılı', 'Doğum günü silindi');
+              } else {
+                Alert.alert('Hata', result.error || 'Silme işlemi başarısız');
+              }
+            } catch (error) {
+              Alert.alert('Hata', 'Bir hata oluştu');
+              console.error('Delete error:', error);
+            }
+          }
         }
       ]
     );
@@ -60,14 +155,15 @@ export default function BirthdayReminderScreen({ navigation }) {
   const upcomingBirthdays = filteredBirthdays.filter(b => b.daysLeft <= 30);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Doğum Günü Hatırlatıcısı</Text>
-          <Text style={styles.headerSubtitle}>
-            Sevdiklerinizin doğum günlerini asla kaçırmayın
-          </Text>
-        </View>
+    <>
+      <StatusBar style="dark" backgroundColor="#f8f9fa" />
+      <CustomHeader 
+        title="Doğum Günü Hatırlatıcısı"
+        onBackPress={() => navigation.goBack()}
+        backgroundColor="#f8f9fa"
+      />
+      <View style={styles.container}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
         <View style={styles.searchSection}>
           <TextInput
@@ -83,31 +179,57 @@ export default function BirthdayReminderScreen({ navigation }) {
             <Text style={styles.sectionTitle}>Yaklaşan Doğum Günleri (30 gün)</Text>
             {upcomingBirthdays.map((birthday) => (
               <View key={birthday.id} style={[styles.birthdayCard, styles.upcomingCard]}>
-                <View style={styles.birthdayInfo}>
-                  <Text style={styles.birthdayName}>{birthday.name}</Text>
-                  <Text style={styles.birthdayDate}>{birthday.date}</Text>
-                  <Text style={styles.birthdayAge}>
-                    {new Date().getFullYear() - birthday.year} yaşına girecek
-                  </Text>
+                {/* Fotoğraf */}
+                <View style={styles.photoContainer}>
+                  {birthday.photo ? (
+                    <Image 
+                      source={{ uri: birthday.photo }} 
+                      style={styles.birthdayPhoto}
+                    />
+                  ) : (
+                    <View style={styles.placeholderPhoto}>
+                      <Text style={styles.placeholderIcon}>👤</Text>
+                    </View>
+                  )}
                 </View>
-                <View style={styles.birthdayActions}>
+
+                {/* Bilgiler */}
+                <View style={styles.birthdayInfo}>
+                  <Text style={styles.birthdayName}>{birthday.name || 'İsimsiz'}</Text>
+                  <Text style={styles.birthdayDate}>{birthday.date}</Text>
+                  
+                  {/* Özel Not */}
+                  {birthday.customNote && (
+                    <Text style={styles.birthdayNote}>"{birthday.customNote}"</Text>
+                  )}
+                  
+                  {/* Yaklaşan Badge */}
                   <View style={styles.daysLeftBadge}>
-                    <Text style={styles.daysLeftText}>{birthday.daysLeft} gün</Text>
+                    <Text style={styles.daysLeftBadgeText}>
+                      {birthday.daysLeft === 0 
+                        ? '🎉 Bugün!' 
+                        : birthday.daysLeft === 1 
+                        ? '🎂 Yarın!' 
+                        : `⏰ ${birthday.daysLeft} gün kaldı`
+                      }
+                    </Text>
                   </View>
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity
-                      style={styles.actionButton}
-                      onPress={() => handleEditBirthday(birthday.id)}
-                    >
-                      <Text style={styles.actionButtonText}>✏️</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.deleteButton]}
-                      onPress={() => handleDeleteBirthday(birthday.id)}
-                    >
-                      <Text style={styles.actionButtonText}>🗑️</Text>
-                    </TouchableOpacity>
-                  </View>
+                </View>
+
+                {/* Aksiyon Butonları */}
+                <View style={styles.birthdayActions}>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => handleEditBirthday(birthday.id)}
+                  >
+                    <Text style={styles.actionButtonText}>✏️</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.deleteButton]}
+                    onPress={() => handleDeleteBirthday(birthday.id)}
+                  >
+                    <Text style={styles.actionButtonText}>🗑️</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}
@@ -116,43 +238,83 @@ export default function BirthdayReminderScreen({ navigation }) {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tüm Doğum Günleri</Text>
-          {filteredBirthdays.length > 0 ? (
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Doğum günleri yükleniyor...</Text>
+            </View>
+          ) : filteredBirthdays.length > 0 ? (
             filteredBirthdays.map((birthday) => (
               <View key={birthday.id} style={styles.birthdayCard}>
-                <View style={styles.birthdayInfo}>
-                  <Text style={styles.birthdayName}>{birthday.name}</Text>
-                  <Text style={styles.birthdayDate}>{birthday.date}</Text>
-                  <Text style={styles.birthdayAge}>
-                    {birthday.year} doğumlu
-                  </Text>
+                {/* Fotoğraf */}
+                <View style={styles.photoContainer}>
+                  {birthday.photo ? (
+                    <Image 
+                      source={{ uri: birthday.photo }} 
+                      style={styles.birthdayPhoto}
+                    />
+                  ) : (
+                    <View style={styles.placeholderPhoto}>
+                      <Text style={styles.placeholderIcon}>👤</Text>
+                    </View>
+                  )}
                 </View>
-                <View style={styles.birthdayActions}>
-                  <Text style={styles.daysLeftText}>
-                    {birthday.daysLeft > 30 ? `${birthday.daysLeft} gün` : 'Yaklaşıyor'}
-                  </Text>
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity
-                      style={styles.actionButton}
-                      onPress={() => handleEditBirthday(birthday.id)}
-                    >
-                      <Text style={styles.actionButtonText}>✏️</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.deleteButton]}
-                      onPress={() => handleDeleteBirthday(birthday.id)}
-                    >
-                      <Text style={styles.actionButtonText}>🗑️</Text>
-                    </TouchableOpacity>
+
+                {/* Bilgiler */}
+                <View style={styles.birthdayInfo}>
+                  <Text style={styles.birthdayName}>{birthday.name || 'İsimsiz'}</Text>
+                  <Text style={styles.birthdayDate}>{birthday.date}</Text>
+                  
+                  {/* Özel Not */}
+                  {birthday.customNote && (
+                    <Text style={styles.birthdayNote}>"{birthday.customNote}"</Text>
+                  )}
+                  
+                  {/* Gün Sayısı */}
+                  <View style={styles.daysLeftContainer}>
+                    <Text style={[
+                      styles.daysLeftText,
+                      birthday.daysLeft <= 7 && styles.urgentDaysLeft
+                    ]}>
+                      {birthday.daysLeft === 0 
+                        ? '🎉 Bugün!' 
+                        : birthday.daysLeft === 1 
+                        ? '🎂 Yarın!' 
+                        : birthday.daysLeft <= 7 
+                        ? `⏰ ${birthday.daysLeft} gün kaldı`
+                        : `📅 ${birthday.daysLeft} gün`
+                      }
+                    </Text>
                   </View>
+                </View>
+
+                {/* Aksiyon Butonları */}
+                <View style={styles.birthdayActions}>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => handleEditBirthday(birthday.id)}
+                  >
+                    <Text style={styles.actionButtonText}>✏️</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.deleteButton]}
+                    onPress={() => handleDeleteBirthday(birthday.id)}
+                  >
+                    <Text style={styles.actionButtonText}>🗑️</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateIcon}>🎂</Text>
-              <Text style={styles.emptyStateTitle}>Henüz doğum günü yok</Text>
+              <Text style={styles.emptyStateTitle}>
+                {searchText ? 'Arama sonucu bulunamadı' : 'Henüz doğum günü yok'}
+              </Text>
               <Text style={styles.emptyStateDescription}>
-                İlk doğum gününüzü ekleyerek başlayın
+                {searchText 
+                  ? 'Farklı bir isim deneyin' 
+                  : 'İlk doğum gününüzü ekleyerek başlayın'
+                }
               </Text>
             </View>
           )}
@@ -177,12 +339,13 @@ export default function BirthdayReminderScreen({ navigation }) {
             </View>
           </View>
         </View>
+        
+        <TouchableOpacity style={styles.addButton} onPress={handleAddBirthday}>
+          <Text style={styles.addButtonText}>+ Doğum Günü Ekle</Text>
+        </TouchableOpacity>
       </ScrollView>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleAddBirthday}>
-        <Text style={styles.addButtonText}>+ Doğum Günü Ekle</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+    </View>
+    </>
   );
 }
 
@@ -194,32 +357,17 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  header: {
-    backgroundColor: '#fff',
-    padding: 20,
-    marginBottom: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
   searchSection: {
     backgroundColor: '#fff',
-    padding: 20,
-    marginBottom: 10,
+    padding: spacing.lg,
+    marginBottom: spacing.sm,
   },
   searchInput: {
     backgroundColor: '#f8f9fa',
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
     borderRadius: 10,
-    fontSize: 16,
+    fontSize: fontSizes.medium,
   },
   section: {
     backgroundColor: '#fff',
@@ -234,63 +382,123 @@ const styles = StyleSheet.create({
   },
   birthdayCard: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
+    alignItems: 'flex-start',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   upcomingCard: {
-    backgroundColor: '#fff3cd',
+    backgroundColor: '#fff8e1',
     borderLeftWidth: 4,
     borderLeftColor: '#ff9500',
   },
-  birthdayInfo: {
-    flex: 1,
+  photoContainer: {
+    marginRight: spacing.md,
+    alignSelf: 'flex-start',
   },
-  birthdayName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+  birthdayPhoto: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#f0f0f0',
   },
-  birthdayDate: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 2,
+  placeholderPhoto: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#e8e8e8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#ddd',
+    borderStyle: 'dashed',
   },
-  birthdayAge: {
-    fontSize: 12,
+  placeholderIcon: {
+    fontSize: 24,
     color: '#999',
   },
+  birthdayInfo: {
+    flex: 1,
+    paddingRight: spacing.sm,
+  },
+  birthdayName: {
+    fontSize: fontSizes.medium,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: spacing.xs,
+  },
+  birthdayDate: {
+    fontSize: fontSizes.small,
+    color: '#666',
+    marginBottom: spacing.xs,
+  },
+  birthdayNote: {
+    fontSize: fontSizes.small,
+    color: '#007AFF',
+    fontStyle: 'italic',
+    marginBottom: spacing.xs,
+  },
+  daysLeftContainer: {
+    marginTop: spacing.xs,
+  },
   birthdayActions: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   daysLeftBadge: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: '#ff9500',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     borderRadius: 12,
-    marginBottom: 8,
+    marginTop: spacing.xs,
+  },
+  daysLeftBadgeText: {
+    color: '#fff',
+    fontSize: fontSizes.small,
+    fontWeight: '600',
   },
   daysLeftText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: fontSizes.small,
+    color: '#666',
+    fontWeight: '500',
   },
-  actionButtons: {
-    flexDirection: 'row',
+  urgentDaysLeft: {
+    color: '#ff3b30',
+    fontWeight: '600',
   },
   actionButton: {
-    padding: 8,
-    marginLeft: 5,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing.xs,
   },
   deleteButton: {
-    backgroundColor: '#ff3b30',
-    borderRadius: 6,
+    backgroundColor: '#ffebee',
   },
   actionButtonText: {
-    fontSize: 16,
+    fontSize: 18,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: fontSizes.medium,
+    color: '#666',
   },
   emptyState: {
     alignItems: 'center',

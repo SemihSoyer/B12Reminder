@@ -5,9 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   Alert,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import CustomHeader from '../../components/common/CustomHeader';
+import { fontSizes, spacing } from '../../constants/responsive';
 
 export default function MedicationReminderScreen({ navigation }) {
   const [medications, setMedications] = useState([
@@ -93,14 +95,15 @@ export default function MedicationReminderScreen({ navigation }) {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>İlaç Hatırlatma</Text>
-          <Text style={styles.headerSubtitle}>
-            İlaçlarınızı zamanında almayı unutmayın
-          </Text>
-        </View>
+    <>
+      <StatusBar style="dark" backgroundColor="#f8f9fa" />
+      <CustomHeader 
+        title="İlaç Hatırlatma"
+        onBackPress={() => navigation.goBack()}
+        backgroundColor="#f8f9fa"
+      />
+      <View style={styles.container}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
         <View style={styles.statsSection}>
           <Text style={styles.sectionTitle}>Bugün</Text>
@@ -259,12 +262,13 @@ export default function MedicationReminderScreen({ navigation }) {
             </View>
           </View>
         </View>
+        
+        <TouchableOpacity style={styles.addButton} onPress={handleAddMedication}>
+          <Text style={styles.addButtonText}>+ İlaç Ekle</Text>
+        </TouchableOpacity>
       </ScrollView>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleAddMedication}>
-        <Text style={styles.addButtonText}>+ İlaç Ekle</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+    </View>
+    </>
   );
 }
 
@@ -275,21 +279,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-  },
-  header: {
-    backgroundColor: '#fff',
-    padding: 20,
-    marginBottom: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
   },
   statsSection: {
     backgroundColor: '#fff',
