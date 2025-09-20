@@ -6,15 +6,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function FeatureCard({ 
   icon, 
   title, 
-  value, 
   gradientColors,
   onPress,
   iconColor = '#FFFFFF',
-  iconBackgroundColor = 'rgba(255, 255, 255, 0.2)'
+  iconBackgroundColor = 'rgba(255, 255, 255, 0.25)',
+  iconType = 'ionicon' // 'ionicon' veya 'emoji'
 }) {
   return (
     <TouchableOpacity 
@@ -28,15 +29,19 @@ export default function FeatureCard({
         end={{ x: 1, y: 1 }}
         style={styles.card}
       >
-        <View style={styles.topRow}>
+        <View style={styles.cardContent}>
           <View style={[styles.iconContainer, { backgroundColor: iconBackgroundColor }]}>
-            <Text style={[styles.icon, { color: iconColor }]}>{icon}</Text>
+            {iconType === 'ionicon' ? (
+              <Ionicons 
+                name={icon} 
+                size={24} 
+                color={iconColor} 
+              />
+            ) : (
+              <Text style={[styles.icon, { color: iconColor }]}>{icon}</Text>
+            )}
           </View>
           <Text style={styles.title}>{title}</Text>
-        </View>
-        
-        <View style={styles.bottomRow}>
-          <Text style={styles.value}>{value}</Text>
         </View>
       </LinearGradient>
     </TouchableOpacity>
@@ -60,43 +65,32 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    height: 120,
+    height: 80,
     borderRadius: 24,
     padding: 20,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
-  topRow: {
+  cardContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   icon: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '600',
   },
   title: {
     fontSize: 16,
     fontWeight: '500',
     color: '#FFFFFF',
-    textAlign: 'right',
+    marginLeft: 12,
     flex: 1,
-    marginLeft: 10,
-  },
-  bottomRow: {
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-  },
-  value: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    lineHeight: 40,
   },
 });
