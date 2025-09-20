@@ -16,29 +16,29 @@ export default function DashboardScreen({ navigation }) {
       icon: '📚',
       title: 'Doğum Günü',
       value: '12',
-      backgroundColor: '#FF9F43',
-      iconBackgroundColor: 'rgba(139, 69, 19, 0.3)',
+      gradientColors: ['#FF9A8B', '#FF6A88', '#FF99AC'],
+      iconBackgroundColor: 'rgba(255, 255, 255, 0.25)',
       iconColor: '#8B4513',
       screen: 'BirthdayReminder'
     },
     {
       id: 'medication',
-      icon: '⏰',
+      icon: '💊',
       title: 'İlaçlar',
       value: '5',
-      backgroundColor: '#A29BFE',
-      iconBackgroundColor: 'rgba(72, 61, 139, 0.3)',
-      iconColor: '#483D8B',
+      gradientColors: ['#A8EDEA', '#74B9FF', '#0984E3'],
+      iconBackgroundColor: 'rgba(255, 255, 255, 0.25)',
+      iconColor: '#2D3436',
       screen: 'MedicationReminder'
     },
     {
       id: 'custom',
-      icon: '⏰',
+      icon: '⚡',
       title: 'Özel',
       value: '8',
-      backgroundColor: '#6C5CE7',
-      iconBackgroundColor: 'rgba(75, 0, 130, 0.3)',
-      iconColor: '#4B0082',
+      gradientColors: ['#D63031', '#E84393', '#A29BFE'],
+      iconBackgroundColor: 'rgba(255, 255, 255, 0.25)',
+      iconColor: '#2D3436',
       screen: 'CustomReminders'
     },
     {
@@ -46,9 +46,9 @@ export default function DashboardScreen({ navigation }) {
       icon: '📅',
       title: 'Regl Takibi',
       value: '28',
-      backgroundColor: '#00B894',
-      iconBackgroundColor: 'rgba(0, 100, 0, 0.3)',
-      iconColor: '#006400',
+      gradientColors: ['#00B894', '#00CEC9', '#81ECEC'],
+      iconBackgroundColor: 'rgba(255, 255, 255, 0.25)',
+      iconColor: '#2D3436',
       screen: 'MenstrualTracking'
     }
   ];
@@ -82,7 +82,7 @@ export default function DashboardScreen({ navigation }) {
                   icon={card.icon}
                   title={card.title}
                   value={card.value}
-                  backgroundColor={card.backgroundColor}
+                  gradientColors={card.gradientColors}
                   iconBackgroundColor={card.iconBackgroundColor}
                   iconColor={card.iconColor}
                   onPress={() => handleCardPress(card.screen)}

@@ -5,52 +5,65 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function FeatureCard({ 
   icon, 
   title, 
   value, 
-  backgroundColor, 
+  gradientColors,
   onPress,
   iconColor = '#FFFFFF',
-  iconBackgroundColor = 'rgba(0, 0, 0, 0.2)'
+  iconBackgroundColor = 'rgba(255, 255, 255, 0.2)'
 }) {
   return (
     <TouchableOpacity 
-      style={[styles.card, { backgroundColor }]} 
+      style={styles.cardContainer} 
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <View style={styles.topRow}>
-        <View style={[styles.iconContainer, { backgroundColor: iconBackgroundColor }]}>
-          <Text style={[styles.icon, { color: iconColor }]}>{icon}</Text>
+      <LinearGradient
+        colors={gradientColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.card}
+      >
+        <View style={styles.topRow}>
+          <View style={[styles.iconContainer, { backgroundColor: iconBackgroundColor }]}>
+            <Text style={[styles.icon, { color: iconColor }]}>{icon}</Text>
+          </View>
+          <Text style={styles.title}>{title}</Text>
         </View>
-        <Text style={styles.title}>{title}</Text>
-      </View>
-      
-      <View style={styles.bottomRow}>
-        <Text style={styles.value}>{value}</Text>
-      </View>
+        
+        <View style={styles.bottomRow}>
+          <Text style={styles.value}>{value}</Text>
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  cardContainer: {
     width: '48%',
-    height: 120,
-    borderRadius: 20,
-    padding: 18,
     marginBottom: 16,
-    justifyContent: 'space-between',
+    // Enhanced shadow for iOS
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 8,
     },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    // Enhanced shadow for Android
+    elevation: 12,
+  },
+  card: {
+    width: '100%',
+    height: 120,
+    borderRadius: 24,
+    padding: 20,
+    justifyContent: 'space-between',
   },
   topRow: {
     flexDirection: 'row',

@@ -4,7 +4,6 @@ import BottomTabNavigator from './BottomTabNavigator';
 
 // Feature Screens
 import BirthdayReminderScreen from '../screens/features/BirthdayReminderScreen';
-import AddBirthdayScreen from '../screens/features/AddBirthdayScreen';
 import MenstrualTrackingScreen from '../screens/features/MenstrualTrackingScreen';
 import MedicationReminderScreen from '../screens/features/MedicationReminderScreen';
 import CustomRemindersScreen from '../screens/features/CustomRemindersScreen';
@@ -25,10 +24,6 @@ export default function MainNavigator() {
       <Stack.Screen 
         name="BirthdayReminder" 
         component={BirthdayReminderScreen}
-      />
-      <Stack.Screen 
-        name="AddBirthday" 
-        component={AddBirthdayScreen}
       />
       <Stack.Screen 
         name="MenstrualTracking" 

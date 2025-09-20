@@ -6,13 +6,19 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
 export default function CustomTabBar({ state, descriptors, navigation }) {
   return (
     <View style={styles.container}>
-      <View style={styles.tabBar}>
+      <LinearGradient
+        colors={['#00B894', '#00CEC9', '#74B9FF']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.tabBar}
+      >
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const isFocused = state.index === index;
@@ -52,20 +58,32 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
               ]}
               activeOpacity={0.7}
             >
-              <View style={[
-                styles.iconContainer,
-                isFocused && styles.activeIconContainer
-              ]}>
-                <Ionicons
-                  name={getIconName(route.name, isFocused)}
-                  size={26}
-                  color={isFocused ? '#1C1C1E' : '#8E8E93'}
-                />
-              </View>
+{isFocused ? (
+                <LinearGradient
+                  colors={['#FFFFFF', '#F8F9FA']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={[styles.iconContainer, styles.activeIconContainer]}
+                >
+                  <Ionicons
+                    name={getIconName(route.name, isFocused)}
+                    size={26}
+                    color="#00B894"
+                  />
+                </LinearGradient>
+              ) : (
+                <View style={styles.iconContainer}>
+                  <Ionicons
+                    name={getIconName(route.name, isFocused)}
+                    size={26}
+                    color="rgba(255, 255, 255, 0.7)"
+                  />
+                </View>
+              )}
             </TouchableOpacity>
           );
         })}
-      </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -82,18 +100,17 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#1C1C1E',
     borderRadius: 35,
     paddingVertical: 8,
     paddingHorizontal: 15,
     justifyContent: 'space-around',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: '#00B894',
     shadowOffset: {
       width: 0,
       height: 15,
     },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 25,
     elevation: 15,
   },
@@ -101,13 +118,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   activeTabItem: {
     // Active tab için ekstra stil gerekirse
   },
   iconContainer: {
-    width: 56,
+    width: 70,
     height: 56,
     borderRadius: 28,
     justifyContent: 'center',
@@ -115,14 +132,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   activeIconContainer: {
-    backgroundColor: '#FFFFFF',
     shadowColor: '#FFFFFF',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 8,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
   },
 });
