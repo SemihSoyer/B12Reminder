@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { FONT_STYLES } from '../../constants/fonts';
 
 export default function FeatureCard({ 
   icon, 
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 80,
     borderRadius: 24,
-    padding: 20,
+    padding: 16,
     justifyContent: 'center',
   },
   cardContent: {
@@ -87,10 +88,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   title: {
-    fontSize: 16,
-    fontWeight: '500',
+    ...FONT_STYLES.cardTitle,
+    fontSize: 14, // cardTitle'dan daha küçük
     color: '#FFFFFF',
-    marginLeft: 12,
+    marginLeft: 10,
     flex: 1,
+    flexWrap: 'wrap',
+    textAlign: 'left',
   },
 });

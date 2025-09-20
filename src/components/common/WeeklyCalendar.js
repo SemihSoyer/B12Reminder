@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { deviceSizes, getResponsiveValue, screenWidth } from '../../constants/responsive';
+import { FONT_FAMILIES } from '../../constants/fonts';
 
 export default function WeeklyCalendar() {
   const [weekDays, setWeekDays] = useState([]);
@@ -130,17 +131,17 @@ const styles = StyleSheet.create({
   },
   dayName: {
     fontSize: getResponsiveValue(10, 11, 12),
-    fontWeight: '500',
+    fontFamily: FONT_FAMILIES.medium,
     color: '#666',
     marginBottom: getResponsiveValue(2, 3, 4),
   },
   activeDayName: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontFamily: FONT_FAMILIES.semiBold,
   },
   dayNumber: {
     fontSize: getResponsiveValue(16, 17, 18),
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILIES.bold,
     color: '#333',
   },
   activeDayNumber: {

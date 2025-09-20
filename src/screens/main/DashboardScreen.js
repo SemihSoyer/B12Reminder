@@ -48,7 +48,7 @@ export default function DashboardScreen({ navigation }) {
       id: 'menstrual',
       icon: 'calendar-outline',
       iconType: 'ionicon',
-      title: 'Regl Takibi',
+      title: 'Regl Takip',
       gradientColors: ['#00B894', '#00CEC9', '#81ECEC'],
       iconBackgroundColor: 'rgba(255, 255, 255, 0.25)',
       iconColor: '#FFFFFF',

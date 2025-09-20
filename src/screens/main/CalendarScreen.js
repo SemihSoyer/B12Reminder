@@ -5,6 +5,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { FONT_STYLES } from '../../constants/fonts';
 
 export default function CalendarScreen({ navigation }) {
   return (
@@ -29,13 +30,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    ...FONT_STYLES.heading1,
     color: '#333',
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 16,
+    ...FONT_STYLES.bodyLarge,
     color: '#666',
     textAlign: 'center',
   },

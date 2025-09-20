@@ -1,12 +1,14 @@
 import React from 'react';
 import {
   View,
+  Text,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FONT_FAMILIES } from '../../constants/fonts';
 
 const { width } = Dimensions.get('window');
 

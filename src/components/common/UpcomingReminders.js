@@ -5,6 +5,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { getResponsiveValue, spacing, fontSizes } from '../../constants/responsive';
+import { FONT_FAMILIES, FONT_STYLES } from '../../constants/fonts';
 
 export default function UpcomingReminders({ upcomingReminders = [] }) {
   const hasUpcoming = upcomingReminders && upcomingReminders.length > 0;
@@ -54,8 +55,7 @@ const styles = StyleSheet.create({
     paddingBottom: 120, // Tab bar için alan
   },
   sectionTitle: {
-    fontSize: fontSizes.large,
-    fontWeight: '600',
+    ...FONT_STYLES.heading3,
     color: '#1a1a1a',
     marginBottom: spacing.md,
   },
@@ -98,8 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemTitle: {
-    fontSize: fontSizes.medium,
-    fontWeight: '400',
+    ...FONT_STYLES.bodyMedium,
     color: '#1a1a1a',
     marginBottom: 2,
   },
@@ -108,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemDate: {
-    fontSize: fontSizes.small,
+    ...FONT_STYLES.bodySmall,
     color: '#666',
   },
   separator: {
@@ -119,9 +118,8 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.xs,
   },
   itemDays: {
-    fontSize: fontSizes.small,
+    ...FONT_STYLES.emphasisSmall,
     color: '#00B894',
-    fontWeight: '500',
   },
   itemIcon: {
     fontSize: 18,

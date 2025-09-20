@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getResponsiveValue, spacing, fontSizes } from '../../constants/responsive';
+import { FONT_FAMILIES, FONT_STYLES } from '../../constants/fonts';
 
 export default function DailyReminders({ reminders = [] }) {
   const hasReminders = reminders && reminders.length > 0;
@@ -57,8 +58,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   sectionTitle: {
-    fontSize: fontSizes.large,
-    fontWeight: '600',
+    ...FONT_STYLES.heading3,
     color: '#1a1a1a',
     marginBottom: spacing.md,
   },
@@ -81,13 +81,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   emptyText: {
-    fontSize: fontSizes.medium,
-    fontWeight: '500',
+    ...FONT_STYLES.emphasisMedium,
     color: '#333',
     marginBottom: spacing.xs,
   },
   emptySubtext: {
-    fontSize: fontSizes.small,
+    ...FONT_STYLES.bodySmall,
     color: '#666',
   },
   listContainer: {
@@ -129,8 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemTitle: {
-    fontSize: fontSizes.medium,
-    fontWeight: '400',
+    ...FONT_STYLES.bodyMedium,
     color: '#1a1a1a',
     marginBottom: 2,
   },
@@ -139,9 +137,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemTime: {
-    fontSize: fontSizes.small,
+    ...FONT_STYLES.emphasisSmall,
     color: '#666',
-    fontWeight: '500',
   },
   separator: {
     width: 4,
@@ -151,7 +148,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.xs,
   },
   itemCategory: {
-    fontSize: fontSizes.small,
+    ...FONT_STYLES.bodySmall,
     color: '#666',
   },
   itemIcon: {
