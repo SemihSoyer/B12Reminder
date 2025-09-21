@@ -77,6 +77,7 @@ export const BirthdayService = {
                  birthday.date &&
                  typeof birthday.name === 'string' &&
                  typeof birthday.date === 'string';
+          // Note alanı isteğe bağlı, kontrol etmiyoruz
         })
         .map(birthday => ({
           ...birthday,

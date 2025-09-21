@@ -44,6 +44,9 @@ export default function BirthdayList({ birthdays = [], onDelete }) {
             <View style={styles.separator} />
             <Text style={styles.daysText}>{item.daysLeft} gün kaldı</Text>
           </View>
+          {item.note && item.note.trim() && (
+            <Text style={styles.itemNote}>{item.note}</Text>
+          )}
         </View>
         <Text style={styles.itemIcon}>🎂</Text>
         <TouchableOpacity 
@@ -138,6 +141,13 @@ const styles = StyleSheet.create({
   daysText: {
     ...FONT_STYLES.bodySmall,
     color: '#FF6A88',
+  },
+  itemNote: {
+    ...FONT_STYLES.bodySmall,
+    color: '#888',
+    fontStyle: 'italic',
+    marginTop: 4,
+    lineHeight: 16,
   },
   itemIcon: {
     fontSize: 18,

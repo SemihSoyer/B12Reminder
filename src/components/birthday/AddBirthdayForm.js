@@ -14,7 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
-import DatePickerModal from './DatePickerModal';
+import WheelDatePicker from './WheelDatePicker';
 
 export default function AddBirthdayForm({ 
   visible, 
@@ -24,6 +24,7 @@ export default function AddBirthdayForm({
 }) {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
+  const [note, setNote] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDateObject, setSelectedDateObject] = useState(null);
 
@@ -89,6 +90,7 @@ export default function AddBirthdayForm({
     const newBirthday = {
       name: name.trim(),
       date: date.trim(),
+      note: note.trim(), // Özel not eklendi
       daysLeft: selectedDate ? calculateDaysLeft(selectedDate) : 
                 selectedDateObject ? calculateDaysLeft(selectedDateObject) : 0
     };
@@ -99,12 +101,14 @@ export default function AddBirthdayForm({
     // Formu temizle ve kapat
     setName('');
     setDate('');
+    setNote('');
     onClose();
   };
 
   const handleCancel = () => {
     setName('');
     setDate('');
+    setNote('');
     setSelectedDateObject(null);
     onClose();
   };
@@ -206,6 +210,22 @@ export default function AddBirthdayForm({
               )}
             </View>
 
+            <View style={styles.inputSection}>
+              <Text style={styles.label}>Özel Not (İsteğe bağlı)</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons name="document-text-outline" size={20} color="#666" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  value={note}
+                  onChangeText={setNote}
+                  placeholder="Örn: Hediye almayı unutma!"
+                  placeholderTextColor="#999"
+                  multiline={true}
+                  numberOfLines={2}
+                />
+              </View>
+            </View>
+
             {/* Bilgi Notu */}
             <View style={styles.infoContainer}>
               <Ionicons name="information-circle-outline" size={16} color="#666" />
@@ -216,12 +236,13 @@ export default function AddBirthdayForm({
           </View>
         </LinearGradient>
 
-        {/* Date Picker Modal */}
-        <DatePickerModal
+        {/* Wheel Date Picker */}
+        <WheelDatePicker
           visible={showDatePicker}
           onClose={handleDatePickerClose}
           onDateSelect={handleDatePickerSelect}
-          initialDate={selectedDateObject}
+          initialDay={selectedDateObject ? selectedDateObject.getDate() : 1}
+          initialMonth={selectedDateObject ? selectedDateObject.getMonth() : 0}
         />
       </KeyboardAvoidingView>
     </Modal>
