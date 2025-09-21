@@ -37,7 +37,13 @@ export default function BirthdayReminderScreen({ navigation }) {
     try {
       setLoading(true);
       const storedBirthdays = await BirthdayService.getAllBirthdays();
-      setBirthdays(storedBirthdays);
+      
+      // Doğum günlerini yakınlık sırasına göre sırala (en yakın önce)
+      const sortedBirthdays = storedBirthdays.sort((a, b) => {
+        return a.daysLeft - b.daysLeft;
+      });
+      
+      setBirthdays(sortedBirthdays);
     } catch (error) {
       console.error('Error loading birthdays:', error);
       Alert.alert('Hata', 'Doğum günleri yüklenirken bir hata oluştu.');
@@ -64,8 +70,12 @@ export default function BirthdayReminderScreen({ navigation }) {
       const savedBirthday = await BirthdayService.addBirthday(newBirthday);
       
       if (savedBirthday) {
-        // State'i güncelle
-        setBirthdays(prevBirthdays => [...prevBirthdays, savedBirthday]);
+        // State'i güncelle ve sırala
+        setBirthdays(prevBirthdays => {
+          const updatedBirthdays = [...prevBirthdays, savedBirthday];
+          // Yakınlık sırasına göre sırala
+          return updatedBirthdays.sort((a, b) => a.daysLeft - b.daysLeft);
+        });
         
         // Başarı mesajı
         Alert.alert(

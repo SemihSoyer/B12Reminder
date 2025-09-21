@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
+import DatePickerModal from './DatePickerModal';
 
 export default function AddBirthdayForm({ 
   visible, 
@@ -23,6 +24,8 @@ export default function AddBirthdayForm({
 }) {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDateObject, setSelectedDateObject] = useState(null);
 
   // Türkçe ay isimleri
   const monthNames = [
@@ -86,7 +89,8 @@ export default function AddBirthdayForm({
     const newBirthday = {
       name: name.trim(),
       date: date.trim(),
-      daysLeft: selectedDate ? calculateDaysLeft(selectedDate) : 0
+      daysLeft: selectedDate ? calculateDaysLeft(selectedDate) : 
+                selectedDateObject ? calculateDaysLeft(selectedDateObject) : 0
     };
 
     // Parent komponente gönder
@@ -101,7 +105,22 @@ export default function AddBirthdayForm({
   const handleCancel = () => {
     setName('');
     setDate('');
+    setSelectedDateObject(null);
     onClose();
+  };
+
+  const handleDatePickerOpen = () => {
+    setShowDatePicker(true);
+  };
+
+  const handleDatePickerClose = () => {
+    setShowDatePicker(false);
+  };
+
+  const handleDatePickerSelect = (dateObject, dateString) => {
+    setSelectedDateObject(dateObject);
+    setDate(dateString);
+    setShowDatePicker(false);
   };
 
   return (
@@ -161,19 +180,29 @@ export default function AddBirthdayForm({
 
             <View style={styles.inputSection}>
               <Text style={styles.label}>Tarih</Text>
-              <View style={styles.inputContainer}>
+              <TouchableOpacity 
+                style={styles.inputContainer}
+                onPress={selectedDate ? undefined : handleDatePickerOpen}
+                activeOpacity={selectedDate ? 1 : 0.7}
+              >
                 <Ionicons name="calendar-outline" size={20} color="#666" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={date}
-                  onChangeText={setDate}
-                  placeholder="Örn: 15 Ocak"
+                  placeholder="Tarih seçmek için tıklayın"
                   placeholderTextColor="#999"
-                  editable={!selectedDate} // Takvimden seçilmişse düzenlenemez
+                  editable={false} // Her zaman sadece modal ile seçim
+                  pointerEvents="none"
                 />
-              </View>
+                {!selectedDate && (
+                  <Ionicons name="chevron-down" size={20} color="#999" style={styles.dropdownIcon} />
+                )}
+              </TouchableOpacity>
               {selectedDate && (
                 <Text style={styles.dateHint}>Takvimden seçilen tarih</Text>
+              )}
+              {!selectedDate && date && (
+                <Text style={styles.dateHint}>Manuel seçilen tarih</Text>
               )}
             </View>
 
@@ -186,6 +215,14 @@ export default function AddBirthdayForm({
             </View>
           </View>
         </LinearGradient>
+
+        {/* Date Picker Modal */}
+        <DatePickerModal
+          visible={showDatePicker}
+          onClose={handleDatePickerClose}
+          onDateSelect={handleDatePickerSelect}
+          initialDate={selectedDateObject}
+        />
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -258,6 +295,9 @@ const styles = StyleSheet.create({
   },
   inputIcon: {
     marginRight: spacing.sm,
+  },
+  dropdownIcon: {
+    marginLeft: spacing.sm,
   },
   input: {
     flex: 1,

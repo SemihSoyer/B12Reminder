@@ -91,13 +91,13 @@ export default function MonthlyCalendar({ birthdays = [], onDateSelect }) {
     return date.toDateString() === today.toDateString();
   };
 
-  // Bu tarihte doğum günü var mı kontrol et
-  const hasBirthday = (date) => {
+  // Bu tarihte kaç doğum günü var kontrol et
+  const getBirthdayCount = (date) => {
     if (!birthdays || !Array.isArray(birthdays)) {
-      return false;
+      return 0;
     }
 
-    return birthdays.some(birthday => {
+    const count = birthdays.filter(birthday => {
       // Null/undefined kontrolü
       if (!birthday || !birthday.date || typeof birthday.date !== 'string') {
         return false;
@@ -116,7 +116,41 @@ export default function MonthlyCalendar({ birthdays = [], onDateSelect }) {
         console.warn('Error checking birthday for date:', error);
         return false;
       }
-    });
+    }).length;
+
+    return count;
+  };
+
+  // Bu tarihte doğum günü var mı kontrol et (geriye uyumluluk için)
+  const hasBirthday = (date) => {
+    return getBirthdayCount(date) > 0;
+  };
+
+  // Çoklu doğum günü noktaları gösterimi
+  const renderBirthdayIndicators = (count) => {
+    if (count === 0) return null;
+    
+    // Maksimum 3 nokta göster
+    const displayCount = Math.min(count, 3);
+    const dots = [];
+    
+    for (let i = 0; i < displayCount; i++) {
+      dots.push(
+        <View
+          key={i}
+          style={[
+            styles.birthdayDot,
+            { marginHorizontal: displayCount > 1 ? 1 : 0 }
+          ]}
+        />
+      );
+    }
+    
+    return (
+      <View style={styles.birthdayIndicators}>
+        {dots}
+      </View>
+    );
   };
 
   const days = getDaysInMonth();
@@ -157,48 +191,58 @@ export default function MonthlyCalendar({ birthdays = [], onDateSelect }) {
 
       {/* Takvim Grid */}
       <View style={styles.calendarGrid}>
-        {days.map((dayObj, index) => {
-          const isCurrentDay = isToday(dayObj.date);
-          const hasBirthdayToday = hasBirthday(dayObj.date);
-          
-          return (
-            <TouchableOpacity
-              key={index}
-              style={styles.dayContainer}
-              onPress={() => onDateSelect && onDateSelect(dayObj.date)}
-              activeOpacity={0.7}
-            >
-              {isCurrentDay ? (
-                <LinearGradient
-                  colors={['#FF9A8B', '#FF6A88']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.dayButton}
-                >
-                  <Text style={[styles.dayText, styles.todayText]}>
-                    {dayObj.day}
-                  </Text>
-                </LinearGradient>
-              ) : hasBirthdayToday ? (
-                <View style={[styles.dayButton, styles.birthdayDay]}>
-                  <Text style={[styles.dayText, styles.birthdayText]}>
-                    {dayObj.day}
-                  </Text>
-                  <View style={styles.birthdayIndicator} />
+          {days.map((dayObj, index) => {
+            const isCurrentDay = isToday(dayObj.date);
+            const birthdayCount = getBirthdayCount(dayObj.date);
+            const hasBirthdayToday = birthdayCount > 0;
+            
+            // Diğer ayların günlerini gösterme
+            if (!dayObj.isCurrentMonth) {
+              return (
+                <View key={index} style={styles.dayContainer}>
+                  <View style={styles.dayButton}>
+                    {/* Boş alan - diğer ayların günleri gösterilmez */}
+                  </View>
                 </View>
-              ) : (
-                <View style={styles.dayButton}>
-                  <Text style={[
-                    styles.dayText,
-                    !dayObj.isCurrentMonth && styles.otherMonthText
-                  ]}>
-                    {dayObj.day}
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          );
-        })}
+              );
+            }
+            
+            return (
+              <TouchableOpacity
+                key={index}
+                style={styles.dayContainer}
+                onPress={() => onDateSelect && onDateSelect(dayObj.date)}
+                activeOpacity={0.7}
+              >
+                {isCurrentDay ? (
+                  <LinearGradient
+                    colors={['#FF9A8B', '#FF6A88']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.dayButton}
+                  >
+                    <Text style={[styles.dayText, styles.todayText]}>
+                      {dayObj.day}
+                    </Text>
+                    {hasBirthdayToday && renderBirthdayIndicators(birthdayCount)}
+                  </LinearGradient>
+                ) : hasBirthdayToday ? (
+                  <View style={[styles.dayButton, styles.birthdayDay]}>
+                    <Text style={[styles.dayText, styles.birthdayText]}>
+                      {dayObj.day}
+                    </Text>
+                    {renderBirthdayIndicators(birthdayCount)}
+                  </View>
+                ) : (
+                  <View style={styles.dayButton}>
+                    <Text style={styles.dayText}>
+                      {dayObj.day}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
       </View>
     </View>
   );
@@ -289,6 +333,19 @@ const styles = StyleSheet.create({
   birthdayIndicator: {
     position: 'absolute',
     bottom: 4,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#FF6A88',
+  },
+  birthdayIndicators: {
+    position: 'absolute',
+    bottom: 4,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  birthdayDot: {
     width: 4,
     height: 4,
     borderRadius: 2,
