@@ -1,43 +1,248 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
+import { spacing } from '../../constants/responsive';
+import { BirthdayService } from '../../utils/storage';
+
+// Components
+import BirthdayList from '../../components/birthday/BirthdayList';
+import EmptyState from '../../components/birthday/EmptyState';
+import AddBirthdayButton from '../../components/birthday/AddBirthdayButton';
+import MonthlyCalendar from '../../components/birthday/MonthlyCalendar';
+import AddBirthdayForm from '../../components/birthday/AddBirthdayForm';
 
 export default function BirthdayReminderScreen({ navigation }) {
+  // State'ler
+  const [birthdays, setBirthdays] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedDateForForm, setSelectedDateForForm] = useState(null);
+
+  // Sayfa yüklendiğinde doğum günlerini getir
+  useEffect(() => {
+    loadBirthdays();
+  }, []);
+
+  const loadBirthdays = async () => {
+    try {
+      setLoading(true);
+      const storedBirthdays = await BirthdayService.getAllBirthdays();
+      setBirthdays(storedBirthdays);
+    } catch (error) {
+      console.error('Error loading birthdays:', error);
+      Alert.alert('Hata', 'Doğum günleri yüklenirken bir hata oluştu.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddBirthday = () => {
+    // Butondan ekleme - tarih seçilmemiş
+    setSelectedDateForForm(null);
+    setShowAddForm(true);
+  };
+
+  const handleDateSelect = (date) => {
+    // Takvimden ekleme - tarih önceden seçilmiş
+    setSelectedDateForForm(date);
+    setShowAddForm(true);
+  };
+
+  const handleFormAdd = async (newBirthday) => {
+    try {
+      // AsyncStorage'a kaydet
+      const savedBirthday = await BirthdayService.addBirthday(newBirthday);
+      
+      if (savedBirthday) {
+        // State'i güncelle
+        setBirthdays(prevBirthdays => [...prevBirthdays, savedBirthday]);
+        
+        // Başarı mesajı
+        Alert.alert(
+          'Başarılı!',
+          `${newBirthday.name} için doğum günü hatırlatıcısı eklendi.`,
+          [{ text: 'Tamam', style: 'default' }]
+        );
+      } else {
+        Alert.alert('Hata', 'Doğum günü eklenirken bir hata oluştu.');
+      }
+    } catch (error) {
+      console.error('Error adding birthday:', error);
+      Alert.alert('Hata', 'Doğum günü eklenirken bir hata oluştu.');
+    }
+  };
+
+  const handleDelete = async (birthday) => {
+    try {
+      const success = await BirthdayService.deleteBirthday(birthday.id);
+      
+      if (success) {
+        // State'den kaldır
+        setBirthdays(prevBirthdays => 
+          prevBirthdays.filter(item => item.id !== birthday.id)
+        );
+        
+        // Başarı mesajı
+        Alert.alert(
+          'Silindi!',
+          `${birthday.name} için doğum günü hatırlatıcısı silindi.`,
+          [{ text: 'Tamam', style: 'default' }]
+        );
+      } else {
+        Alert.alert('Hata', 'Doğum günü silinirken bir hata oluştu.');
+      }
+    } catch (error) {
+      console.error('Error deleting birthday:', error);
+      Alert.alert('Hata', 'Doğum günü silinirken bir hata oluştu.');
+    }
+  };
+
+  const handleFormClose = () => {
+    setShowAddForm(false);
+    setSelectedDateForForm(null);
+  };
+
+  const hasBirthdays = birthdays && birthdays.length > 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Doğum Günü Hatırlatıcısı</Text>
-        <Text style={styles.subtitle}>Doğum günü özellikleri buraya gelecek</Text>
-      </View>
-    </SafeAreaView>
+    <>
+      <LinearGradient
+        colors={['#F7F7F7', '#FAFAFA', '#F5F5F5']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.gradientContainer}
+      >
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
+              </TouchableOpacity>
+                <Text style={styles.title}>Doğum Günü Hatırlatıcıları</Text>
+                <View style={styles.headerSpacer} />
+              </View>
+          </View>
+
+          {/* Content */}
+          <ScrollView 
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {/* Takvim */}
+            <MonthlyCalendar 
+              birthdays={birthdays}
+              onDateSelect={handleDateSelect}
+            />
+
+            {/* Doğum Günü Listesi */}
+            <View style={styles.listSection}>
+              <Text style={styles.sectionTitle}>
+                {hasBirthdays ? 'Kayıtlı Doğum Günleri' : 'Doğum Günleri'}
+              </Text>
+              {hasBirthdays ? (
+                <BirthdayList 
+                  birthdays={birthdays} 
+                  onDelete={handleDelete}
+                />
+              ) : (
+                <EmptyState />
+              )}
+            </View>
+          </ScrollView>
+
+          {/* Add Button */}
+          <View style={styles.buttonSection}>
+            <AddBirthdayButton onPress={handleAddBirthday} />
+          </View>
+        </SafeAreaView>
+
+        {/* Add Birthday Form Modal */}
+        <AddBirthdayForm
+          visible={showAddForm}
+          onClose={handleFormClose}
+          onAdd={handleFormAdd}
+          selectedDate={selectedDateForForm}
+        />
+      </LinearGradient>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: 'transparent',
   },
-  content: {
-    flex: 1,
+  header: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
   title: {
     ...FONT_STYLES.heading1,
-    color: '#333',
-    marginBottom: 10,
+    color: '#1a1a1a',
+    flex: 1,
+    textAlign: 'center',
+    marginHorizontal: spacing.sm,
+  },
+  headerSpacer: {
+    width: 40,
   },
   subtitle: {
-    ...FONT_STYLES.bodyLarge,
+    ...FONT_STYLES.bodyMedium,
     color: '#666',
-    textAlign: 'center',
+  },
+  content: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+  },
+  listSection: {
+    marginTop: spacing.md,
+  },
+  sectionTitle: {
+    ...FONT_STYLES.heading3,
+    color: '#1a1a1a',
+    marginBottom: spacing.md,
+  },
+  buttonSection: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+    paddingTop: spacing.md,
   },
 });
