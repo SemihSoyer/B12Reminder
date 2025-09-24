@@ -211,3 +211,51 @@ export const BirthdayService = {
   }
 };
 
+// İlaç servisi
+export const MedicationService = {
+  // Tüm ilaçları getir
+  async getAllMedications() {
+    try {
+      const medications = await StorageService.getItem(STORAGE_KEYS.MEDICATIONS);
+      return medications || [];
+    } catch (error) {
+      console.error('Error getting medications:', error);
+      return [];
+    }
+  },
+
+  // Yeni ilaç ekle
+  async addMedication(medication) {
+    try {
+      const currentMedications = await this.getAllMedications();
+      const newMedication = {
+        ...medication,
+        id: `med_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: new Date().toISOString(),
+      };
+      
+      const updatedMedications = [...currentMedications, newMedication];
+      await StorageService.setItem(STORAGE_KEYS.MEDICATIONS, updatedMedications);
+      
+      return newMedication;
+    } catch (error) {
+      console.error('Error adding medication:', error);
+      return null;
+    }
+  },
+
+  // İlaç sil
+  async deleteMedication(medicationId) {
+    try {
+      const currentMedications = await this.getAllMedications();
+      const updatedMedications = currentMedications.filter(med => med.id !== medicationId);
+      
+      await StorageService.setItem(STORAGE_KEYS.MEDICATIONS, updatedMedications);
+      return true;
+    } catch (error) {
+      console.error('Error deleting medication:', error);
+      return false;
+    }
+  },
+};
+
