@@ -32,14 +32,12 @@ export default function DailyReminders({ reminders = [] }) {
           <View key={index} style={styles.listItem}>
             <View style={styles.itemContent}>
               <View style={styles.checkbox}>
-                <View style={[styles.checkboxInner, { backgroundColor: reminder.categoryColor }]} />
+                <View style={[styles.checkboxInner, { backgroundColor: '#FF6A88' }]} />
               </View>
               <View style={styles.itemInfo}>
                 <Text style={styles.itemTitle}>{reminder.title}</Text>
                 <View style={styles.itemDetails}>
                   <Text style={styles.itemTime}>{reminder.time}</Text>
-                  <View style={styles.separator} />
-                  <Text style={styles.itemCategory}>{reminder.category}</Text>
                 </View>
               </View>
               <Text style={styles.itemIcon}>{reminder.icon}</Text>

@@ -7,40 +7,34 @@ import {
 import { getResponsiveValue, spacing, fontSizes } from '../../constants/responsive';
 import { FONT_FAMILIES, FONT_STYLES } from '../../constants/fonts';
 
-export default function UpcomingReminders({ upcomingReminders = [] }) {
-  const hasUpcoming = upcomingReminders && upcomingReminders.length > 0;
+export default function UpcomingReminders({ reminders = [] }) {
+  const hasUpcoming = reminders && reminders.length > 0;
 
   if (!hasUpcoming) {
     return null; // Yaklaşan hatırlatma yoksa hiçbir şey gösterme
   }
 
-  const getDaysText = (days) => {
-    if (days === 0) return 'Bugün';
-    if (days === 1) return 'Yarın';
-    return `${days} gün sonra`;
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Yaklaşan Hatırlatıcılar</Text>
       <View style={styles.listContainer}>
-        {upcomingReminders.map((reminder, index) => (
+        {reminders.map((reminder, index) => (
           <View key={index} style={styles.listItem}>
             <View style={styles.itemContent}>
               <View style={styles.checkbox}>
-                <View style={[styles.checkboxInner, { backgroundColor: reminder.categoryColor }]} />
+                <View style={[styles.checkboxInner, { backgroundColor: '#00B894' }]} />
               </View>
               <View style={styles.itemInfo}>
                 <Text style={styles.itemTitle}>{reminder.title}</Text>
                 <View style={styles.itemDetails}>
-                  <Text style={styles.itemDate}>{reminder.date}</Text>
+                  <Text style={styles.itemDate}>{reminder.time}</Text>
                   <View style={styles.separator} />
-                  <Text style={styles.itemDays}>{getDaysText(reminder.daysLeft)}</Text>
+                  <Text style={styles.itemDays}>{reminder.details}</Text>
                 </View>
               </View>
               <Text style={styles.itemIcon}>{reminder.icon}</Text>
             </View>
-            {index < upcomingReminders.length - 1 && <View style={styles.divider} />}
+            {index < reminders.length - 1 && <View style={styles.divider} />}
           </View>
         ))}
       </View>

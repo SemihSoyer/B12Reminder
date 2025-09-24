@@ -119,3 +119,48 @@ export const parseBirthdaysFromStorage = (storedData) => {
       daysLeft: calculateDaysLeft(item.date) // Kalan günleri yeniden hesapla
     }));
 };
+
+export const transformBirthdaysToReminders = (birthdays) => {
+  const todayReminders = [];
+  const upcomingReminders = [];
+
+  if (!birthdays || !Array.isArray(birthdays)) {
+    return { todayReminders: [], upcomingReminders: [] };
+  }
+
+  birthdays.forEach(birthday => {
+    // daysLeft'in bir sayı olduğundan emin olalım
+    if (typeof birthday.daysLeft !== 'number') {
+      return; // veya varsayılan bir değer ata
+    }
+
+    if (birthday.daysLeft === 0) {
+      todayReminders.push({
+        id: `birthday-${birthday.id}`,
+        time: 'Bugün',
+        title: `${birthday.name}'in doğum günü!`,
+        icon: '🎂',
+      });
+    } 
+    // Gelecekteki 1 yıl içindeki doğum günlerini al
+    else if (birthday.daysLeft > 0 && birthday.daysLeft <= 365) { 
+      upcomingReminders.push({
+        id: `birthday-${birthday.id}`,
+        time: `${birthday.date}`, // Orijinal tarihi gösterelim
+        title: `${birthday.name}'in doğum günü`,
+        details: `${birthday.daysLeft} gün kaldı`,
+        icon: '🎁',
+      });
+    }
+  });
+
+  // Yaklaşan hatırlatıcıları gün sayısına göre sırala (en yakın olan önce)
+  upcomingReminders.sort((a, b) => {
+    // 'details' alanından gün sayısını çıkarıp karşılaştıralım
+    const daysA = a.details ? parseInt(a.details.split(' ')[0]) : 366;
+    const daysB = b.details ? parseInt(b.details.split(' ')[0]) : 366;
+    return daysA - daysB;
+  });
+
+  return { todayReminders, upcomingReminders };
+};
