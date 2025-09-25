@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import { getFrequencyText } from '../../utils/medicationUtils';
+import ReminderIcon from '../common/ReminderIcon';
 
 export default function MedicationList({ medications, onDelete }) {
   const renderItem = ({ item }) => {
@@ -11,13 +12,15 @@ export default function MedicationList({ medications, onDelete }) {
     
     return (
       <View style={styles.itemContainer}>
-        <View style={styles.iconContainer}>
-          <Text style={styles.icon}>💊</Text>
-        </View>
         <View style={styles.infoContainer}>
           <Text style={styles.title}>{item.name}</Text>
           <Text style={styles.details}>{detailsText}</Text>
         </View>
+        <ReminderIcon 
+          name="medkit-outline" 
+          color="#74B9FF" 
+          backgroundColor="rgba(116, 185, 255, 0.1)" 
+        />
         <TouchableOpacity onPress={() => onDelete(item)} style={styles.deleteButton}>
           <Ionicons name="trash-outline" size={22} color="#FF6A88" />
         </TouchableOpacity>
@@ -42,7 +45,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     marginVertical: spacing.xs,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -50,20 +54,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(116, 185, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  icon: {
-    fontSize: 24,
-  },
   infoContainer: {
     flex: 1,
+    marginRight: spacing.sm,
   },
   title: {
     ...FONT_STYLES.bodyLarge,
@@ -77,7 +70,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   deleteButton: {
-    padding: spacing.sm,
+    paddingLeft: spacing.sm, // İkonla arasında boşluk bırakmak için
   },
   separator: {
     height: spacing.sm,

@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
+import ReminderIcon from '../common/ReminderIcon';
 
 export default function BirthdayList({ birthdays = [], onDelete }) {
   const handleDeletePress = (item) => {
@@ -42,13 +43,19 @@ export default function BirthdayList({ birthdays = [], onDelete }) {
           <View style={styles.itemDetails}>
             <Text style={styles.itemDate}>{item.date}</Text>
             <View style={styles.separator} />
-            <Text style={styles.daysText}>{item.daysLeft} gün kaldı</Text>
+            <Text style={styles.daysText}>
+              {item.daysLeft === 0 ? 'Bugün!' : `${item.daysLeft} gün kaldı`}
+            </Text>
           </View>
           {item.note && item.note.trim() && (
             <Text style={styles.itemNote}>{item.note}</Text>
           )}
         </View>
-        <Text style={styles.itemIcon}>🎂</Text>
+        <ReminderIcon 
+          name="gift" 
+          color="#FF6A88" 
+          backgroundColor="rgba(255, 106, 136, 0.1)" 
+        />
         <TouchableOpacity 
           style={styles.deleteButton}
           onPress={() => handleDeletePress(item)}
@@ -148,10 +155,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 4,
     lineHeight: 16,
-  },
-  itemIcon: {
-    fontSize: 18,
-    marginLeft: spacing.sm,
   },
   deleteButton: {
     width: 32,

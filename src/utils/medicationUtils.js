@@ -114,7 +114,11 @@ export const transformMedicationsToReminders = (medications) => {
           reminderType: 'medication',
           time: time,
           title: `${med.name} (${med.dosage})`,
-          icon: '💊',
+          iconConfig: { 
+            name: 'medkit-outline', 
+            color: '#74B9FF', 
+            backgroundColor: 'rgba(116, 185, 255, 0.1)' 
+          },
         });
       });
     }
@@ -138,7 +142,11 @@ export const transformMedicationsToReminders = (medications) => {
           time: futureDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
           title: `${med.name} (${med.dosage})`,
           details: `${daysLeft} gün kaldı`,
-          icon: '💊',
+          iconConfig: { 
+            name: 'medkit-outline', 
+            color: '#74B9FF', 
+            backgroundColor: 'rgba(116, 185, 255, 0.1)' 
+          },
           daysLeft: daysLeft, // Sıralama için
         });
       }

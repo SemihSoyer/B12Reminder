@@ -138,9 +138,14 @@ export const transformBirthdaysToReminders = (birthdays) => {
       todayReminders.push({
         id: `birthday-${birthday.id}`,
         originalId: birthday.id, // Orijinal ID'yi ekliyoruz
+        reminderType: 'birthday',
         time: 'Bugün',
         title: `${birthday.name}'in doğum günü!`,
-        icon: '🎂',
+        iconConfig: { 
+          name: 'gift', 
+          color: '#FF6A88', 
+          backgroundColor: 'rgba(255, 106, 136, 0.1)' 
+        },
       });
     } 
     // Gelecekteki 1 yıl içindeki doğum günlerini al
@@ -148,10 +153,15 @@ export const transformBirthdaysToReminders = (birthdays) => {
       upcomingReminders.push({
         id: `birthday-${birthday.id}`,
         originalId: birthday.id, // Orijinal ID'yi ekliyoruz
+        reminderType: 'birthday',
         time: `${birthday.date}`, // Orijinal tarihi gösterelim
         title: `${birthday.name}'in doğum günü`,
         details: `${birthday.daysLeft} gün kaldı`,
-        icon: '🎁',
+        iconConfig: { 
+          name: 'gift', 
+          color: '#00B894', 
+          backgroundColor: 'rgba(0, 184, 148, 0.1)' 
+        },
       });
     }
   });

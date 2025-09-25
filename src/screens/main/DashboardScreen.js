@@ -71,10 +71,14 @@ export default function DashboardScreen({ navigation }) {
     }, [])
   );
 
-  const handleDeleteBirthday = (birthdayId) => {
+  const handleDeleteReminder = (id, type) => {
+    const isBirthday = type === 'birthday';
+    const title = isBirthday ? 'Doğum Gününü Sil' : 'İlacı Sil';
+    const message = `Bu hatırlatıcıyı kalıcı olarak silmek istediğinizden emin misiniz?`;
+
     Alert.alert(
-      'Doğum Gününü Sil',
-      'Bu doğum gününü kalıcı olarak silmek istediğinizden emin misiniz?',
+      title,
+      message,
       [
         {
           text: 'İptal',
@@ -84,12 +88,16 @@ export default function DashboardScreen({ navigation }) {
           text: 'Sil',
           onPress: async () => {
             try {
-              await BirthdayService.deleteBirthday(birthdayId);
+              if (isBirthday) {
+                await BirthdayService.deleteBirthday(id);
+              } else {
+                await MedicationService.deleteMedication(id);
+              }
               // State'i anında güncelle
-              setTodayReminders(prev => prev.filter(r => r.originalId !== birthdayId));
-              setUpcomingReminders(prev => prev.filter(r => r.originalId !== birthdayId));
+              setTodayReminders(prev => prev.filter(r => r.originalId !== id));
+              setUpcomingReminders(prev => prev.filter(r => r.originalId !== id));
             } catch (error) {
-              console.error("Doğum günü silinirken hata oluştu:", error);
+              console.error("Hatırlatıcı silinirken hata oluştu:", error);
               Alert.alert('Hata', 'Silme işlemi sırasında bir sorun oluştu.');
             }
           },
@@ -127,9 +135,9 @@ export default function DashboardScreen({ navigation }) {
 
           <WeeklyCalendar />
           
-          <DailyReminders reminders={todayReminders} onDelete={handleDeleteBirthday} />
+          <DailyReminders reminders={todayReminders} onDelete={handleDeleteReminder} />
           
-          <UpcomingReminders reminders={upcomingReminders} onDelete={handleDeleteBirthday} />
+          <UpcomingReminders reminders={upcomingReminders} onDelete={handleDeleteReminder} />
         </ScrollView>
       </SafeAreaView>
     </>

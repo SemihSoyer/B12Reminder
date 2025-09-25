@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getResponsiveValue, spacing, fontSizes } from '../../constants/responsive';
 import { FONT_FAMILIES, FONT_STYLES } from '../../constants/fonts';
+import ReminderIcon from './ReminderIcon';
 
 export default function DailyReminders({ reminders = [], onDelete }) {
   const hasReminders = reminders && reminders.length > 0;
@@ -42,8 +43,8 @@ export default function DailyReminders({ reminders = [], onDelete }) {
                   <Text style={styles.itemTime}>{reminder.time}</Text>
                 </View>
               </View>
-              <Text style={styles.itemIcon}>{reminder.icon}</Text>
-              <TouchableOpacity onPress={() => onDelete(reminder.originalId)} style={styles.deleteButton}>
+              <ReminderIcon {...reminder.iconConfig} />
+              <TouchableOpacity onPress={() => onDelete(reminder.originalId, reminder.reminderType)} style={styles.deleteButton}>
                 <Ionicons name="trash-outline" size={22} color="#FF6A88" />
               </TouchableOpacity>
             </View>
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: spacing.sm,
-    marginLeft: spacing.sm,
+    marginLeft: spacing.xs,
   },
   divider: {
     height: 1,
