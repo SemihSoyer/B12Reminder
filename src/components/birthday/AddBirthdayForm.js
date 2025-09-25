@@ -17,74 +17,59 @@ import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import WheelDatePicker from './WheelDatePicker';
 
-export default function AddBirthdayForm({ 
-  visible, 
-  onClose, 
-  onAdd, 
-  selectedDate = null 
-}) {
+export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate }) {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [note, setNote] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDateObject, setSelectedDateObject] = useState(null);
-
-  const monthNames = [
-    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-  ];
 
   useEffect(() => {
-    if (visible) {
-        if (selectedDate) {
-            const day = selectedDate.getDate();
-            const month = selectedDate.getMonth();
-            setDate(`${day} ${monthNames[month]}`);
-            setSelectedDateObject(selectedDate);
-        } else {
-            // Modal her açıldığında formu temizle (eğer takvimden gelinmediyse)
-            setName('');
-            setDate('');
-            setNote('');
-            setSelectedDateObject(null);
-        }
+    if (selectedDate) {
+      const day = selectedDate.getDate();
+      const monthIndex = selectedDate.getMonth();
+      const monthNames = [
+        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      ];
+      setDate(`${day} ${monthNames[monthIndex]}`);
+    } else {
+      setDate('');
     }
-  }, [visible, selectedDate]);
-
-  const calculateDaysLeft = (birthdayDate) => {
-    if (!birthdayDate) return 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const currentYear = today.getFullYear();
-    let thisYearBirthday = new Date(birthdayDate);
-    thisYearBirthday.setFullYear(currentYear);
-    thisYearBirthday.setHours(0, 0, 0, 0);
-    if (thisYearBirthday < today) {
-      thisYearBirthday.setFullYear(currentYear + 1);
-    }
-    const diffTime = thisYearBirthday - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays);
-  };
+    // Reset other fields when the modal is opened with a new date
+    setName('');
+    setNote('');
+  }, [selectedDate, visible]);
 
   const handleAdd = () => {
     if (!name.trim() || !date.trim()) {
-      Alert.alert('Eksik Bilgi', 'Lütfen isim ve tarih alanlarını doldurun.');
+      Alert.alert('Hata', 'Lütfen isim ve tarih alanlarını doldurun.');
       return;
     }
+
     const newBirthday = {
+      id: Date.now().toString(),
       name: name.trim(),
       date: date.trim(),
       note: note.trim(),
-      daysLeft: calculateDaysLeft(selectedDateObject)
     };
+
     onAdd(newBirthday);
-    onClose(); // Formu kapat
+    resetForm();
+    onClose();
   };
 
-  const handleDatePickerSelect = (dateObject, dateString) => {
-    setSelectedDateObject(dateObject);
-    setDate(dateString);
+  const resetForm = () => {
+    setName('');
+    setDate('');
+    setNote('');
+  };
+
+  const handleDateSelect = (selectedDay, selectedMonth) => {
+    const monthNames = [
+      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    ];
+    setDate(`${selectedDay} ${monthNames[selectedMonth]}`);
     setShowDatePicker(false);
   };
 
@@ -92,100 +77,114 @@ export default function AddBirthdayForm({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      transparent={true}
       onRequestClose={onClose}
     >
-      <KeyboardAvoidingView 
-        style={styles.container}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.modalContainer}>
+           <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose} />
           {/* Header */}
+           <LinearGradient
+            colors={['#FFFFFF', '#F7F7F7']}
+            style={styles.formContainer}
+          >
           <View style={styles.header}>
             <TouchableOpacity style={styles.headerButton} onPress={onClose}>
-              <Text style={styles.headerButtonText}>İptal</Text>
+               <Ionicons name="close" size={24} color="#666" />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Doğum Günü Ekle</Text>
-            <TouchableOpacity style={[styles.headerButton, styles.headerButtonPrimary]} onPress={handleAdd}>
-              <Text style={styles.headerButtonPrimaryText}>Kaydet</Text>
+            <View style={styles.headerTitleContainer}>
+                <Ionicons name="gift-outline" size={20} color="#FF6A88" />
+                <Text style={styles.headerTitle}>Doğum Günü Ekle</Text>
+            </View>
+            <TouchableOpacity style={[styles.headerButton, styles.saveButton]} onPress={handleAdd}>
+              <Ionicons name="checkmark" size={24} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
 
           {/* Form */}
-          <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.form}>
+            {/* İsim */}
             <View style={styles.inputSection}>
-              <Text style={styles.label}>İsim</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons name="person-outline" size={20} color="#888" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  value={name}
-                  onChangeText={setName}
-                  placeholder="Örn: Ahmet Yılmaz"
-                  placeholderTextColor="#ccc"
-                  autoCapitalize="words"
-                />
-              </View>
+                <Text style={styles.label}>İsim</Text>
+                <View style={styles.inputContainer}>
+                    <Ionicons name="person-outline" size={22} color="#8e44ad" style={styles.inputIcon} />
+                    <TextInput
+                        style={styles.input}
+                        value={name}
+                        onChangeText={setName}
+                        placeholder="Örn: Ahmet Yılmaz"
+                        placeholderTextColor="#b2bec3"
+                    />
+                </View>
             </View>
 
+            {/* Tarih */}
             <View style={styles.inputSection}>
-              <Text style={styles.label}>Tarih</Text>
-              <TouchableOpacity 
-                style={styles.inputContainer}
-                onPress={() => setShowDatePicker(true)}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="calendar-outline" size={20} color="#888" style={styles.inputIcon} />
-                <Text style={[styles.input, !date && styles.placeholder]}>
-                  {date || 'Tarih seçmek için tıklayın'}
-                </Text>
-                <Ionicons name="chevron-forward" size={20} color="#ccc" />
-              </TouchableOpacity>
+                <Text style={styles.label}>Doğum Günü Tarihi</Text>
+                <TouchableOpacity 
+                    style={styles.inputContainer}
+                    onPress={() => !selectedDate && setShowDatePicker(true)}
+                    activeOpacity={selectedDate ? 1 : 0.7}
+                >
+                    <Ionicons name="calendar-outline" size={22} color="#27ae60" style={styles.inputIcon} />
+                    <Text style={[styles.input, !date && { color: '#b2bec3' }]}>
+                        {date || 'Tarih seçin'}
+                    </Text>
+                     {!selectedDate && <Ionicons name="chevron-forward" size={22} color="#636e72" />}
+                </TouchableOpacity>
+                 {selectedDate && <Text style={styles.infoText}>Tarih takvimden seçildi.</Text>}
             </View>
 
+            {/* Notlar */}
             <View style={styles.inputSection}>
-              <Text style={styles.label}>Özel Not (İsteğe bağlı)</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons name="document-text-outline" size={20} color="#888" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  value={note}
-                  onChangeText={setNote}
-                  placeholder="Örn: Hediye almayı unutma!"
-                  placeholderTextColor="#ccc"
-                />
-              </View>
+                <Text style={styles.label}>Notlar (İsteğe bağlı)</Text>
+                <View style={[styles.inputContainer, { height: 120 }]}>
+                  <Ionicons name="document-text-outline" size={22} color="#f39c12" style={styles.inputIcon} />
+                  <TextInput
+                    style={[styles.input, { textAlignVertical: 'top', paddingTop: spacing.md }]}
+                    value={note}
+                    onChangeText={setNote}
+                    placeholder="Hediye fikri: Kitap..."
+                    placeholderTextColor="#b2bec3"
+                    multiline
+                  />
+                </View>
             </View>
-
-            {/* Bilgi Notu */}
-            <View style={styles.infoBox}>
-              <Ionicons name="information-circle-outline" size={20} color="#FF6A88" />
-              <Text style={styles.infoText}>
-                Doğum günü hatırlatıcınız otomatik olarak hesaplanacak ve size bildirim gönderilecektir.
-              </Text>
             </View>
           </ScrollView>
+          </LinearGradient>
         </View>
-
-        <WheelDatePicker
-          visible={showDatePicker}
-          onClose={() => setShowDatePicker(false)}
-          onDateSelect={handleDatePickerSelect}
-          initialDay={selectedDateObject?.getDate() ?? new Date().getDate()}
-          initialMonth={selectedDateObject?.getMonth() ?? new Date().getMonth()}
-        />
       </KeyboardAvoidingView>
+
+      <WheelDatePicker
+        visible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        onDateSelect={handleDateSelect}
+      />
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f7f8fa',
-  },
   modalContainer: {
     flex: 1,
+    justifyContent: 'flex-end',
+  },
+   overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  formContainer: {
+    height: 'auto',
+    maxHeight: '80%',
+    backgroundColor: '#F7F7F7',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
@@ -194,79 +193,81 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#eef0f2',
-    backgroundColor: '#fff',
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+    backgroundColor: '#FFFFFF',
   },
-  headerButton: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: 20,
-    backgroundColor: '#f0f2f5',
+   headerButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+      justifyContent: 'center',
+      alignItems: 'center',
   },
-  headerButtonText: {
-    ...FONT_STYLES.bodyMedium,
-    color: '#666',
+  saveButton: {
+      backgroundColor: '#FF6A88',
+      shadowColor: '#FF6A88',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6,
   },
-  headerButtonPrimary: {
-    backgroundColor: '#FF6A88',
-  },
-  headerButtonPrimaryText: {
-    ...FONT_STYLES.emphasisMedium,
-    color: '#fff',
+  headerTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255, 106, 136, 0.1)',
   },
   headerTitle: {
     ...FONT_STYLES.heading3,
-    color: '#1a1a1a',
+    color: '#FF6A88',
+    marginLeft: spacing.sm,
   },
   form: {
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: 40,
   },
   inputSection: {
     marginBottom: spacing.xl,
   },
   label: {
-    ...FONT_STYLES.emphasisMedium,
-    color: '#1a1a1a',
-    marginBottom: spacing.sm,
+      ...FONT_STYLES.emphasisMedium,
+      color: '#2d3436',
+      marginBottom: spacing.md,
+      marginLeft: spacing.xs,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: spacing.md,
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#eef0f2',
-    shadowColor: '#1a1a1a',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FFFFFF',
+      borderRadius: 16,
+      paddingHorizontal: spacing.lg,
+      borderWidth: 1,
+      borderColor: '#dfe6e9',
+      minHeight: 56,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
   },
   inputIcon: {
-    marginRight: spacing.sm,
+      marginRight: spacing.md,
   },
   input: {
-    flex: 1,
-    ...FONT_STYLES.bodyMedium,
-    color: '#1a1a1a',
-  },
-  placeholder: {
-    color: '#ccc',
-  },
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 106, 136, 0.1)',
-    borderRadius: 12,
-    padding: spacing.md,
-    marginTop: spacing.md,
+      flex: 1,
+      ...FONT_STYLES.body,
+      color: '#2d3436',
+      fontSize: 16,
   },
   infoText: {
     ...FONT_STYLES.body,
-    color: '#666',
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
+    fontSize: 12,
+    color: '#636e72',
+    marginTop: spacing.sm,
+    marginLeft: spacing.xs,
+  }
 });

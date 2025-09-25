@@ -94,85 +94,96 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
         <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose} />
         <View style={styles.modalContainer}>
           <LinearGradient
-            colors={['#F7F7F7', '#FAFAFA']}
+            colors={['#FFFFFF', '#F7F7F7']}
             style={styles.gradientContainer}
           >
             <View style={styles.header}>
-              <TouchableOpacity onPress={onClose}>
-                <Text style={styles.cancelText}>İptal</Text>
+              <TouchableOpacity style={styles.headerButton} onPress={onClose}>
+                <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
-              <Text style={styles.title}>İlaç Ekle</Text>
-              <TouchableOpacity onPress={handleAdd}>
-                <Text style={styles.saveText}>Kaydet</Text>
+              <View style={styles.headerTitleContainer}>
+                <Ionicons name="medical-outline" size={20} color="#E17055" />
+                <Text style={styles.title}>İlaç Ekle</Text>
+              </View>
+              <TouchableOpacity style={[styles.headerButton, styles.saveButton]} onPress={handleAdd}>
+                <Ionicons name="checkmark" size={24} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
 
             <ScrollView contentContainerStyle={styles.form}>
+              {/* İlaç Adı */}
               <View style={styles.inputSection}>
                 <Text style={styles.label}>İlaç Adı</Text>
                 <View style={styles.inputContainer}>
-                  <Ionicons name="medical-outline" size={20} color="#666" style={styles.inputIcon} />
+                  <Ionicons name="medical-outline" size={22} color="#E17055" style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
                     value={name}
                     onChangeText={setName}
                     placeholder="Örn: Parol 500mg"
+                    placeholderTextColor="#b2bec3"
                   />
                 </View>
               </View>
 
+              {/* Dozaj */}
               <View style={styles.inputSection}>
                 <Text style={styles.label}>Dozaj</Text>
                  <View style={styles.inputContainer}>
-                    <Ionicons name="options-outline" size={20} color="#666" style={styles.inputIcon} />
+                    <Ionicons name="options-outline" size={22} color="#6c5ce7" style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       value={dosage}
                       onChangeText={setDosage}
                       placeholder="Örn: 1 Tablet"
+                      placeholderTextColor="#b2bec3"
                     />
                   </View>
               </View>
 
+              {/* Kullanım Saatleri */}
               <View style={styles.inputSection}>
                 <Text style={styles.label}>Kullanım Saatleri</Text>
                 {times.map((time, index) => (
                   <View key={index} style={styles.timeRow}>
-                    <TouchableOpacity onPress={() => openTimePicker(index)} style={styles.inputContainer_time}>
-                      <Ionicons name="time-outline" size={20} color="#666" style={styles.inputIcon} />
-                      <Text style={styles.input}>{time}</Text>
+                    <TouchableOpacity onPress={() => openTimePicker(index)} style={styles.inputContainer}>
+                      <Ionicons name="time-outline" size={22} color="#00b894" style={styles.inputIcon} />
+                      <Text style={styles.timeText}>{time}</Text>
                     </TouchableOpacity>
                     {times.length > 1 && (
                       <TouchableOpacity onPress={() => removeTimeField(index)} style={styles.removeButton}>
-                        <Ionicons name="remove-circle" size={24} color="#FF6A88" />
+                        <Ionicons name="trash-outline" size={22} color="#d63031" />
                       </TouchableOpacity>
                     )}
                   </View>
                 ))}
                 <TouchableOpacity onPress={addTimeField} style={styles.addButton}>
-                  <Ionicons name="add-circle-outline" size={22} color="#74B9FF" />
+                  <Ionicons name="add-circle-outline" size={24} color="#0984e3" />
                   <Text style={styles.addButtonText}>Başka bir saat ekle</Text>
                 </TouchableOpacity>
               </View>
 
+              {/* Tekrarlama Sıklığı */}
               <View style={styles.inputSection}>
                 <Text style={styles.label}>Tekrarlama Sıklığı</Text>
                 <TouchableOpacity onPress={() => setShowFrequencyModal(true)} style={styles.inputContainer}>
-                    <Ionicons name="repeat-outline" size={20} color="#666" style={styles.inputIcon} />
+                    <Ionicons name="repeat-outline" size={22} color="#fd79a8" style={styles.inputIcon} />
                     <Text style={styles.input}>{getFrequencyText(frequency)}</Text>
-                    <Ionicons name="chevron-forward" size={20} color="#666" />
+                    <Ionicons name="chevron-forward" size={22} color="#636e72" />
                 </TouchableOpacity>
               </View>
               
+              {/* Notlar */}
               <View style={styles.inputSection}>
                 <Text style={styles.label}>Notlar (İsteğe bağlı)</Text>
-                <View style={[styles.inputContainer, { height: 80 }]}>
-                  <Ionicons name="document-text-outline" size={20} color="#666" style={styles.inputIcon} />
+                <View style={[styles.inputContainer, { height: 100 }]}>
+                  <Ionicons name="document-text-outline" size={22} color="#fab1a0" style={styles.inputIcon} />
                   <TextInput
-                    style={[styles.input, { textAlignVertical: 'top' }]}
+                    style={[styles.input, { textAlignVertical: 'top', paddingTop: spacing.md }]}
                     value={note}
                     onChangeText={setNote}
                     placeholder="Yemekten sonra al..."
+                    placeholderTextColor="#b2bec3"
                     multiline
                   />
                 </View>
@@ -206,13 +217,13 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContainer: {
-        height: '85%',
-        backgroundColor: 'white',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
+        height: '92%',
+        backgroundColor: '#F7F7F7',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
         overflow: 'hidden',
     },
     gradientContainer: {
@@ -225,78 +236,104 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingVertical: spacing.md,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+        borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+        backgroundColor: '#FFFFFF',
     },
-    cancelText: {
-        ...FONT_STYLES.bodyMedium,
-        color: '#666',
+    headerButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    saveButton: {
+      backgroundColor: '#fd79a8',
+      shadowColor: '#fd79a8',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6,
+    },
+    headerTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: 20,
+      backgroundColor: 'rgba(225, 112, 85, 0.1)',
     },
     title: {
         ...FONT_STYLES.heading3,
-        color: '#1a1a1a',
-    },
-    saveText: {
-        ...FONT_STYLES.emphasisMedium,
-        color: '#74B9FF',
+        color: '#E17055',
+        marginLeft: spacing.sm,
     },
     form: {
-        padding: spacing.lg,
+        paddingHorizontal: spacing.lg,
+        paddingTop: spacing.lg,
+        paddingBottom: 100,
     },
     inputSection: {
-        marginBottom: spacing.lg,
+        marginBottom: spacing.xl,
     },
     label: {
         ...FONT_STYLES.emphasisMedium,
-        color: '#1a1a1a',
-        marginBottom: spacing.sm,
+        color: '#2d3436',
+        marginBottom: spacing.md,
+        marginLeft: spacing.xs,
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        paddingHorizontal: spacing.md,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        paddingHorizontal: spacing.lg,
         borderWidth: 1,
-        borderColor: '#eee',
-        minHeight: 50,
-    },
-    inputContainer_time:{
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#fff',
-      borderRadius: 12,
-      paddingHorizontal: spacing.md,
-      borderWidth: 1,
-      borderColor: '#eee',
-      minHeight: 50,
-      flex: 1,
+        borderColor: '#dfe6e9',
+        minHeight: 56,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
     },
     inputIcon: {
-        marginRight: spacing.sm,
+        marginRight: spacing.md,
     },
     input: {
         flex: 1,
-        ...FONT_STYLES.bodyMedium,
-        color: '#1a1a1a',
+        ...FONT_STYLES.body,
+        color: '#2d3436',
+        fontSize: 16,
     },
     timeRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: spacing.sm,
+        marginBottom: spacing.md,
+    },
+    timeText: {
+      flex: 1,
+      ...FONT_STYLES.body,
+      color: '#2d3436',
+      fontSize: 16,
     },
     removeButton: {
         padding: spacing.sm,
-        marginLeft: spacing.sm,
+        marginLeft: spacing.md,
     },
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: spacing.sm,
-        padding: spacing.sm,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.sm,
+        borderRadius: 12,
+        backgroundColor: 'rgba(9, 132, 227, 0.05)',
+        alignSelf: 'flex-start',
     },
     addButtonText: {
-        ...FONT_STYLES.body,
-        color: '#74B9FF',
-        marginLeft: spacing.xs,
+        ...FONT_STYLES.emphasis,
+        color: '#0984e3',
+        marginLeft: spacing.sm,
     },
 });
