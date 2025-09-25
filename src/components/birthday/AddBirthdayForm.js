@@ -9,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,97 +29,57 @@ export default function AddBirthdayForm({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDateObject, setSelectedDateObject] = useState(null);
 
-  // Türkçe ay isimleri
   const monthNames = [
     'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
     'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
   ];
 
-  // Seçilen tarih varsa otomatik doldur
   useEffect(() => {
-    if (selectedDate) {
-      const day = selectedDate.getDate();
-      const month = selectedDate.getMonth();
-      setDate(`${day} ${monthNames[month]}`);
+    if (visible) {
+        if (selectedDate) {
+            const day = selectedDate.getDate();
+            const month = selectedDate.getMonth();
+            setDate(`${day} ${monthNames[month]}`);
+            setSelectedDateObject(selectedDate);
+        } else {
+            // Modal her açıldığında formu temizle (eğer takvimden gelinmediyse)
+            setName('');
+            setDate('');
+            setNote('');
+            setSelectedDateObject(null);
+        }
     }
-  }, [selectedDate]);
+  }, [visible, selectedDate]);
 
-  // Kalan günleri hesapla
   const calculateDaysLeft = (birthdayDate) => {
-    try {
-      if (!birthdayDate) {
-        return 0;
-      }
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const currentYear = today.getFullYear();
-      
-      // Bu yılki doğum günü tarihini oluştur
-      let thisYearBirthday = new Date(birthdayDate);
-      thisYearBirthday.setFullYear(currentYear);
-      thisYearBirthday.setHours(0, 0, 0, 0);
-      
-      // Eğer bu yılki doğum günü geçmişse, gelecek yılki doğum gününü hesapla
-      if (thisYearBirthday < today) {
-        thisYearBirthday.setFullYear(currentYear + 1);
-      }
-      
-      // Gün farkını hesapla
-      const diffTime = thisYearBirthday - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      return Math.max(0, diffDays);
-    } catch (error) {
-      console.warn('Error calculating days left in form:', error);
-      return 0;
+    if (!birthdayDate) return 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentYear = today.getFullYear();
+    let thisYearBirthday = new Date(birthdayDate);
+    thisYearBirthday.setFullYear(currentYear);
+    thisYearBirthday.setHours(0, 0, 0, 0);
+    if (thisYearBirthday < today) {
+      thisYearBirthday.setFullYear(currentYear + 1);
     }
+    const diffTime = thisYearBirthday - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
   };
 
   const handleAdd = () => {
-    if (!name.trim()) {
-      Alert.alert('Hata', 'Lütfen isim giriniz.');
+    if (!name.trim() || !date.trim()) {
+      Alert.alert('Eksik Bilgi', 'Lütfen isim ve tarih alanlarını doldurun.');
       return;
     }
-    
-    if (!date.trim()) {
-      Alert.alert('Hata', 'Lütfen tarih giriniz.');
-      return;
-    }
-
-    // Yeni doğum günü objesi oluştur
     const newBirthday = {
       name: name.trim(),
       date: date.trim(),
-      note: note.trim(), // Özel not eklendi
-      daysLeft: selectedDate ? calculateDaysLeft(selectedDate) : 
-                selectedDateObject ? calculateDaysLeft(selectedDateObject) : 0
+      note: note.trim(),
+      daysLeft: calculateDaysLeft(selectedDateObject)
     };
-
-    // Parent komponente gönder
     onAdd(newBirthday);
-    
-    // Formu temizle ve kapat
-    setName('');
-    setDate('');
-    setNote('');
-    onClose();
-  };
-
-  const handleCancel = () => {
-    setName('');
-    setDate('');
-    setNote('');
-    setSelectedDateObject(null);
-    onClose();
-  };
-
-  const handleDatePickerOpen = () => {
-    setShowDatePicker(true);
-  };
-
-  const handleDatePickerClose = () => {
-    setShowDatePicker(false);
+    onClose(); // Formu kapat
   };
 
   const handleDatePickerSelect = (dateObject, dateString) => {
@@ -138,45 +99,30 @@ export default function AddBirthdayForm({
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <LinearGradient
-          colors={['#F7F7F7', '#FAFAFA', '#F5F5F5']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.gradientContainer}
-        >
+        <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity 
-              style={styles.cancelButton}
-              onPress={handleCancel}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.cancelText}>İptal</Text>
+            <TouchableOpacity style={styles.headerButton} onPress={onClose}>
+              <Text style={styles.headerButtonText}>İptal</Text>
             </TouchableOpacity>
-            
-            <Text style={styles.title}>Doğum Günü Ekle</Text>
-            
-            <TouchableOpacity 
-              style={styles.saveButton}
-              onPress={handleAdd}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.saveText}>Kaydet</Text>
+            <Text style={styles.headerTitle}>Doğum Günü Ekle</Text>
+            <TouchableOpacity style={[styles.headerButton, styles.headerButtonPrimary]} onPress={handleAdd}>
+              <Text style={styles.headerButtonPrimaryText}>Kaydet</Text>
             </TouchableOpacity>
           </View>
 
           {/* Form */}
-          <View style={styles.form}>
+          <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
             <View style={styles.inputSection}>
               <Text style={styles.label}>İsim</Text>
               <View style={styles.inputContainer}>
-                <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
+                <Ionicons name="person-outline" size={20} color="#888" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={name}
                   onChangeText={setName}
                   placeholder="Örn: Ahmet Yılmaz"
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#ccc"
                   autoCapitalize="words"
                 />
               </View>
@@ -186,63 +132,47 @@ export default function AddBirthdayForm({
               <Text style={styles.label}>Tarih</Text>
               <TouchableOpacity 
                 style={styles.inputContainer}
-                onPress={selectedDate ? undefined : handleDatePickerOpen}
-                activeOpacity={selectedDate ? 1 : 0.7}
+                onPress={() => setShowDatePicker(true)}
+                activeOpacity={0.7}
               >
-                <Ionicons name="calendar-outline" size={20} color="#666" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  value={date}
-                  placeholder="Tarih seçmek için tıklayın"
-                  placeholderTextColor="#999"
-                  editable={false} // Her zaman sadece modal ile seçim
-                  pointerEvents="none"
-                />
-                {!selectedDate && (
-                  <Ionicons name="chevron-down" size={20} color="#999" style={styles.dropdownIcon} />
-                )}
+                <Ionicons name="calendar-outline" size={20} color="#888" style={styles.inputIcon} />
+                <Text style={[styles.input, !date && styles.placeholder]}>
+                  {date || 'Tarih seçmek için tıklayın'}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#ccc" />
               </TouchableOpacity>
-              {selectedDate && (
-                <Text style={styles.dateHint}>Takvimden seçilen tarih</Text>
-              )}
-              {!selectedDate && date && (
-                <Text style={styles.dateHint}>Manuel seçilen tarih</Text>
-              )}
             </View>
 
             <View style={styles.inputSection}>
               <Text style={styles.label}>Özel Not (İsteğe bağlı)</Text>
               <View style={styles.inputContainer}>
-                <Ionicons name="document-text-outline" size={20} color="#666" style={styles.inputIcon} />
+                <Ionicons name="document-text-outline" size={20} color="#888" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={note}
                   onChangeText={setNote}
                   placeholder="Örn: Hediye almayı unutma!"
-                  placeholderTextColor="#999"
-                  multiline={true}
-                  numberOfLines={2}
+                  placeholderTextColor="#ccc"
                 />
               </View>
             </View>
 
             {/* Bilgi Notu */}
-            <View style={styles.infoContainer}>
-              <Ionicons name="information-circle-outline" size={16} color="#666" />
+            <View style={styles.infoBox}>
+              <Ionicons name="information-circle-outline" size={20} color="#FF6A88" />
               <Text style={styles.infoText}>
                 Doğum günü hatırlatıcınız otomatik olarak hesaplanacak ve size bildirim gönderilecektir.
               </Text>
             </View>
-          </View>
-        </LinearGradient>
+          </ScrollView>
+        </View>
 
-        {/* Wheel Date Picker */}
         <WheelDatePicker
           visible={showDatePicker}
-          onClose={handleDatePickerClose}
+          onClose={() => setShowDatePicker(false)}
           onDateSelect={handleDatePickerSelect}
-          initialDay={selectedDateObject ? selectedDateObject.getDate() : 1}
-          initialMonth={selectedDateObject ? selectedDateObject.getMonth() : 0}
+          initialDay={selectedDateObject?.getDate() ?? new Date().getDate()}
+          initialMonth={selectedDateObject?.getMonth() ?? new Date().getMonth()}
         />
       </KeyboardAvoidingView>
     </Modal>
@@ -252,8 +182,9 @@ export default function AddBirthdayForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
   },
-  gradientContainer: {
+  modalContainer: {
     flex: 1,
   },
   header: {
@@ -263,35 +194,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+    borderBottomColor: '#eef0f2',
+    backgroundColor: '#fff',
   },
-  cancelButton: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+  headerButton: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: 20,
+    backgroundColor: '#f0f2f5',
   },
-  cancelText: {
+  headerButtonText: {
     ...FONT_STYLES.bodyMedium,
     color: '#666',
   },
-  title: {
+  headerButtonPrimary: {
+    backgroundColor: '#FF6A88',
+  },
+  headerButtonPrimaryText: {
+    ...FONT_STYLES.emphasisMedium,
+    color: '#fff',
+  },
+  headerTitle: {
     ...FONT_STYLES.heading3,
     color: '#1a1a1a',
   },
-  saveButton: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  saveText: {
-    ...FONT_STYLES.emphasisMedium,
-    color: '#FF6A88',
-  },
   form: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
+    padding: spacing.lg,
   },
   inputSection: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
   },
   label: {
     ...FONT_STYLES.emphasisMedium,
@@ -301,50 +232,41 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#fff',
     borderRadius: 12,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#eef0f2',
+    shadowColor: '#1a1a1a',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
     elevation: 2,
   },
   inputIcon: {
     marginRight: spacing.sm,
   },
-  dropdownIcon: {
-    marginLeft: spacing.sm,
-  },
   input: {
     flex: 1,
     ...FONT_STYLES.bodyMedium,
     color: '#1a1a1a',
-    paddingVertical: spacing.xs,
   },
-  dateHint: {
-    ...FONT_STYLES.bodySmall,
-    color: '#FF6A88',
-    marginTop: spacing.xs,
-    marginLeft: spacing.sm,
+  placeholder: {
+    color: '#ccc',
   },
-  infoContainer: {
+  infoBox: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     backgroundColor: 'rgba(255, 106, 136, 0.1)',
     borderRadius: 12,
     padding: spacing.md,
-    marginTop: spacing.lg,
+    marginTop: spacing.md,
   },
   infoText: {
-    ...FONT_STYLES.bodySmall,
+    ...FONT_STYLES.body,
     color: '#666',
     marginLeft: spacing.sm,
     flex: 1,
-    lineHeight: 18,
   },
 });
