@@ -3,11 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { getResponsiveValue, spacing, fontSizes } from '../../constants/responsive';
 import { FONT_FAMILIES, FONT_STYLES } from '../../constants/fonts';
 
-export default function UpcomingReminders({ reminders = [] }) {
+export default function UpcomingReminders({ reminders = [], onDelete }) {
   const hasUpcoming = reminders && reminders.length > 0;
 
   if (!hasUpcoming) {
@@ -19,7 +21,7 @@ export default function UpcomingReminders({ reminders = [] }) {
       <Text style={styles.sectionTitle}>Yaklaşan Hatırlatıcılar</Text>
       <View style={styles.listContainer}>
         {reminders.map((reminder, index) => (
-          <View key={index} style={styles.listItem}>
+          <View key={reminder.id} style={styles.listItem}>
             <View style={styles.itemContent}>
               <View style={styles.checkbox}>
                 <View style={[styles.checkboxInner, { backgroundColor: '#00B894' }]} />
@@ -33,6 +35,9 @@ export default function UpcomingReminders({ reminders = [] }) {
                 </View>
               </View>
               <Text style={styles.itemIcon}>{reminder.icon}</Text>
+              <TouchableOpacity onPress={() => onDelete(reminder.originalId)} style={styles.deleteButton}>
+                <Ionicons name="trash-outline" size={22} color="#FF6A88" />
+              </TouchableOpacity>
             </View>
             {index < reminders.length - 1 && <View style={styles.divider} />}
           </View>
@@ -117,6 +122,10 @@ const styles = StyleSheet.create({
   },
   itemIcon: {
     fontSize: 18,
+    marginLeft: spacing.sm,
+  },
+  deleteButton: {
+    padding: spacing.sm,
     marginLeft: spacing.sm,
   },
   divider: {

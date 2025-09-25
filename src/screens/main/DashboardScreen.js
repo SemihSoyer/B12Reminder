@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   FlatList,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
@@ -21,8 +22,9 @@ import DailyReminders from '../../components/common/DailyReminders';
 import UpcomingReminders from '../../components/common/UpcomingReminders';
 
 // Services & Utils
-import { BirthdayService } from '../../utils/storage';
+import { BirthdayService, MedicationService } from '../../utils/storage';
 import { transformBirthdaysToReminders } from '../../utils/birthdayUtils';
+import { transformMedicationsToReminders } from '../../utils/medicationUtils';
 
 // Data
 import { featureCards } from '../../data/featureCards';
@@ -35,22 +37,30 @@ export default function DashboardScreen({ navigation }) {
     useCallback(() => {
       const loadReminders = async () => {
         try {
-          // Doğum günü verilerini al
+          // Doğum günü verilerini al ve işle
           const birthdays = await BirthdayService.getAllBirthdays();
-          
-          // Verileri anasayfa formatına dönüştür
           const { 
             todayReminders: birthdayToday, 
             upcomingReminders: birthdayUpcoming 
           } = transformBirthdaysToReminders(birthdays);
 
-          // Diğer hatırlatıcılar (ileride eklenecek)
-          const staticToday = []; 
-          const staticUpcoming = [];
+          // İlaç verilerini al ve işle
+          const medications = await MedicationService.getAllMedications();
+          const {
+            todayReminders: medicationToday,
+            upcomingReminders: medicationUpcoming
+          } = transformMedicationsToReminders(medications);
+
+          // Tüm hatırlatıcıları birleştir ve sırala
+          const allToday = [...birthdayToday, ...medicationToday]
+            .sort((a, b) => a.time.localeCompare(b.time));
+          
+          const allUpcoming = [...birthdayUpcoming, ...medicationUpcoming]
+            .sort((a, b) => a.daysLeft - b.daysLeft);
 
           // State'leri güncelle
-          setTodayReminders([...staticToday, ...birthdayToday]);
-          setUpcomingReminders([...staticUpcoming, ...birthdayUpcoming]);
+          setTodayReminders(allToday);
+          setUpcomingReminders(allUpcoming);
 
         } catch (error) {
           console.error("Hatırlatıcılar yüklenirken hata oluştu:", error);
@@ -60,6 +70,34 @@ export default function DashboardScreen({ navigation }) {
       loadReminders();
     }, [])
   );
+
+  const handleDeleteBirthday = (birthdayId) => {
+    Alert.alert(
+      'Doğum Gününü Sil',
+      'Bu doğum gününü kalıcı olarak silmek istediğinizden emin misiniz?',
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'Sil',
+          onPress: async () => {
+            try {
+              await BirthdayService.deleteBirthday(birthdayId);
+              // State'i anında güncelle
+              setTodayReminders(prev => prev.filter(r => r.originalId !== birthdayId));
+              setUpcomingReminders(prev => prev.filter(r => r.originalId !== birthdayId));
+            } catch (error) {
+              console.error("Doğum günü silinirken hata oluştu:", error);
+              Alert.alert('Hata', 'Silme işlemi sırasında bir sorun oluştu.');
+            }
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
 
   const handleCardPress = (screen) => {
     navigation.navigate(screen);
@@ -89,9 +127,9 @@ export default function DashboardScreen({ navigation }) {
 
           <WeeklyCalendar />
           
-          <DailyReminders reminders={todayReminders} />
+          <DailyReminders reminders={todayReminders} onDelete={handleDeleteBirthday} />
           
-          <UpcomingReminders reminders={upcomingReminders} />
+          <UpcomingReminders reminders={upcomingReminders} onDelete={handleDeleteBirthday} />
         </ScrollView>
       </SafeAreaView>
     </>

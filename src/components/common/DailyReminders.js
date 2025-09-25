@@ -3,12 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getResponsiveValue, spacing, fontSizes } from '../../constants/responsive';
 import { FONT_FAMILIES, FONT_STYLES } from '../../constants/fonts';
 
-export default function DailyReminders({ reminders = [] }) {
+export default function DailyReminders({ reminders = [], onDelete }) {
   const hasReminders = reminders && reminders.length > 0;
 
   if (!hasReminders) {
@@ -29,7 +31,7 @@ export default function DailyReminders({ reminders = [] }) {
       <Text style={styles.sectionTitle}>Bugün ({reminders.length})</Text>
       <View style={styles.listContainer}>
         {reminders.map((reminder, index) => (
-          <View key={index} style={styles.listItem}>
+          <View key={reminder.id} style={styles.listItem}>
             <View style={styles.itemContent}>
               <View style={styles.checkbox}>
                 <View style={[styles.checkboxInner, { backgroundColor: '#FF6A88' }]} />
@@ -41,6 +43,9 @@ export default function DailyReminders({ reminders = [] }) {
                 </View>
               </View>
               <Text style={styles.itemIcon}>{reminder.icon}</Text>
+              <TouchableOpacity onPress={() => onDelete(reminder.originalId)} style={styles.deleteButton}>
+                <Ionicons name="trash-outline" size={22} color="#FF6A88" />
+              </TouchableOpacity>
             </View>
             {index < reminders.length - 1 && <View style={styles.divider} />}
           </View>
@@ -151,6 +156,10 @@ const styles = StyleSheet.create({
   },
   itemIcon: {
     fontSize: 18,
+    marginLeft: spacing.sm,
+  },
+  deleteButton: {
+    padding: spacing.sm,
     marginLeft: spacing.sm,
   },
   divider: {

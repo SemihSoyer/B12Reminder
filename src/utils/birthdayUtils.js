@@ -137,6 +137,7 @@ export const transformBirthdaysToReminders = (birthdays) => {
     if (birthday.daysLeft === 0) {
       todayReminders.push({
         id: `birthday-${birthday.id}`,
+        originalId: birthday.id, // Orijinal ID'yi ekliyoruz
         time: 'Bugün',
         title: `${birthday.name}'in doğum günü!`,
         icon: '🎂',
@@ -146,6 +147,7 @@ export const transformBirthdaysToReminders = (birthdays) => {
     else if (birthday.daysLeft > 0 && birthday.daysLeft <= 365) { 
       upcomingReminders.push({
         id: `birthday-${birthday.id}`,
+        originalId: birthday.id, // Orijinal ID'yi ekliyoruz
         time: `${birthday.date}`, // Orijinal tarihi gösterelim
         title: `${birthday.name}'in doğum günü`,
         details: `${birthday.daysLeft} gün kaldı`,
