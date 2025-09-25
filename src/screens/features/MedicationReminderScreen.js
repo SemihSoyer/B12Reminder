@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -19,22 +19,29 @@ import AddMedicationButton from '../../components/medication/AddMedicationButton
 import AddMedicationForm from '../../components/medication/AddMedicationForm';
 import MedicationList from '../../components/medication/MedicationList';
 import { MedicationService } from '../../utils/storage';
+import { groupMedicationsForToday } from '../../utils/medicationUtils';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function MedicationReminderScreen({ navigation }) {
-  const [medications, setMedications] = useState([]);
+  const [allMedications, setAllMedications] = useState([]);
+  const [todayMedications, setTodayMedications] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Sayfa yüklendiğinde ilaçları getir
-  useEffect(() => {
-    loadMedications();
-  }, []);
+  // Sayfa her odaklandığında ilaçları yeniden yükle
+  useFocusEffect(
+    useCallback(() => {
+      loadMedications();
+    }, [])
+  );
 
   const loadMedications = async () => {
     try {
       setLoading(true);
       const storedMedications = await MedicationService.getAllMedications();
-      setMedications(storedMedications);
+      setAllMedications(storedMedications);
+      const grouped = groupMedicationsForToday(storedMedications);
+      setTodayMedications(grouped);
     } catch (error) {
       Alert.alert('Hata', 'İlaçlar yüklenirken bir sorun oluştu.');
     } finally {
@@ -46,7 +53,10 @@ export default function MedicationReminderScreen({ navigation }) {
     try {
       const savedMedication = await MedicationService.addMedication(newMedication);
       if (savedMedication) {
-        setMedications(prev => [...prev, savedMedication]);
+        const updatedMedications = [...allMedications, savedMedication];
+        setAllMedications(updatedMedications);
+        const grouped = groupMedicationsForToday(updatedMedications);
+        setTodayMedications(grouped);
         Alert.alert('Başarılı!', `${savedMedication.name} eklendi.`);
       } else {
         Alert.alert('Hata', 'İlaç eklenirken bir sorun oluştu.');
@@ -60,7 +70,10 @@ export default function MedicationReminderScreen({ navigation }) {
     try {
       const success = await MedicationService.deleteMedication(medicationToDelete.id);
       if (success) {
-        setMedications(prev => prev.filter(item => item.id !== medicationToDelete.id));
+        const updatedMedications = allMedications.filter(item => item.id !== medicationToDelete.id);
+        setAllMedications(updatedMedications);
+        const grouped = groupMedicationsForToday(updatedMedications);
+        setTodayMedications(grouped);
         Alert.alert('Silindi!', `${medicationToDelete.name} silindi.`);
       } else {
         Alert.alert('Hata', 'İlaç silinirken bir sorun oluştu.');
@@ -70,7 +83,7 @@ export default function MedicationReminderScreen({ navigation }) {
     }
   };
 
-  const hasMedications = medications.length > 0;
+  const hasTodayMedications = todayMedications.length > 0;
 
   return (
     <>
@@ -99,17 +112,20 @@ export default function MedicationReminderScreen({ navigation }) {
             contentContainerStyle={styles.scrollContent}
           >
             <Text style={styles.sectionTitle}>
-              {hasMedications ? 'İlaçların' : 'Hatırlatıcılar'}
+              {hasTodayMedications ? 'Bugünkü İlaçların' : 'Bugün Planlanmış İlaç Yok'}
             </Text>
             {loading ? (
               <EmptyState message="İlaçlar yükleniyor..." />
-            ) : hasMedications ? (
+            ) : hasTodayMedications ? (
               <MedicationList
-                medications={medications}
+                medications={todayMedications}
                 onDelete={handleDelete}
               />
             ) : (
-              <EmptyState />
+              <EmptyState 
+                message="Bugün için planlanmış bir hatırlatıcınız bulunmuyor."
+                subMessage="Yeni bir ilaç ekleyerek başlayın!"
+              />
             )}
           </ScrollView>
 

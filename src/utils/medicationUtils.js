@@ -162,3 +162,77 @@ export const transformMedicationsToReminders = (medications) => {
 
   return { todayReminders, upcomingReminders };
 };
+
+const dayOfWeekMap = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+
+const isMedicationForToday = (medication, today) => {
+  const { frequency } = medication;
+  if (!frequency) return false;
+
+  const todayDayOfWeek = dayOfWeekMap[today.getDay()];
+
+  switch (frequency.type) {
+    case 'daily':
+      // Her X günde bir mantığı için bir başlangıç tarihi gerekir.
+      // Şimdilik, basitçe her X günde birin bugün olup olmadığını kontrol edemeyiz
+      // Bu nedenle, 'value' 1 ise her gün kabul edelim.
+      // Daha gelişmiş bir mantık için ilacın eklenme tarihi saklanmalıdır.
+      return frequency.value === 1;
+    
+    case 'weekly':
+      return frequency.value.includes(todayDayOfWeek);
+
+    case 'specific_dates':
+      const todayString = today.toISOString().split('T')[0];
+      return frequency.value.includes(todayString);
+      
+    default:
+      return false;
+  }
+};
+
+export const groupMedicationsForToday = (medications) => {
+  const today = new Date();
+  
+  const todayMedications = medications.filter(med => isMedicationForToday(med, today));
+
+  if (todayMedications.length === 0) {
+    return [];
+  }
+
+  const timeSlots = {
+    Sabah: { icon: 'sunny-outline', start: 5, end: 11, data: [] },
+    Öğle: { icon: 'partly-sunny-outline', start: 12, end: 16, data: [] },
+    Akşam: { icon: 'moon-outline', start: 17, end: 20, data: [] },
+    Gece: { icon: 'bed-outline', start: 21, end: 4, data: [] },
+  };
+
+  todayMedications.forEach(med => {
+    med.times.forEach(time => {
+      const [hour] = time.split(':').map(Number);
+      
+      if (hour >= timeSlots.Sabah.start && hour <= timeSlots.Sabah.end) {
+        timeSlots.Sabah.data.push({ ...med, time });
+      } else if (hour >= timeSlots.Öğle.start && hour <= timeSlots.Öğle.end) {
+        timeSlots.Öğle.data.push({ ...med, time });
+      } else if (hour >= timeSlots.Akşam.start && hour <= timeSlots.Akşam.end) {
+        timeSlots.Akşam.data.push({ ...med, time });
+      } else { // Gece
+        timeSlots.Gece.data.push({ ...med, time });
+      }
+    });
+  });
+
+  // Her bir zaman dilimindeki ilaçları kendi içinde saate göre sırala
+  for (const slot in timeSlots) {
+    timeSlots[slot].data.sort((a, b) => {
+      const timeA = a.time.replace(':', '');
+      const timeB = b.time.replace(':', '');
+      return timeA.localeCompare(timeB);
+    });
+  }
+
+  return Object.entries(timeSlots)
+    .map(([title, { icon, data }]) => ({ title, icon, data }))
+    .filter(slot => slot.data.length > 0);
+};

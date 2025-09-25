@@ -1,78 +1,115 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SectionList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import { getFrequencyText } from '../../utils/medicationUtils';
-import ReminderIcon from '../common/ReminderIcon';
 
-export default function MedicationList({ medications, onDelete }) {
-  const renderItem = ({ item }) => {
-    const detailsText = `${item.dosage} • ${item.times.join(', ')} • ${getFrequencyText(item.frequency)}`;
-    
-    return (
-      <View style={styles.itemContainer}>
-        <View style={styles.infoContainer}>
-          <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.details}>{detailsText}</Text>
-        </View>
-        <ReminderIcon 
-          name="medkit-outline" 
-          color="#74B9FF" 
-          backgroundColor="rgba(116, 185, 255, 0.1)" 
-        />
-        <TouchableOpacity onPress={() => onDelete(item)} style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={22} color="#FF6A88" />
-        </TouchableOpacity>
+const MedicationItem = ({ item, onDelete }) => {
+  return (
+    <View style={styles.itemContainer}>
+      <View style={styles.itemIcon}>
+        <Ionicons name="medical-outline" size={24} color="#E17055" />
       </View>
-    );
-  };
+      <View style={styles.itemDetails}>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemInfo}>
+          {`${item.dosage} • ${item.time}`}
+        </Text>
+      </View>
+      <TouchableOpacity onPress={() => onDelete(item)} style={styles.deleteButton}>
+        <Ionicons name="trash-outline" size={22} color="#d63031" />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const MedicationList = ({ medications, onDelete }) => {
+  if (!medications || medications.length === 0) {
+    return null;
+  }
+
+  const renderSectionHeader = ({ section: { title, icon } }) => (
+    <View style={styles.sectionHeader}>
+      <Ionicons name={icon} size={20} color="#636e72" style={styles.sectionIcon} />
+      <Text style={styles.sectionTitle}>{title}</Text>
+    </View>
+  );
 
   return (
-    <FlatList
-      data={medications}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
+    <SectionList
+      sections={medications}
+      keyExtractor={(item, index) => item.id + index}
+      renderItem={({ item }) => <MedicationItem item={item} onDelete={onDelete} />}
+      renderSectionHeader={renderSectionHeader}
+      contentContainerStyle={styles.listContainer}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
-      scrollEnabled={false}
     />
   );
-}
+};
 
 const styles = StyleSheet.create({
-  itemContainer: {
+  listContainer: {
+    paddingBottom: spacing.lg,
+  },
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
     paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    marginVertical: spacing.xs,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: '#dfe6e9',
   },
-  infoContainer: {
-    flex: 1,
+  sectionIcon: {
     marginRight: spacing.sm,
   },
-  title: {
-    ...FONT_STYLES.bodyLarge,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
+  sectionTitle: {
+    ...FONT_STYLES.heading3,
+    color: '#2d3436',
   },
-  details: {
+  itemContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  itemIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(225, 112, 85, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  itemDetails: {
+    flex: 1,
+  },
+  itemName: {
+    ...FONT_STYLES.emphasis,
+    fontSize: 16,
+    color: '#2d3436',
+    marginBottom: spacing.xs,
+  },
+  itemInfo: {
     ...FONT_STYLES.body,
-    color: '#666',
-    marginTop: 4,
-    lineHeight: 18,
+    color: '#636e72',
+    flexWrap: 'wrap',
   },
   deleteButton: {
-    paddingLeft: spacing.sm, // İkonla arasında boşluk bırakmak için
+    padding: spacing.sm,
+    marginLeft: spacing.md,
   },
   separator: {
-    height: spacing.sm,
+    height: spacing.md,
   },
 });
+
+export default MedicationList;
