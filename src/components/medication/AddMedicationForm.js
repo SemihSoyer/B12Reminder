@@ -59,26 +59,91 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
   };
 
   const handleTimeChange = (newTime) => {
+    // Aynı saatin zaten var olup olmadığını kontrol et
+    if (times.includes(newTime) && times[editingTimeIndex] !== newTime) {
+      Alert.alert('Uyarı', 'Bu saat zaten eklenmiş. Lütfen farklı bir saat seçin.');
+      return;
+    }
+
     const newTimes = [...times];
     newTimes[editingTimeIndex] = newTime;
+    // Saatleri sıralı tutmak için sort yap
+    newTimes.sort();
     setTimes(newTimes);
   };
 
   const addTimeField = () => {
-    setTimes([...times, '12:00']); // Yeni saat için varsayılan
+    if (times.length >= 6) {
+      Alert.alert('Limit', 'Maksimum 6 saat ekleyebilirsiniz.');
+      return;
+    }
+
+    // Yeni saat için akıllı varsayılan değer öner
+    const getNextSuggestedTime = () => {
+      if (times.length === 0) return '09:00';
+      
+      const sortedTimes = [...times].sort();
+      const lastTime = sortedTimes[sortedTimes.length - 1];
+      const [hours, minutes] = lastTime.split(':').map(Number);
+      
+      // Son saate 4 saat ekle (tipik ilaç alım aralığı)
+      let nextHour = hours + 4;
+      if (nextHour >= 24) nextHour = nextHour - 24;
+      
+      const suggestedTime = `${nextHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      
+      // Eğer önerilen saat zaten varsa, farklı bir saat öner
+      if (times.includes(suggestedTime)) {
+        const commonTimes = ['08:00', '12:00', '16:00', '20:00', '09:00', '13:00', '17:00', '21:00'];
+        for (const time of commonTimes) {
+          if (!times.includes(time)) {
+            return time;
+          }
+        }
+        return '10:00'; // Son çare
+      }
+      
+      return suggestedTime;
+    };
+
+    const newTime = getNextSuggestedTime();
+    if (!times.includes(newTime)) {
+      const newTimes = [...times, newTime].sort();
+      setTimes(newTimes);
+    }
   };
 
   const removeTimeField = (index) => {
-    if (times.length > 1) {
-      const newTimes = times.filter((_, i) => i !== index);
-      setTimes(newTimes);
+    if (times.length <= 1) {
+      Alert.alert('Uyarı', 'En az bir saat olması gerekiyor.');
+      return;
     }
+
+    Alert.alert(
+      'Saati Sil',
+      `${times[index]} saatini silmek istediğinizden emin misiniz?`,
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: () => {
+            const newTimes = times.filter((_, i) => i !== index);
+            setTimes(newTimes);
+          },
+        },
+      ]
+    );
   };
 
   const openTimePicker = (index) => {
     setEditingTimeIndex(index);
     setShowTimePicker(true);
   };
+
 
   return (
     <Modal
@@ -146,21 +211,36 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
                 <Text style={styles.label}>Kullanım Saatleri</Text>
                 {times.map((time, index) => (
                   <View key={index} style={styles.timeRow}>
-                    <TouchableOpacity onPress={() => openTimePicker(index)} style={styles.inputContainer}>
+                    <TouchableOpacity onPress={() => openTimePicker(index)} style={styles.timeInputContainer}>
                       <Ionicons name="time-outline" size={22} color="#00b894" style={styles.inputIcon} />
                       <Text style={styles.timeText}>{time}</Text>
                     </TouchableOpacity>
-                    {times.length > 1 && (
-                      <TouchableOpacity onPress={() => removeTimeField(index)} style={styles.removeButton}>
-                        <Ionicons name="trash-outline" size={22} color="#d63031" />
-                      </TouchableOpacity>
-                    )}
+                    <TouchableOpacity 
+                      onPress={() => removeTimeField(index)} 
+                      style={[
+                        styles.removeButton, 
+                        times.length === 1 && styles.disabledButton
+                      ]}
+                      disabled={times.length === 1}
+                    >
+                      <Ionicons 
+                        name="trash-outline" 
+                        size={22} 
+                        color={times.length === 1 ? "#b2bec3" : "#d63031"} 
+                      />
+                    </TouchableOpacity>
                   </View>
                 ))}
                 <TouchableOpacity onPress={addTimeField} style={styles.addButton}>
                   <Ionicons name="add-circle-outline" size={24} color="#0984e3" />
                   <Text style={styles.addButtonText}>Başka bir saat ekle</Text>
                 </TouchableOpacity>
+                
+                {times.length >= 6 && (
+                  <Text style={styles.limitText}>
+                    Maksimum 6 saat ekleyebilirsiniz
+                  </Text>
+                )}
               </View>
 
               {/* Tekrarlama Sıklığı */}
@@ -310,6 +390,23 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: spacing.md,
+        gap: spacing.sm,
+    },
+    timeInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        paddingHorizontal: spacing.lg,
+        borderWidth: 1,
+        borderColor: '#dfe6e9',
+        minHeight: 56,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+        flex: 1,
     },
     timeText: {
       flex: 1,
@@ -318,8 +415,24 @@ const styles = StyleSheet.create({
       fontSize: 16,
     },
     removeButton: {
-        padding: spacing.sm,
-        marginLeft: spacing.md,
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        backgroundColor: 'rgba(214, 48, 49, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(214, 48, 49, 0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#d63031',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    disabledButton: {
+        backgroundColor: 'rgba(178, 190, 195, 0.05)',
+        borderColor: 'rgba(178, 190, 195, 0.1)',
+        opacity: 0.5,
     },
     addButton: {
         flexDirection: 'row',
@@ -335,5 +448,12 @@ const styles = StyleSheet.create({
         ...FONT_STYLES.emphasis,
         color: '#0984e3',
         marginLeft: spacing.sm,
+    },
+    limitText: {
+        ...FONT_STYLES.bodySmall,
+        color: '#636e72',
+        textAlign: 'center',
+        marginTop: spacing.sm,
+        fontStyle: 'italic',
     },
 });
