@@ -44,6 +44,7 @@ const MedicationList = ({ medications, onDelete }) => {
       renderSectionHeader={renderSectionHeader}
       contentContainerStyle={styles.listContainer}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
+      stickySectionHeadersEnabled={false}
     />
   );
 };
