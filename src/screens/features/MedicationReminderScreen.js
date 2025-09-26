@@ -106,10 +106,9 @@ export default function MedicationReminderScreen({ navigation }) {
           </View>
 
           {/* Content */}
-          <ScrollView
-            style={styles.content}
+          <View
+            style={[styles.content, styles.scrollContent]}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
           >
             <Text style={styles.sectionTitle}>
               {hasTodayMedications ? 'Bugünkü İlaçların' : 'Bugün Planlanmış İlaç Yok'}
@@ -127,7 +126,7 @@ export default function MedicationReminderScreen({ navigation }) {
                 subMessage="Yeni bir ilaç ekleyerek başlayın!"
               />
             )}
-          </ScrollView>
+          </View>
 
           {/* Add Button */}
           <View style={styles.buttonSection}>

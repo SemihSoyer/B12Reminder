@@ -96,7 +96,6 @@ const isMedicationForDate = (medication, date) => {
  * @returns {{todayReminders: Array, upcomingReminders: Array}}
  */
 export const transformMedicationsToReminders = (medications) => {
-  const todayReminders = [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -104,25 +103,42 @@ export const transformMedicationsToReminders = (medications) => {
     return { todayReminders: [], upcomingReminders: [] };
   }
 
-  // Bugünkü hatırlatıcıları bul
+  // Bugünkü hatırlatıcıları gruplamak için bir map kullan
+  const todayRemindersMap = new Map();
+
   medications.forEach(med => {
     if (isMedicationForDate(med, today)) {
-      med.times.forEach(time => {
-        todayReminders.push({
-          id: `med-${med.id}-${time}`,
+      // İlaç adı ve dozajına göre bir anahtar oluştur
+      const key = `${med.name}|${med.dosage}`;
+
+      if (!todayRemindersMap.has(key)) {
+        // Eğer ilaç map'te yoksa, yeni bir girdi oluştur
+        todayRemindersMap.set(key, {
+          id: `med-${med.id}`,
           originalId: med.id,
           reminderType: 'medication',
-          time: time,
-          title: `${med.name} (${med.dosage})`,
-          iconConfig: { 
-            name: 'medkit-outline', 
-            color: '#74B9FF', 
-            backgroundColor: 'rgba(116, 185, 255, 0.1)' 
-          },
+          title: `${med.name}`,
+          subTitle: med.dosage,
+          times: [], // Saatleri bir dizi olarak tut
+          icon: 'medkit-outline',
+          // Renk veya diğer ikon bilgileri de buraya eklenebilir
         });
-      });
+      }
+
+      // Mevcut ilacın saatler dizisine yeni saatleri ekle
+      const existing = todayRemindersMap.get(key);
+      existing.times.push(...med.times);
+      existing.times.sort(); // Saatleri küçükten büyüğe sırala
     }
   });
+
+  // Map'i tekrar diziye çevir
+  const todayReminders = Array.from(todayRemindersMap.values()).map(rem => ({
+    ...rem,
+    // Sıralama için ilk saati ana 'time' alanı olarak ekle
+    // Bu, doğum günleri gibi tek zamanlı hatırlatıcılarla uyumluluğu sağlar
+    time: rem.times[0], 
+  }));
 
   // Yaklaşan hatırlatıcıları bul (sonraki 30 gün içinde ilk vuku bulma)
   const upcomingRemindersMap = new Map();

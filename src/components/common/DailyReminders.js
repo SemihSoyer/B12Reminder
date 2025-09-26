@@ -40,7 +40,9 @@ export default function DailyReminders({ reminders = [], onDelete }) {
               <View style={styles.itemInfo}>
                 <Text style={styles.itemTitle}>{reminder.title}</Text>
                 <View style={styles.itemDetails}>
-                  <Text style={styles.itemTime}>{reminder.time}</Text>
+                  <Text style={styles.itemTime}>
+                    {Array.isArray(reminder.times) ? reminder.times.join(' • ') : reminder.time}
+                  </Text>
                 </View>
               </View>
               <ReminderIcon {...reminder.iconConfig} />
