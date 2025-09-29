@@ -90,6 +90,18 @@ const isMedicationForDate = (medication, date) => {
   }
 };
 
+// Times normalizasyonu: Boş/eksik saatler için güvenli varsayılan
+const getNormalizedTimes = (med) => {
+  try {
+    if (Array.isArray(med.times)) {
+      const cleaned = med.times.filter(Boolean).map(String);
+      if (cleaned.length > 0) return cleaned;
+    }
+  } catch (_) {}
+  // Varsayılan tek saat (sıralama ve gösterim için)
+  return ['09:00'];
+};
+
 /**
  * İlaç listesini anasayfa hatırlatıcı formatına çevirir.
  * @param {Array} medications - İlaç objeleri dizisi.
@@ -125,9 +137,9 @@ export const transformMedicationsToReminders = (medications) => {
         });
       }
 
-      // Mevcut ilacın saatler dizisine yeni saatleri ekle
+      // Mevcut ilacın saatler dizisine yeni saatleri ekle (normalize ederek)
       const existing = todayRemindersMap.get(key);
-      existing.times.push(...med.times);
+      existing.times.push(...getNormalizedTimes(med));
       existing.times.sort(); // Saatleri küçükten büyüğe sırala
     }
   });
@@ -210,7 +222,7 @@ const isMedicationForToday = (medication, today) => {
 export const groupMedicationsForToday = (medications) => {
   const today = new Date();
   
-  const todayMedications = medications.filter(med => isMedicationForToday(med, today));
+  const todayMedications = medications.filter(med => isMedicationForDate(med, today));
 
   if (todayMedications.length === 0) {
     return [];
@@ -251,4 +263,48 @@ export const groupMedicationsForToday = (medications) => {
   return Object.entries(timeSlots)
     .map(([title, { icon, data }]) => ({ title, icon, data }))
     .filter(slot => slot.data.length > 0);
+};
+
+// Akıllı varsayılan öneriler
+export const getSmartFrequencyDefaults = (medicationName = '') => {
+  const name = medicationName.toLowerCase();
+  
+  // Vitamin ve mineral varsayılanları
+  if (name.includes('vitamin') || name.includes('b12') || name.includes('d3') || 
+      name.includes('omega') || name.includes('magnezyum') || name.includes('kalsiyum')) {
+    return { type: 'daily', value: 1 };
+  }
+  
+  // Antibiyotik varsayılanları
+  if (name.includes('antibiyotik') || name.includes('penisilin') || name.includes('amoksisilin')) {
+    return { type: 'interval', value: 2 }; // Her 2 günde bir
+  }
+  
+  // Ağrı kesici varsayılanları
+  if (name.includes('aspirin') || name.includes('ibuprofen') || name.includes('paracetamol')) {
+    return { type: 'interval', value: 3 }; // Her 3 günde bir
+  }
+  
+  // Varsayılan: Günlük
+  return { type: 'daily', value: 1 };
+};
+
+// Frequency validation
+export const validateFrequency = (frequency) => {
+  if (!frequency || !frequency.type) return false;
+  
+  const { type, value } = frequency;
+  
+  switch (type) {
+    case 'daily':
+      return true;
+    case 'interval':
+      return Number.isInteger(value) && value > 0;
+    case 'weekly':
+      return Array.isArray(value) && value.length > 0;
+    case 'specific_dates':
+      return Array.isArray(value) && value.length > 0;
+    default:
+      return false;
+  }
 };

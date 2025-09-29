@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
-import { getFrequencyText } from '../../utils/medicationUtils';
+import { getFrequencyText, getSmartFrequencyDefaults, validateFrequency } from '../../utils/medicationUtils';
 
 import FrequencySelector from './FrequencySelector';
 import WheelTimePicker from './WheelTimePicker';
@@ -29,10 +29,38 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
   const [showFrequencyModal, setShowFrequencyModal] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [editingTimeIndex, setEditingTimeIndex] = useState(0);
+  const [showSmartSuggestion, setShowSmartSuggestion] = useState(false);
+
+  // Gelişmiş validasyon
+  const validateForm = () => {
+    const errors = [];
+    
+    if (!name.trim()) {
+      errors.push('İlaç adı gereklidir');
+    } else if (name.trim().length < 2) {
+      errors.push('İlaç adı en az 2 karakter olmalıdır');
+    }
+    
+    if (!dosage.trim()) {
+      errors.push('Doz bilgisi gereklidir');
+    }
+    
+    if (times.length === 0 || times.some(t => !t.trim())) {
+      errors.push('En az bir saat belirtmelisiniz');
+    }
+    
+    if (!validateFrequency(frequency)) {
+      errors.push('Geçerli bir tekrarlama sıklığı seçin');
+    }
+    
+    return errors;
+  };
 
   const handleAdd = () => {
-    if (!name.trim() || !dosage.trim() || times.some(t => !t.trim())) {
-      Alert.alert('Hata', 'Lütfen tüm zorunlu alanları doldurun.');
+    const errors = validateForm();
+    
+    if (errors.length > 0) {
+      Alert.alert('Hata', errors.join('\n'));
       return;
     }
 
@@ -43,11 +71,28 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
       times: times.filter(t => t.trim()),
       note: note.trim(),
       frequency,
+      createdAt: new Date().toISOString(), // Interval hesaplamaları için
     };
 
     onAdd(newMedication);
     resetForm();
     onClose();
+  };
+
+  // İlaç adı değiştiğinde akıllı öneriler
+  const handleNameChange = (text) => {
+    setName(text);
+    
+    // Akıllı frequency önerisi
+    if (text.length > 3) {
+      const smartDefault = getSmartFrequencyDefaults(text);
+      if (JSON.stringify(smartDefault) !== JSON.stringify(frequency)) {
+        setFrequency(smartDefault);
+        setShowSmartSuggestion(true);
+        // 3 saniye sonra öneriyi gizle
+        setTimeout(() => setShowSmartSuggestion(false), 3000);
+      }
+    }
   };
 
   const resetForm = () => {
@@ -56,6 +101,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
     setTimes(['09:00']);
     setNote('');
     setFrequency({ type: 'daily', value: 1 });
+    setShowSmartSuggestion(false);
   };
 
   const handleTimeChange = (newTime) => {
@@ -184,8 +230,8 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
                   <TextInput
                     style={styles.input}
                     value={name}
-                    onChangeText={setName}
-                    placeholder="Örn: Parol 500mg"
+                    onChangeText={handleNameChange}
+                    placeholder="Örn: Vitamin B12, Parol 500mg"
                     placeholderTextColor="#b2bec3"
                   />
                 </View>
@@ -245,7 +291,15 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
 
               {/* Tekrarlama Sıklığı */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Tekrarlama Sıklığı</Text>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Tekrarlama Sıklığı</Text>
+                  {showSmartSuggestion && (
+                    <View style={styles.smartBadge}>
+                      <Ionicons name="bulb" size={14} color="#FFFFFF" />
+                      <Text style={styles.smartBadgeText}>Akıllı Öneri</Text>
+                    </View>
+                  )}
+                </View>
                 <TouchableOpacity onPress={() => setShowFrequencyModal(true)} style={styles.inputContainer}>
                     <Ionicons name="repeat-outline" size={22} color="#fd79a8" style={styles.inputIcon} />
                     <Text style={styles.input}>{getFrequencyText(frequency)}</Text>
@@ -356,11 +410,36 @@ const styles = StyleSheet.create({
     inputSection: {
         marginBottom: spacing.xl,
     },
+    labelContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.md,
+        marginLeft: spacing.xs,
+    },
     label: {
         ...FONT_STYLES.emphasisMedium,
         color: '#2d3436',
-        marginBottom: spacing.md,
-        marginLeft: spacing.xs,
+    },
+    smartBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#00B894',
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 4,
+        borderRadius: 12,
+        shadowColor: '#00B894',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    smartBadgeText: {
+        ...FONT_STYLES.bodySmall,
+        color: '#FFFFFF',
+        fontSize: 10,
+        marginLeft: 4,
+        fontWeight: '600',
     },
     inputContainer: {
         flexDirection: 'row',
