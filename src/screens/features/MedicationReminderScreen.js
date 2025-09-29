@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Alert,
-  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,12 +18,14 @@ import AddMedicationButton from '../../components/medication/AddMedicationButton
 import AddMedicationForm from '../../components/medication/AddMedicationForm';
 import MedicationList from '../../components/medication/MedicationList';
 import { MedicationService } from '../../utils/storage';
-import { groupMedicationsForToday } from '../../utils/medicationUtils';
+import { groupMedicationsForToday, transformMedicationsToReminders } from '../../utils/medicationUtils';
+import UpcomingReminders from '../../components/common/UpcomingReminders';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function MedicationReminderScreen({ navigation }) {
   const [allMedications, setAllMedications] = useState([]);
   const [todayMedications, setTodayMedications] = useState([]);
+  const [upcomingReminders, setUpcomingReminders] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -42,6 +43,8 @@ export default function MedicationReminderScreen({ navigation }) {
       setAllMedications(storedMedications);
       const grouped = groupMedicationsForToday(storedMedications);
       setTodayMedications(grouped);
+      const { upcomingReminders } = transformMedicationsToReminders(storedMedications);
+      setUpcomingReminders(upcomingReminders);
     } catch (error) {
       Alert.alert('Hata', 'İlaçlar yüklenirken bir sorun oluştu.');
     } finally {
@@ -57,6 +60,8 @@ export default function MedicationReminderScreen({ navigation }) {
         setAllMedications(updatedMedications);
         const grouped = groupMedicationsForToday(updatedMedications);
         setTodayMedications(grouped);
+        const { upcomingReminders } = transformMedicationsToReminders(updatedMedications);
+        setUpcomingReminders(upcomingReminders);
         Alert.alert('Başarılı!', `${savedMedication.name} eklendi.`);
       } else {
         Alert.alert('Hata', 'İlaç eklenirken bir sorun oluştu.');
@@ -74,6 +79,8 @@ export default function MedicationReminderScreen({ navigation }) {
         setAllMedications(updatedMedications);
         const grouped = groupMedicationsForToday(updatedMedications);
         setTodayMedications(grouped);
+        const { upcomingReminders } = transformMedicationsToReminders(updatedMedications);
+        setUpcomingReminders(upcomingReminders);
         Alert.alert('Silindi!', `${medicationToDelete.name} silindi.`);
       } else {
         Alert.alert('Hata', 'İlaç silinirken bir sorun oluştu.');
@@ -105,11 +112,11 @@ export default function MedicationReminderScreen({ navigation }) {
             <View style={styles.headerSpacer} />
           </View>
 
+          {/* Upcoming Reminders */}
+          <UpcomingReminders reminders={upcomingReminders} onDelete={(id) => handleDelete({ id })} />
+
           {/* Content */}
-          <View
-            style={[styles.content, styles.scrollContent]}
-            showsVerticalScrollIndicator={false}
-          >
+          <View style={[styles.content, styles.scrollContent]}>
             <Text style={styles.sectionTitle}>
               {hasTodayMedications ? 'Bugünkü İlaçların' : 'Bugün Planlanmış İlaç Yok'}
             </Text>
@@ -121,7 +128,7 @@ export default function MedicationReminderScreen({ navigation }) {
                 onDelete={handleDelete}
               />
             ) : (
-              <EmptyState 
+              <EmptyState
                 message="Bugün için planlanmış bir hatırlatıcınız bulunmuyor."
                 subMessage="Yeni bir ilaç ekleyerek başlayın!"
               />

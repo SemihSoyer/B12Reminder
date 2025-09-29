@@ -64,12 +64,20 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
     setNote('');
   };
 
-  const handleDateSelect = (selectedDay, selectedMonth) => {
-    const monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-    ];
-    setDate(`${selectedDay} ${monthNames[selectedMonth]}`);
+  const handleDateSelect = (dateObject, dateString) => {
+    // WheelDatePicker (dateObject, dateString) döner
+    // Uygulama genelinde kullandığımız format: "DD Ay"
+    if (typeof dateString === 'string' && dateString.trim().length > 0) {
+      setDate(dateString.trim());
+    } else if (dateObject instanceof Date && !isNaN(dateObject)) {
+      const day = dateObject.getDate();
+      const monthIndex = dateObject.getMonth();
+      const monthNames = [
+        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      ];
+      setDate(`${day} ${monthNames[monthIndex]}`);
+    }
     setShowDatePicker(false);
   };
 

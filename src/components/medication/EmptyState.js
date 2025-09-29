@@ -3,13 +3,13 @@ import { View, Text, StyleSheet } from 'react-native';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 
-export default function EmptyState() {
+export default function EmptyState({ message, subMessage }) {
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>💊</Text>
-      <Text style={styles.title}>Henüz İlaç Eklenmemiş</Text>
+      <Text style={styles.title}>{message || 'Henüz İlaç Eklenmemiş'}</Text>
       <Text style={styles.subtitle}>
-        İlk ilaç hatırlatıcını ekleyerek tedavini takip etmeye başla.
+        {subMessage || 'İlk ilaç hatırlatıcını ekleyerek tedavini takip etmeye başla.'}
       </Text>
     </View>
   );

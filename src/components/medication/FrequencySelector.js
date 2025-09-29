@@ -338,14 +338,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
   },
   frequencyCard: {
-    width: (width - spacing.lg * 3) / 2,
+    width: '48%',
     marginBottom: spacing.md,
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 4,
   },
   selectedCard: {
@@ -355,8 +355,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   cardGradient: {
-    padding: spacing.lg,
-    minHeight: 120,
+    padding: spacing.xl,
+    minHeight: 150,
     justifyContent: 'space-between',
   },
   cardHeader: {
@@ -366,9 +366,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',

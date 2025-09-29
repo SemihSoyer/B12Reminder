@@ -313,7 +313,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
                 <View style={[styles.inputContainer, { height: 100 }]}>
                   <Ionicons name="document-text-outline" size={22} color="#fab1a0" style={styles.inputIcon} />
                   <TextInput
-                    style={[styles.input, { textAlignVertical: 'top', paddingTop: spacing.md }]}
+                    style={[styles.input, { textAlignVertical: 'top', paddingTop: spacing.sm }]}
                     value={note}
                     onChangeText={setNote}
                     placeholder="Yemekten sonra al..."
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
     },
     inputSection: {
-        marginBottom: spacing.xl,
+        marginBottom: spacing.lg,
     },
     labelContainer: {
         flexDirection: 'row',
@@ -420,6 +420,7 @@ const styles = StyleSheet.create({
     label: {
         ...FONT_STYLES.emphasisMedium,
         color: '#2d3436',
+        marginBottom: spacing.sm,
     },
     smartBadge: {
         flexDirection: 'row',
@@ -446,10 +447,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderRadius: 16,
-        paddingHorizontal: spacing.lg,
+        paddingHorizontal: spacing.md,
         borderWidth: 1,
         borderColor: '#dfe6e9',
-        minHeight: 56,
+        minHeight: 52,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -457,7 +458,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     inputIcon: {
-        marginRight: spacing.md,
+        marginRight: spacing.sm,
     },
     input: {
         flex: 1,
@@ -476,10 +477,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderRadius: 16,
-        paddingHorizontal: spacing.lg,
+        paddingHorizontal: spacing.md,
         borderWidth: 1,
         borderColor: '#dfe6e9',
-        minHeight: 56,
+        minHeight: 52,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
