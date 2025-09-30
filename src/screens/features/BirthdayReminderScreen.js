@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Alert,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -20,6 +19,7 @@ import EmptyState from '../../components/birthday/EmptyState';
 import AddBirthdayButton from '../../components/birthday/AddBirthdayButton';
 import MonthlyCalendar from '../../components/birthday/MonthlyCalendar';
 import AddBirthdayForm from '../../components/birthday/AddBirthdayForm';
+import { showAlert } from '../../components/ui/CustomAlert';
 
 export default function BirthdayReminderScreen({ navigation }) {
   // State'ler
@@ -46,7 +46,7 @@ export default function BirthdayReminderScreen({ navigation }) {
       setBirthdays(sortedBirthdays);
     } catch (error) {
       console.error('Error loading birthdays:', error);
-      Alert.alert('Hata', 'Doğum günleri yüklenirken bir hata oluştu.');
+      showAlert('Hata', 'Doğum günleri yüklenirken bir hata oluştu.', 'error');
     } finally {
       setLoading(false);
     }
@@ -78,17 +78,17 @@ export default function BirthdayReminderScreen({ navigation }) {
         });
         
         // Başarı mesajı
-        Alert.alert(
+        showAlert(
           'Başarılı!',
           `${newBirthday.name} için doğum günü hatırlatıcısı eklendi.`,
-          [{ text: 'Tamam', style: 'default' }]
+          'success'
         );
       } else {
-        Alert.alert('Hata', 'Doğum günü eklenirken bir hata oluştu.');
+        showAlert('Hata', 'Doğum günü eklenirken bir hata oluştu.', 'error');
       }
     } catch (error) {
       console.error('Error adding birthday:', error);
-      Alert.alert('Hata', 'Doğum günü eklenirken bir hata oluştu.');
+      showAlert('Hata', 'Doğum günü eklenirken bir hata oluştu.', 'error');
     }
   };
 
@@ -103,17 +103,17 @@ export default function BirthdayReminderScreen({ navigation }) {
         );
         
         // Başarı mesajı
-        Alert.alert(
+        showAlert(
           'Silindi!',
           `${birthday.name} için doğum günü hatırlatıcısı silindi.`,
-          [{ text: 'Tamam', style: 'default' }]
+          'success'
         );
       } else {
-        Alert.alert('Hata', 'Doğum günü silinirken bir hata oluştu.');
+        showAlert('Hata', 'Doğum günü silinirken bir hata oluştu.', 'error');
       }
     } catch (error) {
       console.error('Error deleting birthday:', error);
-      Alert.alert('Hata', 'Doğum günü silinirken bir hata oluştu.');
+      showAlert('Hata', 'Doğum günü silinirken bir hata oluştu.', 'error');
     }
   };
 

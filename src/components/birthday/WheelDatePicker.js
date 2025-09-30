@@ -76,7 +76,6 @@ export default function WheelDatePicker({
       animationType="slide"
       transparent={true}
       onRequestClose={onClose}
-      presentationStyle="pageSheet"
     >
       <View style={styles.overlay}>
         <LinearGradient

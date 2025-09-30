@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +20,7 @@ import { MedicationService } from '../../utils/storage';
 import { groupMedicationsForToday, transformMedicationsToReminders } from '../../utils/medicationUtils';
 import UpcomingReminders from '../../components/common/UpcomingReminders';
 import { useFocusEffect } from '@react-navigation/native';
+import { showAlert } from '../../components/ui/CustomAlert';
 
 export default function MedicationReminderScreen({ navigation }) {
   const [allMedications, setAllMedications] = useState([]);
@@ -46,7 +46,7 @@ export default function MedicationReminderScreen({ navigation }) {
       const { upcomingReminders } = transformMedicationsToReminders(storedMedications);
       setUpcomingReminders(upcomingReminders);
     } catch (error) {
-      Alert.alert('Hata', 'İlaçlar yüklenirken bir sorun oluştu.');
+      showAlert('Hata', 'İlaçlar yüklenirken bir sorun oluştu.', 'error');
     } finally {
       setLoading(false);
     }
@@ -62,12 +62,12 @@ export default function MedicationReminderScreen({ navigation }) {
         setTodayMedications(grouped);
         const { upcomingReminders } = transformMedicationsToReminders(updatedMedications);
         setUpcomingReminders(upcomingReminders);
-        Alert.alert('Başarılı!', `${savedMedication.name} eklendi.`);
+        showAlert('Başarılı!', `${savedMedication.name} eklendi.`, 'success');
       } else {
-        Alert.alert('Hata', 'İlaç eklenirken bir sorun oluştu.');
+        showAlert('Hata', 'İlaç eklenirken bir sorun oluştu.', 'error');
       }
     } catch (error) {
-      Alert.alert('Hata', 'İlaç eklenirken bir hata oluştu.');
+      showAlert('Hata', 'İlaç eklenirken bir hata oluştu.', 'error');
     }
   };
 
@@ -81,12 +81,12 @@ export default function MedicationReminderScreen({ navigation }) {
         setTodayMedications(grouped);
         const { upcomingReminders } = transformMedicationsToReminders(updatedMedications);
         setUpcomingReminders(upcomingReminders);
-        Alert.alert('Silindi!', `${medicationToDelete.name} silindi.`);
+        showAlert('Silindi!', `${medicationToDelete.name} silindi.`, 'success');
       } else {
-        Alert.alert('Hata', 'İlaç silinirken bir sorun oluştu.');
+        showAlert('Hata', 'İlaç silinirken bir sorun oluştu.', 'error');
       }
     } catch (error) {
-        Alert.alert('Hata', 'İlaç silinirken bir hata oluştu.');
+        showAlert('Hata', 'İlaç silinirken bir hata oluştu.', 'error');
     }
   };
 

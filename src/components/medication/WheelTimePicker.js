@@ -53,7 +53,7 @@ export default function WheelTimePicker({ visible, onClose, onTimeSelect, initia
   };
 
   return (
-    <Modal visible={visible} transparent={true} animationType="slide">
+    <Modal visible={visible} transparent={true} animationType="slide" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose} />
         <View style={styles.modalContainer}>

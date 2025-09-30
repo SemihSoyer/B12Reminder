@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   FlatList,
-  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
@@ -28,6 +27,7 @@ import { transformMedicationsToReminders } from '../../utils/medicationUtils';
 
 // Data
 import { featureCards } from '../../data/featureCards';
+import { showAlert } from '../../components/ui/CustomAlert';
 
 export default function DashboardScreen({ navigation }) {
   const [todayReminders, setTodayReminders] = useState([]);
@@ -76,9 +76,10 @@ export default function DashboardScreen({ navigation }) {
     const title = isBirthday ? 'Doğum Gününü Sil' : 'İlacı Sil';
     const message = `Bu hatırlatıcıyı kalıcı olarak silmek istediğinizden emin misiniz?`;
 
-    Alert.alert(
+    showAlert(
       title,
       message,
+      'warning',
       [
         {
           text: 'İptal',
@@ -86,6 +87,7 @@ export default function DashboardScreen({ navigation }) {
         },
         {
           text: 'Sil',
+          style: 'destructive',
           onPress: async () => {
             try {
               if (isBirthday) {
@@ -98,10 +100,9 @@ export default function DashboardScreen({ navigation }) {
               setUpcomingReminders(prev => prev.filter(r => r.originalId !== id));
             } catch (error) {
               console.error("Hatırlatıcı silinirken hata oluştu:", error);
-              Alert.alert('Hata', 'Silme işlemi sırasında bir sorun oluştu.');
+              showAlert('Hata', 'Silme işlemi sırasında bir sorun oluştu.', 'error');
             }
           },
-          style: 'destructive',
         },
       ]
     );

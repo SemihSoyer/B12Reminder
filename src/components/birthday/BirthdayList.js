@@ -5,19 +5,20 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import ReminderIcon from '../common/ReminderIcon';
+import { showAlert } from '../ui/CustomAlert';
 
 export default function BirthdayList({ birthdays = [], onDelete }) {
   const handleDeletePress = (item) => {
-    Alert.alert(
+    showAlert(
       'Doğum Günü Sil',
       `${item.name} için doğum günü hatırlatıcısını silmek istediğinizden emin misiniz?`,
+      'warning',
       [
         {
           text: 'İptal',

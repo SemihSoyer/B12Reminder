@@ -15,6 +15,7 @@ import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import WeekDayPicker from './WeekDayPicker';
 import MultiSelectCalendar from './MultiSelectCalendar';
+import { showAlert } from '../ui/CustomAlert';
 
 const { width } = Dimensions.get('window');
 
@@ -98,7 +99,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
       case 'interval':
         const interval = parseInt(intervalDays, 10);
         if (isNaN(interval) || interval < 1) {
-          alert('Lütfen geçerli bir gün sayısı girin');
+          showAlert('Hata', 'Lütfen geçerli bir gün sayısı girin', 'warning');
           return;
         }
         selection = { type: 'interval', value: interval };
@@ -106,7 +107,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
         
       case 'weekly':
         if (weeklyDays.length === 0) {
-          alert('Lütfen en az bir gün seçin');
+          showAlert('Hata', 'Lütfen en az bir gün seçin', 'warning');
           return;
         }
         selection = { type: 'weekly', value: weeklyDays.sort((a,b) => a - b) };
@@ -114,7 +115,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
         
       case 'specific':
         if (specificDates.length === 0) {
-          alert('Lütfen en az bir tarih seçin');
+          showAlert('Hata', 'Lütfen en az bir tarih seçin', 'warning');
           return;
         }
         selection = { 

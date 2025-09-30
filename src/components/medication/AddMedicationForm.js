@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -16,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import { getFrequencyText, getSmartFrequencyDefaults, validateFrequency } from '../../utils/medicationUtils';
+import { showAlert } from '../ui/CustomAlert';
 
 import FrequencySelector from './FrequencySelector';
 import WheelTimePicker from './WheelTimePicker';
@@ -60,7 +60,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
     const errors = validateForm();
     
     if (errors.length > 0) {
-      Alert.alert('Hata', errors.join('\n'));
+      showAlert('Hata', errors.join('\n'), 'warning');
       return;
     }
 
@@ -107,7 +107,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
   const handleTimeChange = (newTime) => {
     // Aynı saatin zaten var olup olmadığını kontrol et
     if (times.includes(newTime) && times[editingTimeIndex] !== newTime) {
-      Alert.alert('Uyarı', 'Bu saat zaten eklenmiş. Lütfen farklı bir saat seçin.');
+      showAlert('Uyarı', 'Bu saat zaten eklenmiş. Lütfen farklı bir saat seçin.', 'warning');
       return;
     }
 
@@ -120,7 +120,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
 
   const addTimeField = () => {
     if (times.length >= 6) {
-      Alert.alert('Limit', 'Maksimum 6 saat ekleyebilirsiniz.');
+      showAlert('Limit', 'Maksimum 6 saat ekleyebilirsiniz.', 'info');
       return;
     }
 
@@ -161,13 +161,14 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
 
   const removeTimeField = (index) => {
     if (times.length <= 1) {
-      Alert.alert('Uyarı', 'En az bir saat olması gerekiyor.');
+      showAlert('Uyarı', 'En az bir saat olması gerekiyor.', 'warning');
       return;
     }
 
-    Alert.alert(
+    showAlert(
       'Saati Sil',
       `${times[index]} saatini silmek istediğinizden emin misiniz?`,
+      'warning',
       [
         {
           text: 'İptal',

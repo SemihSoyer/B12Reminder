@@ -1,11 +1,31 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SectionList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SectionList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import { getFrequencyText } from '../../utils/medicationUtils';
+import { showAlert } from '../ui/CustomAlert';
 
 const MedicationItem = ({ item, onDelete }) => {
+  const handleDelete = () => {
+    showAlert(
+      'İlacı Sil',
+      `${item.name} ilacını silmek istediğinizden emin misiniz?`,
+      'warning',
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: () => onDelete(item),
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.itemContainer}>
       <View style={styles.itemIcon}>
@@ -17,7 +37,7 @@ const MedicationItem = ({ item, onDelete }) => {
           {`${item.dosage} • ${item.time}`}
         </Text>
       </View>
-      <TouchableOpacity onPress={() => onDelete(item)} style={styles.deleteButton}>
+      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
         <Ionicons name="trash-outline" size={22} color="#d63031" />
       </TouchableOpacity>
     </View>

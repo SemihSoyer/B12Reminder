@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -16,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 import WheelDatePicker from './WheelDatePicker';
+import { showAlert } from '../ui/CustomAlert';
 
 export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate }) {
   const [name, setName] = useState('');
@@ -42,7 +42,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
 
   const handleAdd = () => {
     if (!name.trim() || !date.trim()) {
-      Alert.alert('Hata', 'Lütfen isim ve tarih alanlarını doldurun.');
+      showAlert('Hata', 'Lütfen isim ve tarih alanlarını doldurun.', 'warning');
       return;
     }
 
