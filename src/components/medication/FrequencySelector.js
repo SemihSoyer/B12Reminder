@@ -48,7 +48,7 @@ const FREQUENCY_OPTIONS = [
     id: 'specific',
     title: 'Belirli Tarihler',
     description: 'Özel günlerde',
-    icon: 'calendar-check',
+    icon: 'calendar-outline',
     gradient: ['#00B894', '#00CEC9'],
     defaultValue: { type: 'specific_dates', value: [] }
   }
