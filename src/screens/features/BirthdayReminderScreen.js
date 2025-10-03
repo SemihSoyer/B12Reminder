@@ -77,12 +77,14 @@ export default function BirthdayReminderScreen({ navigation }) {
           return updatedBirthdays.sort((a, b) => a.daysLeft - b.daysLeft);
         });
         
-        // Başarı mesajı
-        showAlert(
-          'Başarılı!',
-          `${newBirthday.name} için doğum günü hatırlatıcısı eklendi.`,
-          'success'
-        );
+        // Başarı mesajını modal kapandıktan sonra göster
+        setTimeout(() => {
+          showAlert(
+            'Başarılı!',
+            `${newBirthday.name} için doğum günü hatırlatıcısı eklendi.`,
+            'success'
+          );
+        }, 300);
       } else {
         showAlert('Hata', 'Doğum günü eklenirken bir hata oluştu.', 'error');
       }
@@ -102,12 +104,14 @@ export default function BirthdayReminderScreen({ navigation }) {
           prevBirthdays.filter(item => item.id !== birthday.id)
         );
         
-        // Başarı mesajı
-        showAlert(
-          'Silindi!',
-          `${birthday.name} için doğum günü hatırlatıcısı silindi.`,
-          'success'
-        );
+        // Başarı mesajını kısa bir gecikme ile göster
+        setTimeout(() => {
+          showAlert(
+            'Silindi!',
+            `${birthday.name} için doğum günü hatırlatıcısı silindi.`,
+            'success'
+          );
+        }, 200);
       } else {
         showAlert('Hata', 'Doğum günü silinirken bir hata oluştu.', 'error');
       }

@@ -259,3 +259,121 @@ export const MedicationService = {
   },
 };
 
+// Özel hatırlatıcı servisi
+export const CustomReminderService = {
+  // Tüm özel hatırlatıcıları getir
+  async getAllReminders() {
+    try {
+      const reminders = await StorageService.getItem(STORAGE_KEYS.CUSTOM_REMINDERS);
+      if (!reminders || !Array.isArray(reminders)) {
+        return [];
+      }
+      
+      // Aktif hatırlatıcıları filtrele ve sırala
+      const activeReminders = reminders
+        .filter(reminder => {
+          return reminder && 
+                 typeof reminder === 'object' && 
+                 reminder.title && 
+                 reminder.date &&
+                 reminder.time;
+        })
+        .map(reminder => ({
+          ...reminder,
+          daysLeft: this.calculateDaysLeft(reminder.date)
+        }))
+        .filter(reminder => reminder.daysLeft >= 0); // Sadece gelecek ve bugünkü hatırlatıcıları tut
+      
+      return activeReminders;
+    } catch (error) {
+      console.error('Error getting custom reminders:', error);
+      return [];
+    }
+  },
+
+  // Yeni özel hatırlatıcı ekle
+  async addReminder(reminder) {
+    try {
+      const currentReminders = await this.getAllReminders();
+      
+      // Maksimum 10 hatırlatıcı kontrolü
+      if (currentReminders.length >= 10) {
+        throw new Error('Maksimum 10 hatırlatıcı ekleyebilirsiniz.');
+      }
+      
+      const newReminder = {
+        ...reminder,
+        id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: new Date().toISOString(),
+        daysLeft: this.calculateDaysLeft(reminder.date)
+      };
+      
+      const updatedReminders = [...currentReminders, newReminder];
+      await StorageService.setItem(STORAGE_KEYS.CUSTOM_REMINDERS, updatedReminders);
+      
+      return newReminder;
+    } catch (error) {
+      console.error('Error adding custom reminder:', error);
+      throw error;
+    }
+  },
+
+  // Özel hatırlatıcı sil
+  async deleteReminder(reminderId) {
+    try {
+      const currentReminders = await this.getAllReminders();
+      const updatedReminders = currentReminders.filter(reminder => reminder.id !== reminderId);
+      
+      await StorageService.setItem(STORAGE_KEYS.CUSTOM_REMINDERS, updatedReminders);
+      return true;
+    } catch (error) {
+      console.error('Error deleting custom reminder:', error);
+      return false;
+    }
+  },
+
+  // Kalan günleri hesapla
+  calculateDaysLeft(dateString) {
+    try {
+      if (!dateString || typeof dateString !== 'string') {
+        return 0;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const targetDate = new Date(dateString);
+      targetDate.setHours(0, 0, 0, 0);
+      
+      const diffTime = targetDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      return Math.max(0, diffDays);
+    } catch (error) {
+      console.error('Error calculating days left:', error);
+      return 0;
+    }
+  },
+
+  // Süresi geçen hatırlatıcıları temizle
+  async cleanupExpiredReminders() {
+    try {
+      const currentReminders = await this.getAllReminders();
+      const validReminders = currentReminders.filter(reminder => {
+        const daysLeft = this.calculateDaysLeft(reminder.date);
+        return daysLeft >= 0;
+      });
+      
+      if (validReminders.length !== currentReminders.length) {
+        await StorageService.setItem(STORAGE_KEYS.CUSTOM_REMINDERS, validReminders);
+        console.log(`${currentReminders.length - validReminders.length} expired custom reminders cleaned up`);
+      }
+      
+      return validReminders;
+    } catch (error) {
+      console.error('Error cleaning up custom reminders:', error);
+      return [];
+    }
+  }
+};
+

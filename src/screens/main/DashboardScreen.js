@@ -21,9 +21,10 @@ import DailyReminders from '../../components/common/DailyReminders';
 import UpcomingReminders from '../../components/common/UpcomingReminders';
 
 // Services & Utils
-import { BirthdayService, MedicationService } from '../../utils/storage';
+import { BirthdayService, MedicationService, CustomReminderService } from '../../utils/storage';
 import { transformBirthdaysToReminders } from '../../utils/birthdayUtils';
 import { transformMedicationsToReminders } from '../../utils/medicationUtils';
+import { transformCustomRemindersToReminders } from '../../utils/customReminderUtils';
 
 // Data
 import { featureCards } from '../../data/featureCards';
@@ -51,11 +52,18 @@ export default function DashboardScreen({ navigation }) {
             upcomingReminders: medicationUpcoming
           } = transformMedicationsToReminders(medications);
 
+          // Özel hatırlatıcıları al ve işle
+          const customReminders = await CustomReminderService.getAllReminders();
+          const {
+            todayReminders: customToday,
+            upcomingReminders: customUpcoming
+          } = transformCustomRemindersToReminders(customReminders);
+
           // Tüm hatırlatıcıları birleştir ve sırala
-          const allToday = [...birthdayToday, ...medicationToday]
+          const allToday = [...birthdayToday, ...medicationToday, ...customToday]
             .sort((a, b) => a.time.localeCompare(b.time));
           
-          const allUpcoming = [...birthdayUpcoming, ...medicationUpcoming]
+          const allUpcoming = [...birthdayUpcoming, ...medicationUpcoming, ...customUpcoming]
             .sort((a, b) => a.daysLeft - b.daysLeft);
 
           // State'leri güncelle
@@ -72,8 +80,15 @@ export default function DashboardScreen({ navigation }) {
   );
 
   const handleDeleteReminder = (id, type) => {
-    const isBirthday = type === 'birthday';
-    const title = isBirthday ? 'Doğum Gününü Sil' : 'İlacı Sil';
+    let title = 'Hatırlatıcıyı Sil';
+    if (type === 'birthday') {
+      title = 'Doğum Gününü Sil';
+    } else if (type === 'medication') {
+      title = 'İlacı Sil';
+    } else if (type === 'custom') {
+      title = 'Özel Hatırlatıcıyı Sil';
+    }
+    
     const message = `Bu hatırlatıcıyı kalıcı olarak silmek istediğinizden emin misiniz?`;
 
     showAlert(
@@ -90,10 +105,12 @@ export default function DashboardScreen({ navigation }) {
           style: 'destructive',
           onPress: async () => {
             try {
-              if (isBirthday) {
+              if (type === 'birthday') {
                 await BirthdayService.deleteBirthday(id);
-              } else {
+              } else if (type === 'medication') {
                 await MedicationService.deleteMedication(id);
+              } else if (type === 'custom') {
+                await CustomReminderService.deleteReminder(id);
               }
               // State'i anında güncelle
               setTodayReminders(prev => prev.filter(r => r.originalId !== id));

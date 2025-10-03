@@ -62,7 +62,11 @@ export default function MedicationReminderScreen({ navigation }) {
         setTodayMedications(grouped);
         const { upcomingReminders } = transformMedicationsToReminders(updatedMedications);
         setUpcomingReminders(upcomingReminders);
-        showAlert('Başarılı!', `${savedMedication.name} eklendi.`, 'success');
+        
+        // Başarı mesajını modal kapandıktan sonra göster
+        setTimeout(() => {
+          showAlert('Başarılı!', `${savedMedication.name} eklendi.`, 'success');
+        }, 300);
       } else {
         showAlert('Hata', 'İlaç eklenirken bir sorun oluştu.', 'error');
       }
@@ -81,7 +85,11 @@ export default function MedicationReminderScreen({ navigation }) {
         setTodayMedications(grouped);
         const { upcomingReminders } = transformMedicationsToReminders(updatedMedications);
         setUpcomingReminders(upcomingReminders);
-        showAlert('Silindi!', `${medicationToDelete.name} silindi.`, 'success');
+        
+        // Başarı mesajını kısa bir gecikme ile göster
+        setTimeout(() => {
+          showAlert('Silindi!', `${medicationToDelete.name} silindi.`, 'success');
+        }, 200);
       } else {
         showAlert('Hata', 'İlaç silinirken bir sorun oluştu.', 'error');
       }
