@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const STORAGE_KEYS = {
   MEDICATIONS: 'medications',
   MENSTRUAL: 'menstrual_data',
+  MENSTRUAL_INFO_SHOWN: 'menstrual_info_shown',
   CUSTOM_REMINDERS: 'custom_reminders',
   USER_SETTINGS: 'user_settings',
   BIRTHDAYS: 'birthdays'
@@ -254,6 +255,248 @@ export const MedicationService = {
       return true;
     } catch (error) {
       console.error('Error deleting medication:', error);
+      return false;
+    }
+  },
+};
+
+// Regl takip servisi
+export const MenstrualService = {
+  // Regl verilerini getir
+  async getMenstrualData() {
+    try {
+      const data = await StorageService.getItem(STORAGE_KEYS.MENSTRUAL);
+      if (!data) {
+        return {
+          cycles: [],
+          averageCycleLength: 28,
+          averagePeriodLength: 5,
+          lastPeriodStart: null,
+        };
+      }
+      
+      // Döngüleri tarihe göre sırala (en yeni en sonda)
+      if (data.cycles && data.cycles.length > 0) {
+        data.cycles = data.cycles.sort((a, b) => {
+          const dateA = new Date(a.startDate);
+          const dateB = new Date(b.startDate);
+          return dateA - dateB;
+        });
+        
+        // lastPeriodStart'ı en son döngüden al
+        const latestCycle = data.cycles[data.cycles.length - 1];
+        data.lastPeriodStart = latestCycle.startDate;
+      }
+      
+      // Varsayılan değerleri kontrol et
+      if (!data.averageCycleLength || data.averageCycleLength < 21 || data.averageCycleLength > 45) {
+        data.averageCycleLength = 28;
+      }
+      
+      if (!data.averagePeriodLength || data.averagePeriodLength < 3 || data.averagePeriodLength > 10) {
+        data.averagePeriodLength = 5;
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error getting menstrual data:', error);
+      return {
+        cycles: [],
+        averageCycleLength: 28,
+        averagePeriodLength: 5,
+        lastPeriodStart: null,
+      };
+    }
+  },
+
+  // Yeni regl dönemi başlat
+  async startNewPeriod(startDate, periodLength = 5) {
+    try {
+      const data = await this.getMenstrualData();
+      
+      const newCycle = {
+        id: `cycle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        startDate: startDate,
+        endDate: null,
+        periodLength: periodLength,
+        cycleLength: null,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Tarihlere göre sırala (en eski önce)
+      const sortedCycles = [...data.cycles].sort((a, b) => {
+        const dateA = new Date(a.startDate);
+        const dateB = new Date(b.startDate);
+        return dateA - dateB;
+      });
+
+      // Eğer önceki döngü varsa, döngü süresini hesapla
+      if (sortedCycles.length > 0) {
+        const lastCycle = sortedCycles[sortedCycles.length - 1];
+        const previousStart = new Date(lastCycle.startDate);
+        const currentStart = new Date(startDate);
+        
+        previousStart.setHours(0, 0, 0, 0);
+        currentStart.setHours(0, 0, 0, 0);
+        
+        // Sadece yeni tarih önceki tarihten sonraysa hesapla
+        if (currentStart > previousStart) {
+          const daysBetween = Math.floor((currentStart - previousStart) / (1000 * 60 * 60 * 24));
+          
+          // Makul bir döngü süresi kontrolü (15-60 gün arası)
+          if (daysBetween >= 15 && daysBetween <= 60) {
+            lastCycle.cycleLength = daysBetween;
+            
+            // Güncellenmiş son döngüyü dizide bul ve güncelle
+            const cycleIndex = data.cycles.findIndex(c => c.id === lastCycle.id);
+            if (cycleIndex !== -1) {
+              data.cycles[cycleIndex] = lastCycle;
+            }
+          }
+        }
+      }
+
+      // Yeni döngüyü ekle
+      data.cycles.push(newCycle);
+      
+      // En son regl tarihini güncelle (en yeni tarih)
+      data.lastPeriodStart = startDate;
+
+      // Ortalama döngü süresini yeniden hesapla (sadece geçerli değerlerle)
+      const cyclesWithLength = data.cycles.filter(c => 
+        c.cycleLength !== null && 
+        c.cycleLength >= 21 && 
+        c.cycleLength <= 35
+      );
+      
+      if (cyclesWithLength.length > 0) {
+        const totalLength = cyclesWithLength.reduce((sum, c) => sum + c.cycleLength, 0);
+        data.averageCycleLength = Math.round(totalLength / cyclesWithLength.length);
+      } else {
+        // Varsayılan değer
+        data.averageCycleLength = 28;
+      }
+
+      // Ortalama regl süresini yeniden hesapla
+      const cyclesWithPeriod = data.cycles.filter(c => 
+        c.periodLength !== null && 
+        c.periodLength >= 3 && 
+        c.periodLength <= 10
+      );
+      
+      if (cyclesWithPeriod.length > 0) {
+        const totalPeriod = cyclesWithPeriod.reduce((sum, c) => sum + c.periodLength, 0);
+        data.averagePeriodLength = Math.round(totalPeriod / cyclesWithPeriod.length);
+      } else {
+        // Varsayılan değer
+        data.averagePeriodLength = 5;
+      }
+
+      await StorageService.setItem(STORAGE_KEYS.MENSTRUAL, data);
+      return data;
+    } catch (error) {
+      console.error('Error starting new period:', error);
+      throw error;
+    }
+  },
+
+  // Regl dönemi güncelle (bitiş tarihi, döngü bilgileri)
+  async updatePeriod(cycleId, updates) {
+    try {
+      const data = await this.getMenstrualData();
+      const cycleIndex = data.cycles.findIndex(c => c.id === cycleId);
+      
+      if (cycleIndex !== -1) {
+        data.cycles[cycleIndex] = {
+          ...data.cycles[cycleIndex],
+          ...updates,
+        };
+        
+        await StorageService.setItem(STORAGE_KEYS.MENSTRUAL, data);
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error updating period:', error);
+      return null;
+    }
+  },
+
+  // Regl döngüsünü sil
+  async deleteCycle(cycleId) {
+    try {
+      const data = await this.getMenstrualData();
+      data.cycles = data.cycles.filter(c => c.id !== cycleId);
+      
+      // Döngüleri tarihe göre sırala
+      data.cycles.sort((a, b) => {
+        const dateA = new Date(a.startDate);
+        const dateB = new Date(b.startDate);
+        return dateA - dateB;
+      });
+      
+      // Son regl tarihini güncelle (en yeni tarih)
+      if (data.cycles.length > 0) {
+        data.lastPeriodStart = data.cycles[data.cycles.length - 1].startDate;
+      } else {
+        data.lastPeriodStart = null;
+      }
+      
+      // Ortalamaları yeniden hesapla
+      const cyclesWithLength = data.cycles.filter(c => 
+        c.cycleLength !== null && 
+        c.cycleLength >= 21 && 
+        c.cycleLength <= 35
+      );
+      
+      if (cyclesWithLength.length > 0) {
+        const totalLength = cyclesWithLength.reduce((sum, c) => sum + c.cycleLength, 0);
+        data.averageCycleLength = Math.round(totalLength / cyclesWithLength.length);
+      } else {
+        data.averageCycleLength = 28;
+      }
+      
+      await StorageService.setItem(STORAGE_KEYS.MENSTRUAL, data);
+      return true;
+    } catch (error) {
+      console.error('Error deleting cycle:', error);
+      return false;
+    }
+  },
+
+  // Tüm regl verilerini sıfırla
+  async resetAllData() {
+    try {
+      await StorageService.removeItem(STORAGE_KEYS.MENSTRUAL);
+      return true;
+    } catch (error) {
+      console.error('Error resetting menstrual data:', error);
+      return false;
+    }
+  },
+
+  // İlk açılış bilgisi kontrolü
+  async hasSeenInfo() {
+    try {
+      const value = await StorageService.getItem(STORAGE_KEYS.MENSTRUAL_INFO_SHOWN);
+      return value === true;
+    } catch (error) {
+      console.error('Error checking info status:', error);
+      return false;
+    }
+  },
+
+  // İlk açılış bilgisini kaydet
+  async setInfoShown(value = true) {
+    try {
+      if (value === false) {
+        await StorageService.removeItem(STORAGE_KEYS.MENSTRUAL_INFO_SHOWN);
+      } else {
+        await StorageService.setItem(STORAGE_KEYS.MENSTRUAL_INFO_SHOWN, true);
+      }
+      return true;
+    } catch (error) {
+      console.error('Error setting info status:', error);
       return false;
     }
   },
