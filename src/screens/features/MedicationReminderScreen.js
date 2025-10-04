@@ -16,8 +16,9 @@ import EmptyState from '../../components/medication/EmptyState';
 import AddMedicationButton from '../../components/medication/AddMedicationButton';
 import AddMedicationForm from '../../components/medication/AddMedicationForm';
 import MedicationList from '../../components/medication/MedicationList';
-import { MedicationService } from '../../utils/storage';
+import { MedicationService, SettingsService } from '../../utils/storage';
 import { groupMedicationsForToday, transformMedicationsToReminders } from '../../utils/medicationUtils';
+import { scheduleMedicationNotifications, cancelMedicationNotifications } from '../../utils/medicationNotifications';
 import UpcomingReminders from '../../components/common/UpcomingReminders';
 import { useFocusEffect } from '@react-navigation/native';
 import { showAlert } from '../../components/ui/CustomAlert';
@@ -56,6 +57,17 @@ export default function MedicationReminderScreen({ navigation }) {
     try {
       const savedMedication = await MedicationService.addMedication(newMedication);
       if (savedMedication) {
+        // Bildirimler etkinse, bildirimleri zamanla
+        const notificationsEnabled = await SettingsService.getNotificationsEnabled();
+        if (notificationsEnabled) {
+          const notificationIds = await scheduleMedicationNotifications(savedMedication);
+          
+          // Notification ID'lerini medication'a ekle
+          if (notificationIds && notificationIds.length > 0) {
+            savedMedication.notificationIds = notificationIds;
+          }
+        }
+        
         const updatedMedications = [...allMedications, savedMedication];
         setAllMedications(updatedMedications);
         const grouped = groupMedicationsForToday(updatedMedications);
@@ -77,6 +89,11 @@ export default function MedicationReminderScreen({ navigation }) {
 
   const handleDelete = async (medicationToDelete) => {
     try {
+      // Bildirimleri iptal et
+      if (medicationToDelete.notificationIds && medicationToDelete.notificationIds.length > 0) {
+        await cancelMedicationNotifications(medicationToDelete.notificationIds);
+      }
+      
       const success = await MedicationService.deleteMedication(medicationToDelete.id);
       if (success) {
         const updatedMedications = allMedications.filter(item => item.id !== medicationToDelete.id);

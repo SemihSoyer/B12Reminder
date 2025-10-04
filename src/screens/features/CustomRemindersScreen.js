@@ -18,7 +18,8 @@ import EmptyState from '../../components/custom/EmptyState';
 import AddCustomReminderButton from '../../components/custom/AddCustomReminderButton';
 import AddCustomReminderForm from '../../components/custom/AddCustomReminderForm';
 import CustomReminderList from '../../components/custom/CustomReminderList';
-import { CustomReminderService } from '../../utils/storage';
+import { CustomReminderService, SettingsService } from '../../utils/storage';
+import { scheduleCustomReminderNotification, cancelCustomReminderNotification } from '../../utils/customReminderNotifications';
 import { showAlert } from '../../components/ui/CustomAlert';
 
 export default function CustomRemindersScreen({ navigation }) {
@@ -63,6 +64,17 @@ export default function CustomRemindersScreen({ navigation }) {
       const savedReminder = await CustomReminderService.addReminder(newReminder);
       
       if (savedReminder) {
+        // Bildirimler etkinse, bildirimi zamanla
+        const notificationsEnabled = await SettingsService.getNotificationsEnabled();
+        if (notificationsEnabled) {
+          const notificationId = await scheduleCustomReminderNotification(savedReminder);
+          
+          // Notification ID'sini reminder'a ekle
+          if (notificationId) {
+            savedReminder.notificationId = notificationId;
+          }
+        }
+        
         // State'i güncelle ve sırala
         setReminders(prevReminders => {
           const updatedReminders = [...prevReminders, savedReminder];
@@ -92,6 +104,11 @@ export default function CustomRemindersScreen({ navigation }) {
 
   const handleDelete = async (reminder) => {
     try {
+      // Bildirimi iptal et
+      if (reminder.notificationId) {
+        await cancelCustomReminderNotification(reminder.notificationId);
+      }
+      
       const success = await CustomReminderService.deleteReminder(reminder.id);
       
       if (success) {

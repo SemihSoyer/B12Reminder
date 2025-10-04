@@ -22,6 +22,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
   const [date, setDate] = useState('');
   const [note, setNote] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [notificationDaysBefore, setNotificationDaysBefore] = useState(1);
 
   useEffect(() => {
     if (selectedDate) {
@@ -38,6 +39,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
     // Reset other fields when the modal is opened with a new date
     setName('');
     setNote('');
+    setNotificationDaysBefore(1);
   }, [selectedDate, visible]);
 
   const handleAdd = () => {
@@ -51,6 +53,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
       name: name.trim(),
       date: date.trim(),
       note: note.trim(),
+      notificationDaysBefore: notificationDaysBefore,
     };
 
     onAdd(newBirthday);
@@ -62,6 +65,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
     setName('');
     setDate('');
     setNote('');
+    setNotificationDaysBefore(1);
   };
 
   const handleDateSelect = (dateObject, dateString) => {
@@ -145,6 +149,37 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
                      {!selectedDate && <Ionicons name="chevron-forward" size={22} color="#636e72" />}
                 </TouchableOpacity>
                  {selectedDate && <Text style={styles.infoText}>Tarih takvimden seçildi.</Text>}
+            </View>
+
+            {/* Kaç Gün Önce Hatırlatılsın */}
+            <View style={styles.inputSection}>
+                <Text style={styles.label}>Kaç Gün Önce Hatırlatılsın?</Text>
+                <View style={styles.reminderDaysContainer}>
+                    {[0, 1, 3, 7, 14].map((days) => (
+                        <TouchableOpacity
+                            key={days}
+                            style={[
+                                styles.reminderDayButton,
+                                notificationDaysBefore === days && styles.reminderDayButtonActive
+                            ]}
+                            onPress={() => setNotificationDaysBefore(days)}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={[
+                                styles.reminderDayText,
+                                notificationDaysBefore === days && styles.reminderDayTextActive
+                            ]}>
+                                {days === 0 ? 'Aynı Gün' : `${days} Gün Önce`}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+                <Text style={styles.infoText}>
+                    {notificationDaysBefore === 0 
+                        ? 'Doğum günü sabah 9:00\'da hatırlatılacak' 
+                        : `${notificationDaysBefore} gün önce ve doğum günü sabah hatırlatılacak`
+                    }
+                </Text>
             </View>
 
             {/* Notlar */}
@@ -277,5 +312,30 @@ const styles = StyleSheet.create({
     color: '#636e72',
     marginTop: spacing.sm,
     marginLeft: spacing.xs,
-  }
+  },
+  reminderDaysContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+  },
+  reminderDayButton: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+  },
+  reminderDayButtonActive: {
+    backgroundColor: '#27ae60',
+    borderColor: '#27ae60',
+  },
+  reminderDayText: {
+    ...FONT_STYLES.emphasisSmall,
+    color: '#636e72',
+    fontSize: 13,
+  },
+  reminderDayTextActive: {
+    color: '#FFFFFF',
+  },
 });

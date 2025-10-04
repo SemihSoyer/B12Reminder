@@ -11,7 +11,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
-import { BirthdayService } from '../../utils/storage';
+import { BirthdayService, SettingsService } from '../../utils/storage';
+import { scheduleBirthdayNotifications, cancelBirthdayNotifications } from '../../utils/birthdayNotifications';
 
 // Components
 import BirthdayList from '../../components/birthday/BirthdayList';
@@ -70,6 +71,24 @@ export default function BirthdayReminderScreen({ navigation }) {
       const savedBirthday = await BirthdayService.addBirthday(newBirthday);
       
       if (savedBirthday) {
+        // Bildirimler etkinse, bildirimleri zamanla
+        const notificationsEnabled = await SettingsService.getNotificationsEnabled();
+        if (notificationsEnabled) {
+          const notificationIds = await scheduleBirthdayNotifications(savedBirthday);
+          
+          // Notification ID'lerini birthday'e ekle ve güncelle
+          if (notificationIds && notificationIds.length > 0) {
+            savedBirthday.notificationIds = notificationIds;
+            
+            // Storage'ı güncelle
+            const allBirthdays = await BirthdayService.getAllBirthdays();
+            const updatedBirthdays = allBirthdays.map(b => 
+              b.id === savedBirthday.id ? savedBirthday : b
+            );
+            await BirthdayService.getAllBirthdays(); // Cache'i temizle
+          }
+        }
+        
         // State'i güncelle ve sırala
         setBirthdays(prevBirthdays => {
           const updatedBirthdays = [...prevBirthdays, savedBirthday];
@@ -96,6 +115,11 @@ export default function BirthdayReminderScreen({ navigation }) {
 
   const handleDelete = async (birthday) => {
     try {
+      // Bildirimleri iptal et
+      if (birthday.notificationIds && birthday.notificationIds.length > 0) {
+        await cancelBirthdayNotifications(birthday.notificationIds);
+      }
+      
       const success = await BirthdayService.deleteBirthday(birthday.id);
       
       if (success) {

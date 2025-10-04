@@ -7,7 +7,8 @@ export const STORAGE_KEYS = {
   MENSTRUAL_INFO_SHOWN: 'menstrual_info_shown',
   CUSTOM_REMINDERS: 'custom_reminders',
   USER_SETTINGS: 'user_settings',
-  BIRTHDAYS: 'birthdays'
+  BIRTHDAYS: 'birthdays',
+  NOTIFICATIONS_ENABLED: 'notifications_enabled'
 };
 
 // Genel storage fonksiyonları
@@ -107,7 +108,9 @@ export const BirthdayService = {
         ...birthday,
         id: `birthday_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString(),
-        daysLeft: this.calculateDaysLeft(birthday.date)
+        daysLeft: this.calculateDaysLeft(birthday.date),
+        notificationDaysBefore: birthday.notificationDaysBefore || 1, // Kaç gün önce hatırlatılsın
+        notificationIds: [] // Zamanlanmış bildirim ID'leri
       };
       
       const updatedBirthdays = [...currentBirthdays, newBirthday];
@@ -233,6 +236,7 @@ export const MedicationService = {
         ...medication,
         id: `med_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString(),
+        notificationIds: [] // Zamanlanmış tekrarlayan bildirim ID'leri
       };
       
       const updatedMedications = [...currentMedications, newMedication];
@@ -272,7 +276,13 @@ export const MenstrualService = {
           averageCycleLength: 28,
           averagePeriodLength: 5,
           lastPeriodStart: null,
+          notificationIds: [], // Regl bildirimleri için
         };
+      }
+      
+      // notificationIds yoksa ekle
+      if (!data.notificationIds) {
+        data.notificationIds = [];
       }
       
       // Döngüleri tarihe göre sırala (en yeni en sonda)
@@ -305,6 +315,7 @@ export const MenstrualService = {
         averageCycleLength: 28,
         averagePeriodLength: 5,
         lastPeriodStart: null,
+        notificationIds: [], // Regl bildirimleri için
       };
     }
   },
@@ -548,7 +559,8 @@ export const CustomReminderService = {
         ...reminder,
         id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString(),
-        daysLeft: this.calculateDaysLeft(reminder.date)
+        daysLeft: this.calculateDaysLeft(reminder.date),
+        notificationId: null // Zamanlanmış tek bildirim ID'si
       };
       
       const updatedReminders = [...currentReminders, newReminder];
@@ -618,5 +630,31 @@ export const CustomReminderService = {
       return [];
     }
   }
+};
+
+// Ayarlar servisi
+export const SettingsService = {
+  // Bildirim durumunu getir
+  async getNotificationsEnabled() {
+    try {
+      const enabled = await StorageService.getItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED);
+      // İlk kullanımda null dönebilir, varsayılan olarak true
+      return enabled !== false;
+    } catch (error) {
+      console.error('Error getting notification settings:', error);
+      return true;
+    }
+  },
+
+  // Bildirim durumunu ayarla
+  async setNotificationsEnabled(enabled) {
+    try {
+      await StorageService.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, enabled);
+      return true;
+    } catch (error) {
+      console.error('Error setting notification settings:', error);
+      return false;
+    }
+  },
 };
 
