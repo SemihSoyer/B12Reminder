@@ -9,9 +9,29 @@ import { Ionicons } from '@expo/vector-icons';
 import { getResponsiveValue, spacing, fontSizes } from '../../constants/responsive';
 import { FONT_FAMILIES, FONT_STYLES } from '../../constants/fonts';
 import ReminderIcon from './ReminderIcon';
+import { showAlert } from '../ui/CustomAlert';
 
 export default function UpcomingReminders({ reminders = [], onDelete }) {
   const hasUpcoming = reminders && reminders.length > 0;
+
+  const handleDelete = (reminder) => {
+    showAlert(
+      'Hatırlatıcıyı Sil',
+      `${reminder.title} hatırlatıcısını silmek istediğinizden emin misiniz?`,
+      'warning',
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: () => onDelete(reminder.originalId, reminder.reminderType),
+        },
+      ]
+    );
+  };
 
   if (!hasUpcoming) {
     return null; // Yaklaşan hatırlatma yoksa hiçbir şey gösterme
@@ -36,7 +56,7 @@ export default function UpcomingReminders({ reminders = [], onDelete }) {
                 </View>
               </View>
               <ReminderIcon {...reminder.iconConfig} />
-              <TouchableOpacity onPress={() => onDelete(reminder.originalId, reminder.reminderType)} style={styles.deleteButton}>
+              <TouchableOpacity onPress={() => handleDelete(reminder)} style={styles.deleteButton}>
                 <Ionicons name="trash-outline" size={22} color="#FF6A88" />
               </TouchableOpacity>
             </View>

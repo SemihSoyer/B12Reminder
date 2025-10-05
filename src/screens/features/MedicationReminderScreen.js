@@ -18,7 +18,7 @@ import AddMedicationForm from '../../components/medication/AddMedicationForm';
 import MedicationList from '../../components/medication/MedicationList';
 import { MedicationService, SettingsService } from '../../utils/storage';
 import { groupMedicationsForToday, transformMedicationsToReminders } from '../../utils/medicationUtils';
-import { scheduleMedicationNotifications, cancelMedicationNotifications } from '../../utils/medicationNotifications';
+import { scheduleMedicationNotifications, cancelMedicationNotifications, refreshIfNeeded } from '../../utils/medicationNotifications';
 import UpcomingReminders from '../../components/common/UpcomingReminders';
 import { useFocusEffect } from '@react-navigation/native';
 import { showAlert } from '../../components/ui/CustomAlert';
@@ -30,10 +30,11 @@ export default function MedicationReminderScreen({ navigation }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Sayfa her odaklandığında ilaçları yeniden yükle
+  // Sayfa her odaklandığında ilaçları yeniden yükle ve bildirimleri kontrol et
   useFocusEffect(
     useCallback(() => {
       loadMedications();
+      checkAndRefreshNotifications();
     }, [])
   );
 
@@ -50,6 +51,34 @@ export default function MedicationReminderScreen({ navigation }) {
       showAlert('Hata', 'İlaçlar yüklenirken bir sorun oluştu.', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Bildirimleri kontrol et ve gerekirse yenile
+  const checkAndRefreshNotifications = async () => {
+    try {
+      const medications = await MedicationService.getAllMedications();
+      
+      // Sadece interval tipindeki ilaçları kontrol et
+      const intervalMedications = medications.filter(
+        med => med.frequency && med.frequency.type === 'interval'
+      );
+
+      if (intervalMedications.length === 0) {
+        return;
+      }
+
+      console.log(`🔍 ${intervalMedications.length} interval ilaç kontrol ediliyor...`);
+
+      // Her bir ilacı kontrol et
+      for (const med of intervalMedications) {
+        await refreshIfNeeded(med, async (updatedMed) => {
+          // Storage'ı güncelle
+          await MedicationService.updateMedication(updatedMed);
+        });
+      }
+    } catch (error) {
+      console.error('❌ Bildirim kontrol hatası:', error);
     }
   };
 

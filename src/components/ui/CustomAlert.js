@@ -131,7 +131,7 @@ export default class CustomAlert extends React.Component {
     );
   };
 
-  hide = () => {
+  hide = (callback) => {
     // Çıkış animasyonu
     Animated.parallel([
       Animated.timing(this.scaleAnim, {
@@ -145,15 +145,30 @@ export default class CustomAlert extends React.Component {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      this.setState({ visible: false });
+      this.setState({ visible: false }, () => {
+        // setState tamamlandıktan ve modal tamamen kapandıktan sonra
+        // callback fonksiyonunu bir sonraki frame'de güvenle çalıştır.
+        if (callback) {
+          requestAnimationFrame(callback);
+        }
+      });
     });
   };
 
-  handleButtonPress = (onPress) => {
-    if (onPress) {
-      onPress();
+  handleButtonPress = (onPress, style) => {
+    // 'cancel' butonu için sadece modalı kapat.
+    if (style === 'cancel') {
+      this.hide();
+      return;
     }
-    this.hide();
+    
+    // Diğer tüm butonlar için, modal kapandıktan SONRA
+    // `onPress` fonksiyonunu callback olarak çalıştır.
+    this.hide(() => {
+      if (onPress) {
+        onPress();
+      }
+    });
   };
 
   renderButtons = () => {
@@ -185,7 +200,7 @@ export default class CustomAlert extends React.Component {
       return (
         <TouchableOpacity
           style={styles.singleButton}
-          onPress={() => this.handleButtonPress(button.onPress)}
+          onPress={() => this.handleButtonPress(button.onPress, button.style)}
           activeOpacity={0.8}
         >
           <LinearGradient
@@ -214,7 +229,7 @@ export default class CustomAlert extends React.Component {
                 styles.halfButton,
                 index === 0 && styles.leftButton,
               ]}
-              onPress={() => this.handleButtonPress(button.onPress)}
+              onPress={() => this.handleButtonPress(button.onPress, button.style)}
               activeOpacity={0.8}
             >
               {isCancel ? (

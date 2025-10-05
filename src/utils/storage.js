@@ -249,6 +249,31 @@ export const MedicationService = {
     }
   },
 
+  // İlaç güncelle
+  async updateMedication(medication) {
+    try {
+      const currentMedications = await this.getAllMedications();
+      const index = currentMedications.findIndex(med => med.id === medication.id);
+      
+      if (index !== -1) {
+        currentMedications[index] = {
+          ...currentMedications[index],
+          ...medication,
+          updatedAt: new Date().toISOString(),
+        };
+        
+        await StorageService.setItem(STORAGE_KEYS.MEDICATIONS, currentMedications);
+        return true;
+      }
+      
+      console.warn('Medication not found for update:', medication.id);
+      return false;
+    } catch (error) {
+      console.error('Error updating medication:', error);
+      return false;
+    }
+  },
+
   // İlaç sil
   async deleteMedication(medicationId) {
     try {

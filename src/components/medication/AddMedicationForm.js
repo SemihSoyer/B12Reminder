@@ -159,27 +159,29 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
     }
   };
 
-  const removeTimeField = (index) => {
+  const removeTimeField = (indexToRemove) => {
+    // En az bir saat kalmalı.
     if (times.length <= 1) {
-      showAlert('Uyarı', 'En az bir saat olması gerekiyor.', 'warning');
+      showAlert('Uyarı', 'En az bir kullanım saati gereklidir.', 'warning');
       return;
     }
 
+    // Kullanıcıdan onay al.
     showAlert(
       'Saati Sil',
-      `${times[index]} saatini silmek istediğinizden emin misiniz?`,
+      `'${times[indexToRemove]}' saatini silmek istediğinizden emin misiniz?`,
       'warning',
       [
-        {
-          text: 'İptal',
-          style: 'cancel',
-        },
+        { text: 'İptal', style: 'cancel' },
         {
           text: 'Sil',
           style: 'destructive',
+          // CustomAlert'e yaptığımız düzeltme sayesinde bu onPress artık güvenli bir şekilde çalışacak.
           onPress: () => {
-            const newTimes = times.filter((_, i) => i !== index);
-            setTimes(newTimes);
+            // State'i güncellerken en güncel halini kullan (fonksiyonel güncelleme).
+            setTimes(currentTimes => 
+              currentTimes.filter((_, index) => index !== indexToRemove)
+            );
           },
         },
       ]
