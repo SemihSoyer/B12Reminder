@@ -357,9 +357,14 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   buttonSection: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
     paddingTop: spacing.md,
+    backgroundColor: 'transparent',
   },
   limitText: {
     ...FONT_STYLES.bodySmall,

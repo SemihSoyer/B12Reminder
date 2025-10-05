@@ -10,8 +10,13 @@ const MONTH_NAMES = [
 ];
 const DAYS_OF_WEEK = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
-// Tarihleri YYYY-MM-DD formatına çevirir
-const formatDate = (date) => date.toISOString().split('T')[0];
+// Tarihleri YYYY-MM-DD formatına çevirir (Timezone sorununu önler)
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export default function MultiSelectCalendar({ selectedDates, onSelectionChange }) {
   const [currentDate, setCurrentDate] = useState(new Date());

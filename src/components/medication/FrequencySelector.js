@@ -16,6 +16,7 @@ import { spacing } from '../../constants/responsive';
 import WeekDayPicker from './WeekDayPicker';
 import MultiSelectCalendar from './MultiSelectCalendar';
 import { showAlert } from '../ui/CustomAlert';
+import WheelNumberPicker from './WheelNumberPicker';
 
 const { width } = Dimensions.get('window');
 
@@ -57,9 +58,10 @@ const FREQUENCY_OPTIONS = [
 
 export default function FrequencySelector({ visible, onClose, onSelect, currentFrequency }) {
   const [selectedOption, setSelectedOption] = useState('daily');
-  const [intervalDays, setIntervalDays] = useState('2');
+  const [intervalDays, setIntervalDays] = useState(2);
   const [weeklyDays, setWeeklyDays] = useState([0, 1, 2, 3, 4]); // Varsayılan: Hafta içi
   const [specificDates, setSpecificDates] = useState([]);
+  const [showNumberPicker, setShowNumberPicker] = useState(false);
 
   // Akıllı varsayılan değerleri yükle
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
         setSelectedOption('daily');
       } else if (type === 'interval') {
         setSelectedOption('interval');
-        setIntervalDays(String(value || 2));
+        setIntervalDays(value || 2);
       } else if (type === 'weekly') {
         setSelectedOption('weekly');
         setWeeklyDays(Array.isArray(value) ? value : [0, 1, 2, 3, 4]);
@@ -81,7 +83,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
     } else if (visible) {
       // Yeni ekleme - akıllı varsayılanlar
       setSelectedOption('daily');
-      setIntervalDays('2');
+      setIntervalDays(2);
       setWeeklyDays([0, 1, 2, 3, 4]); // Hafta içi
       setSpecificDates([]);
     }
@@ -235,17 +237,16 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
               {selectedOption === 'interval' && (
                 <View style={styles.detailContainer}>
                   <Text style={styles.detailTitle}>Kaç günde bir?</Text>
-                  <View style={styles.intervalContainer}>
+                  <TouchableOpacity 
+                    style={styles.intervalContainer} 
+                    onPress={() => setShowNumberPicker(true)}
+                  >
                     <Text style={styles.intervalText}>Her</Text>
-                    <TextInput
-                      style={styles.intervalInput}
-                      value={intervalDays}
-                      onChangeText={setIntervalDays}
-                      keyboardType="number-pad"
-                      maxLength={2}
-                    />
+                    <View style={styles.intervalInput}>
+                      <Text style={styles.intervalInputText}>{intervalDays}</Text>
+                    </View>
                     <Text style={styles.intervalText}>günde bir</Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               )}
 
@@ -281,6 +282,14 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
           </LinearGradient>
         </View>
       </View>
+      <WheelNumberPicker
+        visible={showNumberPicker}
+        onClose={() => setShowNumberPicker(false)}
+        onSelect={(value) => setIntervalDays(value)}
+        initialValue={intervalDays}
+        title="Aralık Seçin"
+        label="Gün"
+      />
     </Modal>
   );
 }
@@ -447,6 +456,12 @@ const styles = StyleSheet.create({
     minWidth: 50,
     borderWidth: 1,
     borderColor: '#E5E5E7',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  intervalInputText: {
+    ...FONT_STYLES.heading3,
+    color: '#1a1a1a',
   },
   actionContainer: {
     paddingHorizontal: spacing.lg,

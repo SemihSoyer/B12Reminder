@@ -9,7 +9,7 @@ import MedicationReminderScreen from '../screens/features/MedicationReminderScre
 import CustomRemindersScreen from '../screens/features/CustomRemindersScreen';
 import HelpScreen from '../screens/main/HelpScreen';
 import PaywallScreen from '../screens/main/PaywallScreen';
-import SettingsScreen from '../screens/main/SettingsScreen';
+import SubscriptionScreen from '../screens/profile/SubscriptionScreen';
 
 const Stack = createStackNavigator();
 
@@ -41,16 +41,16 @@ export default function MainNavigator() {
       
       {/* Other Screens */}
       <Stack.Screen 
-        name="Settings" 
-        component={SettingsScreen}
-      />
-      <Stack.Screen 
         name="Help" 
         component={HelpScreen}
       />
       <Stack.Screen 
         name="Paywall" 
         component={PaywallScreen}
+      />
+      <Stack.Screen
+        name="Subscription"
+        component={SubscriptionScreen}
       />
     </Stack.Navigator>
   );

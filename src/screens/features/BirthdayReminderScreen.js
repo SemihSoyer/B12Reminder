@@ -279,8 +279,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   buttonSection: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
     paddingTop: spacing.md,
+    backgroundColor: 'transparent',
   },
 });

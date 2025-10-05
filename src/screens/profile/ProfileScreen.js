@@ -8,67 +8,57 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
-import MenuButton from '../../components/profile/MenuButton';
+import SettingsSection from '../../components/profile/SettingsSection';
+import { showAlert } from '../../components/ui/CustomAlert';
 
 export default function ProfileScreen({ navigation }) {
-
-  // Menü butonları
-  const menuButtons = [
+  const generalSettings = [
     {
-      icon: 'settings-outline',
-      title: 'Uygulama Ayarları',
-      subtitle: 'Bildirimler, tema ve genel ayarlar',
-      gradientColors: ['#74B9FF', '#0984E3'],
-      onPress: () => handleMenuPress('settings'),
-    },
-    {
-      icon: 'bar-chart-outline',
-      title: 'İstatistikler',
-      subtitle: 'Hatırlatıcı özetleri ve analizler',
-      gradientColors: ['#00B894', '#00CEC9'],
-      onPress: () => handleMenuPress('statistics'),
-    },
-    {
-      icon: 'cloud-download-outline',
-      title: 'Veri Yönetimi',
-      subtitle: 'Yedekleme ve veri işlemleri',
-      gradientColors: ['#A29BFE', '#6C5CE7'],
-      onPress: () => handleMenuPress('dataManagement'),
-    },
-    {
-      icon: 'information-circle-outline',
-      title: 'Uygulama Bilgileri',
-      subtitle: 'Versiyon, hakkında ve yardım',
-      gradientColors: ['#FD79A8', '#E84393'],
-      onPress: () => handleMenuPress('appInfo'),
+      icon: 'language-outline',
+      title: 'Dil',
+      subtitle: 'Uygulama dili',
+      value: 'Türkçe',
+      type: 'action',
+      onPress: () => showAlert('Bilgi', 'Dil seçenekleri yakında eklenecek', 'info'),
     },
   ];
 
-  const handleMenuPress = (menuType) => {
-    switch (menuType) {
-      case 'settings':
-        navigation.navigate('Settings');
-        break;
-      case 'statistics':
-        Alert.alert('Bilgi', 'İstatistikler bölümü yakında eklenecek');
-        break;
-      case 'dataManagement':
-        Alert.alert('Bilgi', 'Veri yönetimi bölümü yakında eklenecek');
-        break;
-      case 'appInfo':
-        Alert.alert('Bilgi', 'Uygulama bilgileri bölümü yakında eklenecek');
-        break;
-      default:
-        break;
-    }
-  };
+  const accountSettings = [
+    {
+      icon: 'star-outline',
+      title: 'Abonelikler',
+      subtitle: 'Aboneliklerinizi yönetin',
+      type: 'navigation',
+      onPress: () => navigation.navigate('Subscription'),
+    },
+  ];
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
+  const appInfoSettings = [
+    {
+      icon: 'information-circle-outline',
+      title: 'Versiyon',
+      value: '1.0.0',
+      type: 'info',
+    },
+    {
+      icon: 'book-outline',
+      title: 'Hakkında',
+      type: 'navigation',
+      onPress: () => showAlert('Hakkında', 'Bu uygulama harika bir hatırlatıcıdır.', 'info'),
+    },
+    {
+      icon: 'help-circle-outline',
+      title: 'Yardım',
+      type: 'navigation',
+      onPress: () => showAlert(
+        'Yardım',
+        'Şikayet ve önerileriniz için: sunmateapplication@gmail.com',
+        'info'
+      ),
+    }
+  ]
 
   return (
     <LinearGradient
@@ -89,16 +79,23 @@ export default function ProfileScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Ana Menü Butonları */}
-          <View style={styles.menuSection}>
-            <Text style={styles.sectionTitle}>Profil</Text>
-            {menuButtons.map((button, index) => (
-              <MenuButton
-                key={index}
-                {...button}
-              />
-            ))}
-          </View>
+          {/* Hesap Ayarları */}
+          <SettingsSection
+            title="Hesap"
+            items={accountSettings}
+          />
+
+          {/* Genel Ayarlar */}
+          <SettingsSection
+            title="Genel"
+            items={generalSettings}
+          />
+
+          {/* Uygulama Bilgileri */}
+          <SettingsSection
+            title="Uygulama Bilgileri"
+            items={appInfoSettings}
+          />
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
