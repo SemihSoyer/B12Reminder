@@ -12,16 +12,53 @@ import { NotificationService } from './notificationService';
  */
 export async function scheduleCustomReminderNotification(reminder) {
   try {
+    // 1. ADIM: Bildirim göndermeden önce izinleri kontrol et ve iste
+    const hasPermission = await NotificationService.requestAndCheckPermissions();
+    if (!hasPermission) {
+      console.error('❌ Bildirim izni yok. Zamanlama iptal edildi.');
+      return null;
+    }
+
+    console.log('🔔 ÖZEL HATIRLATICI BİLDİRİM ZAMANLANIYOR...');
+    console.log('   Reminder:', reminder);
+
+    if (!reminder || !reminder.title || !reminder.date || !reminder.time) {
+      console.error('❌ Geçersiz hatırlatıcı verisi:', reminder);
+      return null;
+    }
+
     const { title, date, time } = reminder;
+
+    console.log('   📝 Başlık:', title);
+    console.log('   📅 Tarih:', date);
+    console.log('   ⏰ Saat:', time);
 
     // Tarih ve saatten Date objesi oluştur
     const targetDate = NotificationService.createDateFromDateTime(date, time);
 
-    const now = new Date();
-    if (targetDate <= now) {
-      console.warn('Geçmiş tarih için bildirim zamanlanamaz:', targetDate);
+    // NULL kontrolü (artık hata durumunda null döndürülüyor)
+    if (!targetDate) {
+      console.error('❌ Tarih oluşturulamadı! Date string ve time geçersiz.');
       return null;
     }
+
+    if (!(targetDate instanceof Date) || isNaN(targetDate.getTime())) {
+      console.error('❌ Oluşturulan tarih objesi geçersiz:', targetDate);
+      return null;
+    }
+
+    // Gelecek tarih kontrolü (ekstra güvenlik)
+    const now = new Date();
+    const minimumFutureTime = new Date(now.getTime() + 10000); // 10 saniye
+
+    if (targetDate <= minimumFutureTime) {
+      console.error('❌ Tarih geçmiş veya çok yakın!');
+      console.error('   Şu an:', now.toLocaleString('tr-TR'));
+      console.error('   Hedef:', targetDate.toLocaleString('tr-TR'));
+      return null;
+    }
+
+    console.log('✅ Tarih validasyonu başarılı, bildirim servisi çağrılıyor...');
 
     const notificationId = await NotificationService.scheduleNotification(
       {
@@ -33,12 +70,19 @@ export async function scheduleCustomReminderNotification(reminder) {
     );
 
     if (notificationId) {
-      console.log('✅ Özel hatırlatıcı bildirimi zamanlandı:', title, 'Tarih:', targetDate);
+      console.log('✅ ÖZ EL HATIRLATICI BİLDİRİMİ ZAMANLANADI!');
+      console.log('   ID:', notificationId);
+      console.log('   Başlık:', title);
+      console.log('   Tarih:', targetDate.toLocaleString('tr-TR'));
+    } else {
+      console.error('❌ Bildirim ID alınamadı - Zamanlama başarısız!');
     }
 
     return notificationId;
   } catch (error) {
-    console.error('❌ Özel hatırlatıcı bildirimi zamanlama hatası:', error);
+    console.error('❌ ÖZEL HATIRLATICI BİLDİRİM HATA!');
+    console.error('   Error:', error);
+    console.error('   Reminder:', reminder);
     return null;
   }
 }

@@ -17,20 +17,40 @@ export async function scheduleBirthdayNotifications(birthday) {
   const notificationIds = [];
 
   try {
+    // 1. ADIM: Bildirim göndermeden önce izinleri kontrol et ve iste
+    const hasPermission = await NotificationService.requestAndCheckPermissions();
+    if (!hasPermission) {
+      console.error('❌ Bildirim izni yok. Doğum günü hatırlatıcı zamanlama iptal edildi.');
+      return [];
+    }
+
+    console.log('🎂 DOĞUM GÜNÜ BİLDİRİMLERİ ZAMANLANIYOR...');
+    console.log('   Birthday:', birthday);
+
     const { name, date, notificationDaysBefore = 1 } = birthday;
     
+    if (!name || !date) {
+      console.error('❌ İsim veya tarih eksik!');
+      return [];
+    }
+
     // Tarih parse et ("15 Ocak" formatında)
     const monthNames = [
       'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
       'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
     ];
 
-    const [dayStr, monthName] = date.split(' ');
-    const day = parseInt(dayStr);
-    const monthIndex = monthNames.indexOf(monthName);
+    const dateParts = date.trim().split(' ');
+    if (dateParts.length !== 2) {
+      console.error('❌ Geçersiz tarih formatı:', date);
+      return [];
+    }
 
-    if (monthIndex === -1 || isNaN(day)) {
-      console.error('Invalid date format:', date);
+    const day = parseInt(dateParts[0]);
+    const monthIndex = monthNames.indexOf(dateParts[1]);
+
+    if (monthIndex === -1 || isNaN(day) || day < 1 || day > 31) {
+      console.error('❌ Geçersiz gün/ay değerleri:', day, dateParts[1]);
       return [];
     }
 
@@ -45,13 +65,19 @@ export async function scheduleBirthdayNotifications(birthday) {
       birthdayDate = new Date(currentYear + 1, monthIndex, day, 0, 0, 0, 0);
     }
 
+    console.log('   Doğum günü tarihi:', birthdayDate.toLocaleString('tr-TR'));
+
+    const minimumFutureTime = new Date(now.getTime() + 10000); // 10 saniye
+
     // 1. Bildirim: X gün önce, saat 09:00
     if (notificationDaysBefore > 0) {
       const beforeDate = new Date(birthdayDate);
       beforeDate.setDate(beforeDate.getDate() - notificationDaysBefore);
       beforeDate.setHours(9, 0, 0, 0);
 
-      if (beforeDate > now) {
+      if (beforeDate > minimumFutureTime) {
+        console.log(`   📅 ${notificationDaysBefore} gün önce bildirimi zamanlanıyor:`, beforeDate.toLocaleString('tr-TR'));
+        
         const notificationId = await NotificationService.scheduleNotification(
           {
             title: '🎂 Yaklaşan Doğum Günü',
@@ -63,8 +89,10 @@ export async function scheduleBirthdayNotifications(birthday) {
 
         if (notificationId) {
           notificationIds.push(notificationId);
-          console.log(`✅ Doğum günü ${notificationDaysBefore} gün önce bildirimi zamanlandı:`, name);
+          console.log(`   ✅ ${notificationDaysBefore} gün önce bildirimi zamanlandı`);
         }
+      } else {
+        console.log(`   ⏭️ ${notificationDaysBefore} gün önce bildirimi çok yakın, atlanıyor`);
       }
     }
 
@@ -72,7 +100,9 @@ export async function scheduleBirthdayNotifications(birthday) {
     const midnightDate = new Date(birthdayDate);
     midnightDate.setHours(0, 1, 0, 0);
 
-    if (midnightDate > now) {
+    if (midnightDate > minimumFutureTime) {
+      console.log('   🌙 Gece yarısı bildirimi zamanlanıyor:', midnightDate.toLocaleString('tr-TR'));
+      
       const notificationId = await NotificationService.scheduleNotification(
         {
           title: '🎉 Doğum Günü!',
@@ -84,15 +114,19 @@ export async function scheduleBirthdayNotifications(birthday) {
 
       if (notificationId) {
         notificationIds.push(notificationId);
-        console.log('✅ Doğum günü gece yarısı bildirimi zamanlandı:', name);
+        console.log('   ✅ Gece yarısı bildirimi zamanlandı');
       }
+    } else {
+      console.log('   ⏭️ Gece yarısı bildirimi çok yakın, atlanıyor');
     }
 
     // 3. Bildirim: Doğum günü, saat 09:00
     const morningDate = new Date(birthdayDate);
     morningDate.setHours(9, 0, 0, 0);
 
-    if (morningDate > now) {
+    if (morningDate > minimumFutureTime) {
+      console.log('   ☀️ Sabah bildirimi zamanlanıyor:', morningDate.toLocaleString('tr-TR'));
+      
       const notificationId = await NotificationService.scheduleNotification(
         {
           title: '🎂 Doğum Günü Hatırlatması',
@@ -104,14 +138,18 @@ export async function scheduleBirthdayNotifications(birthday) {
 
       if (notificationId) {
         notificationIds.push(notificationId);
-        console.log('✅ Doğum günü sabah bildirimi zamanlandı:', name);
+        console.log('   ✅ Sabah bildirimi zamanlandı');
       }
+    } else {
+      console.log('   ⏭️ Sabah bildirimi çok yakın, atlanıyor');
     }
 
-    console.log(`📋 Toplam ${notificationIds.length} doğum günü bildirimi zamanlandı:`, name);
+    console.log(`✅ TOPLAM ${notificationIds.length} DOĞUM GÜNÜ BİLDİRİMİ ZAMANLANADI: ${name}`);
     return notificationIds;
   } catch (error) {
-    console.error('❌ Doğum günü bildirimleri zamanlama hatası:', error);
+    console.error('❌ DOĞUM GÜNÜ BİLDİRİMLERİ ZAMANLAMA HATASI!');
+    console.error('   Error:', error);
+    console.error('   Birthday:', birthday);
     return notificationIds;
   }
 }

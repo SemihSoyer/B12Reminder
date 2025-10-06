@@ -14,7 +14,9 @@ SplashScreen.preventAutoHideAsync();
 // Notification handler'ı ayarla
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowAlert: true, // iOS için gerekli (eski ama hala çalışıyor)
+    shouldShowBanner: true, // Yeni: Banner göster
+    shouldShowList: true, // Yeni: Bildirim listesinde göster
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
@@ -31,7 +33,7 @@ export default function App() {
 
   // Notification permissions'ı başlangıçta kaydet
   useEffect(() => {
-    NotificationService.registerForPushNotificationsAsync();
+    NotificationService.requestAndCheckPermissions();
   }, []);
 
   if (!fontsLoaded) {

@@ -18,6 +18,13 @@ export async function scheduleMedicationNotifications(medication) {
   const notificationIds = [];
 
   try {
+    // 1. ADIM: Bildirim göndermeden önce izinleri kontrol et ve iste
+    const hasPermission = await NotificationService.requestAndCheckPermissions();
+    if (!hasPermission) {
+      console.error('❌ Bildirim izni yok. İlaç hatırlatıcı zamanlama iptal edildi.');
+      return [];
+    }
+
     const { name, dosage, times, frequency } = medication;
 
     if (!times || times.length === 0) {
@@ -90,46 +97,72 @@ export async function scheduleMedicationNotifications(medication) {
  * Günlük tekrarlayan bildirim
  */
 async function scheduleDailyNotification(name, dosage, time) {
-  const [hourStr, minuteStr] = time.split(':');
-  const hour = parseInt(hourStr);
-  const minute = parseInt(minuteStr);
+  try {
+    const [hourStr, minuteStr] = time.split(':');
+    const hour = parseInt(hourStr);
+    const minute = parseInt(minuteStr);
 
-  return await NotificationService.scheduleRepeatingNotification(
-    {
-      title: name,
-      body: `${dosage} - İlaç alma zamanı`,
-      data: { type: 'medication', name, time },
-    },
-    {
-      hour,
-      minute,
-      repeats: true,
+    // Saat validasyonu
+    if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      console.error('❌ Geçersiz saat değeri:', time);
+      return null;
     }
-  );
+
+    console.log('💊 Günlük ilaç bildirimi zamanlanıyor:', name, 'Saat:', time);
+
+    return await NotificationService.scheduleRepeatingNotification(
+      {
+        title: name,
+        body: `${dosage} - İlaç alma zamanı`,
+        data: { type: 'medication', name, time },
+      },
+      {
+        hour,
+        minute,
+        repeats: true,
+      }
+    );
+  } catch (error) {
+    console.error('❌ Günlük bildirim zamanlama hatası:', error);
+    return null;
+  }
 }
 
 /**
  * Haftalık tekrarlayan bildirim
  */
 async function scheduleWeeklyNotification(name, dosage, time, weekday) {
-  const [hourStr, minuteStr] = time.split(':');
-  const hour = parseInt(hourStr);
-  const minute = parseInt(minuteStr);
+  try {
+    const [hourStr, minuteStr] = time.split(':');
+    const hour = parseInt(hourStr);
+    const minute = parseInt(minuteStr);
 
-  // weekday: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday (Expo format)
-  return await NotificationService.scheduleRepeatingNotification(
-    {
-      title: name,
-      body: `${dosage} - İlaç alma zamanı`,
-      data: { type: 'medication', name, time, weekday },
-    },
-    {
-      hour,
-      minute,
-      weekday: weekday + 1, // Expo: 1 = Sunday, 2 = Monday, ... (adjust if needed)
-      repeats: true,
+    // Saat validasyonu
+    if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      console.error('❌ Geçersiz saat değeri:', time);
+      return null;
     }
-  );
+
+    console.log('💊 Haftalık ilaç bildirimi zamanlanıyor:', name, 'Gün:', weekday, 'Saat:', time);
+
+    // weekday: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday (Expo format)
+    return await NotificationService.scheduleRepeatingNotification(
+      {
+        title: name,
+        body: `${dosage} - İlaç alma zamanı`,
+        data: { type: 'medication', name, time, weekday },
+      },
+      {
+        hour,
+        minute,
+        weekday: weekday + 1, // Expo: 1 = Sunday, 2 = Monday, ... (adjust if needed)
+        repeats: true,
+      }
+    );
+  } catch (error) {
+    console.error('❌ Haftalık bildirim zamanlama hatası:', error);
+    return null;
+  }
 }
 
 /**
@@ -138,51 +171,68 @@ async function scheduleWeeklyNotification(name, dosage, time, weekday) {
  */
 async function scheduleIntervalNotifications(name, dosage, time, intervalDays, medicationId) {
   const notificationIds = [];
-  const [hourStr, minuteStr] = time.split(':');
-  const hour = parseInt(hourStr);
-  const minute = parseInt(minuteStr);
-
-  const now = new Date();
   
-  // 🔹 AKILLI LİMİT SİSTEMİ
-  // Interval değerine göre dinamik bildirim sayısı
-  let daysToSchedule;
-  if (intervalDays <= 3) {
-    daysToSchedule = 30;  // Her 1-3 günde → 30 gün (10-30 bildirim)
-  } else if (intervalDays <= 6) {
-    daysToSchedule = 21;  // Her 4-6 günde → 21 gün (3-5 bildirim)
-  } else {
-    daysToSchedule = intervalDays * 2;  // Her 7+ günde → 2 döngü (2-4 bildirim)
-  }
+  try {
+    const [hourStr, minuteStr] = time.split(':');
+    const hour = parseInt(hourStr);
+    const minute = parseInt(minuteStr);
 
-  for (let dayOffset = 0; dayOffset < daysToSchedule; dayOffset += intervalDays) {
-    const targetDate = new Date(now);
-    targetDate.setDate(targetDate.getDate() + dayOffset);
-    targetDate.setHours(hour, minute, 0, 0);
+    // Saat validasyonu
+    if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      console.error('❌ Geçersiz saat değeri:', time);
+      return [];
+    }
 
-    if (targetDate > now) {
-      const notificationId = await NotificationService.scheduleNotification(
-        {
-          title: name,
-          body: `${dosage} - İlaç alma zamanı`,
-          data: { 
-            type: 'medication', 
-            name, 
-            time,
-            medicationId: medicationId || `${name}-${time}` // ID tracking için
+    const now = new Date();
+    
+    // 🔹 AKILLI LİMİT SİSTEMİ
+    // Interval değerine göre dinamik bildirim sayısı
+    let daysToSchedule;
+    if (intervalDays <= 3) {
+      daysToSchedule = 30;  // Her 1-3 günde → 30 gün (10-30 bildirim)
+    } else if (intervalDays <= 6) {
+      daysToSchedule = 21;  // Her 4-6 günde → 21 gün (3-5 bildirim)
+    } else {
+      daysToSchedule = intervalDays * 2;  // Her 7+ günde → 2 döngü (2-4 bildirim)
+    }
+
+    console.log(`💊 Interval ilaç bildirimleri zamanlanıyor: ${name}, Aralık: ${intervalDays} gün, Toplam: ${daysToSchedule} gün`);
+
+    for (let dayOffset = 0; dayOffset < daysToSchedule; dayOffset += intervalDays) {
+      const targetDate = new Date(now);
+      targetDate.setDate(targetDate.getDate() + dayOffset);
+      targetDate.setHours(hour, minute, 0, 0);
+
+      // En az 10 saniye sonrasına zamanla
+      const minimumFutureTime = new Date(now.getTime() + 10000);
+      
+      if (targetDate > minimumFutureTime) {
+        const notificationId = await NotificationService.scheduleNotification(
+          {
+            title: name,
+            body: `${dosage} - İlaç alma zamanı`,
+            data: { 
+              type: 'medication', 
+              name, 
+              time,
+              medicationId: medicationId || `${name}-${time}` // ID tracking için
+            },
           },
-        },
-        targetDate
-      );
+          targetDate
+        );
 
-      if (notificationId) {
-        notificationIds.push(notificationId);
+        if (notificationId) {
+          notificationIds.push(notificationId);
+        }
       }
     }
-  }
 
-  console.log(`📋 ${name} için ${notificationIds.length} bildirim zamanlandı (${daysToSchedule} gün)`);
-  return notificationIds;
+    console.log(`✅ ${name} için ${notificationIds.length} bildirim zamanlandı (${daysToSchedule} gün)`);
+    return notificationIds;
+  } catch (error) {
+    console.error('❌ Interval bildirim zamanlama hatası:', error);
+    return notificationIds;
+  }
 }
 
 /**
@@ -194,13 +244,31 @@ async function scheduleSpecificDateNotification(name, dosage, time, dateString) 
     const hour = parseInt(hourStr);
     const minute = parseInt(minuteStr);
 
+    // Saat validasyonu
+    if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      console.error('❌ Geçersiz saat değeri:', time);
+      return null;
+    }
+
     const targetDate = new Date(dateString);
+    
+    // Tarih validasyonu
+    if (isNaN(targetDate.getTime())) {
+      console.error('❌ Geçersiz tarih:', dateString);
+      return null;
+    }
+
     targetDate.setHours(hour, minute, 0, 0);
 
     const now = new Date();
-    if (targetDate <= now) {
-      return null; // Geçmiş tarih
+    const minimumFutureTime = new Date(now.getTime() + 10000); // 10 saniye
+    
+    if (targetDate <= minimumFutureTime) {
+      console.warn('⚠️ Geçmiş tarih veya çok yakın, atlanıyor:', targetDate.toLocaleString('tr-TR'));
+      return null;
     }
+
+    console.log('💊 Belirli tarih için ilaç bildirimi:', name, targetDate.toLocaleString('tr-TR'));
 
     return await NotificationService.scheduleNotification(
       {
@@ -211,7 +279,7 @@ async function scheduleSpecificDateNotification(name, dosage, time, dateString) 
       targetDate
     );
   } catch (error) {
-    console.error('Specific date notification error:', error);
+    console.error('❌ Specific date notification error:', error);
     return null;
   }
 }

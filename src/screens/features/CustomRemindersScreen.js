@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 
@@ -61,37 +62,85 @@ export default function CustomRemindersScreen({ navigation }) {
         return;
       }
 
+      // Önce storage'a kaydet
       const savedReminder = await CustomReminderService.addReminder(newReminder);
       
-      if (savedReminder) {
-        // Bildirimler etkinse, bildirimi zamanla
-        const notificationsEnabled = await SettingsService.getNotificationsEnabled();
-        if (notificationsEnabled) {
-          const notificationId = await scheduleCustomReminderNotification(savedReminder);
-          
-          // Notification ID'sini reminder'a ekle
-          if (notificationId) {
-            savedReminder.notificationId = notificationId;
-          }
-        }
-        
-        // State'i güncelle ve sırala
-        setReminders(prevReminders => {
-          const updatedReminders = [...prevReminders, savedReminder];
-          return updatedReminders.sort((a, b) => a.daysLeft - b.daysLeft);
-        });
-        
-        // Başarı mesajını modal kapandıktan sonra göster
-        setTimeout(() => {
-          showAlert(
-            'Başarılı!',
-            `"${newReminder.title}" hatırlatıcısı eklendi.`,
-            'success'
-          );
-        }, 300);
-      } else {
+      if (!savedReminder) {
         showAlert('Hata', 'Hatırlatıcı eklenirken bir hata oluştu.', 'error');
+        return;
       }
+
+      // Bildirimi zamanla (arka planda)
+      const notificationsEnabled = await SettingsService.getNotificationsEnabled();
+      if (notificationsEnabled) {
+        // Bildirimi async olarak zamanla, beklemeden devam et
+        scheduleCustomReminderNotification(savedReminder)
+          .then(async (notificationId) => {
+            if (notificationId) {
+              console.log('✅ Bildirim zamanlandı:', notificationId);
+              
+              // Sistemin bildirimi kaydetmesi için kısa bir bekleme
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              // DEBUG: Tüm zamanlanmış bildirimleri listele
+              const allScheduled = await Notifications.getAllScheduledNotificationsAsync();
+              console.log('📋 Toplam zamanlanmış bildirim sayısı:', allScheduled.length);
+              
+              if (allScheduled.length > 0) {
+                console.log('🔍 TÜM ZAMANLANMIŞ BİLDİRİMLER:');
+                allScheduled.forEach((notif, index) => {
+                  console.log(`   [${index + 1}] ID: ${notif.identifier}`);
+                  console.log(`       Trigger Type: ${notif.trigger?.type || 'unknown'}`);
+                  if (notif.trigger) {
+                    console.log(`       Trigger Value: ${JSON.stringify(notif.trigger.value)}`);
+                    if (notif.trigger.type === 'date') {
+                      try {
+                        const triggerDate = new Date(notif.trigger.value);
+                        console.log(`       Tetiklenme: ${triggerDate.toLocaleString('tr-TR')}`);
+                        const now = new Date();
+                        const diffSeconds = Math.floor((triggerDate.getTime() - now.getTime()) / 1000);
+                        console.log(`       Kalan: ${Math.floor(diffSeconds / 3600)}s ${Math.floor((diffSeconds % 3600) / 60)}d`);
+                      } catch (e) {
+                        console.log(`       Tarih parse hatası: ${e.message}`);
+                      }
+                    }
+                  }
+                });
+              } else {
+                console.warn('⚠️ HİÇ ZAMANLANMIŞ BİLDİRİM YOK!');
+                console.warn('   Bu, bildirimin anında tetiklenip silindiği anlamına gelir.');
+              }
+              
+              // Bu bildirimi bul
+              const thisNotification = allScheduled.find(n => n.identifier === notificationId);
+              if (thisNotification) {
+                console.log('✅ Bu bildirim listede bulundu!');
+              } else {
+                console.error('❌ Bu bildirim listede BULUNAMADI!');
+                console.error('   ID:', notificationId);
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Bildirim zamanlama hatası:', error);
+          });
+      }
+      
+      // State'i hemen güncelle
+      setReminders(prevReminders => {
+        const updatedReminders = [...prevReminders, savedReminder];
+        return updatedReminders.sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0));
+      });
+      
+      // Başarı mesajını göster
+      setTimeout(() => {
+        showAlert(
+          'Başarılı!',
+          `"${newReminder.title}" hatırlatıcısı eklendi.`,
+          'success'
+        );
+      }, 300);
+      
     } catch (error) {
       console.error('Error adding custom reminder:', error);
       if (error.message === 'Maksimum 10 hatırlatıcı ekleyebilirsiniz.') {
