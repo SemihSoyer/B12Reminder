@@ -14,9 +14,8 @@ SplashScreen.preventAutoHideAsync();
 // Notification handler'ı ayarla
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true, // iOS için gerekli (eski ama hala çalışıyor)
-    shouldShowBanner: true, // Yeni: Banner göster
-    shouldShowList: true, // Yeni: Bildirim listesinde göster
+    shouldShowBanner: true, // Banner göster (üstte açılır bildirim)
+    shouldShowList: true, // Bildirim listesinde göster
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),

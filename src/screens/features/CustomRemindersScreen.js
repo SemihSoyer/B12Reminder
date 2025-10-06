@@ -46,11 +46,55 @@ export default function CustomRemindersScreen({ navigation }) {
       });
       
       setReminders(sortedReminders);
+      
+      // 🧹 OTOMATIK TEMİZLİK: Yetim kalmış bildirimleri temizle
+      await cleanupOrphanedNotifications(sortedReminders);
     } catch (error) {
       console.error('Error loading custom reminders:', error);
       showAlert('Hata', 'Hatırlatıcılar yüklenirken bir hata oluştu.', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Yetim kalmış (hatırlatıcısı olmayan) bildirimleri temizle
+  const cleanupOrphanedNotifications = async (currentReminders) => {
+    try {
+      // Tüm zamanlanmış bildirimleri al
+      const allScheduled = await Notifications.getAllScheduledNotificationsAsync();
+      
+      // Özel hatırlatıcı bildirimlerini filtrele (data.type === 'custom_reminder')
+      const customReminderNotifications = allScheduled.filter(
+        notif => notif.content?.data?.type === 'custom_reminder'
+      );
+      
+      if (customReminderNotifications.length === 0) {
+        return; // Temizlenecek bildirim yok
+      }
+      
+      // Mevcut hatırlatıcıların notification ID'lerini topla
+      const validNotificationIds = currentReminders
+        .map(r => r.notificationId)
+        .filter(id => id); // null/undefined olanları filtrele
+      
+      // Yetim kalmış bildirimleri bul ve sil
+      let cleanedCount = 0;
+      for (const notification of customReminderNotifications) {
+        const notifId = notification.identifier;
+        
+        // Bu bildirim hiçbir hatırlatıcıya ait değilse
+        if (!validNotificationIds.includes(notifId)) {
+          await Notifications.cancelScheduledNotificationAsync(notifId);
+          cleanedCount++;
+          console.log('🧹 Yetim bildirim silindi:', notifId);
+        }
+      }
+      
+      if (cleanedCount > 0) {
+        console.log(`✅ ${cleanedCount} yetim bildirim temizlendi`);
+      }
+    } catch (error) {
+      console.error('Bildirim temizleme hatası:', error);
     }
   };
 
