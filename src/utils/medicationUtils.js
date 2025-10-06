@@ -9,21 +9,21 @@ const formatSpecificDate = (dateString) => {
 };
 
 export const getFrequencyText = (frequency) => {
-  if (!frequency) return 'Seçilmedi';
+  if (!frequency) return 'Not selected';
 
   const { type, value } = frequency;
 
   if (type === 'daily') {
-    return 'Her Gün';
+    return 'Every Day';
   }
 
   if (type === 'interval') {
-    return `Her ${value} günde bir`;
+    return `Every ${value} days`;
   }
 
   if (type === 'weekly') {
-    if (!value || value.length === 0) return 'Seçilmedi';
-    if (value.length === 7) return 'Her Gün';
+    if (!value || value.length === 0) return 'Not selected';
+    if (value.length === 7) return 'Every Day';
     
     // Haftanın tüm günleri ve hafta sonu/içi kısayolları
     const weekdays = [0, 1, 2, 3, 4];
@@ -31,25 +31,25 @@ export const getFrequencyText = (frequency) => {
     const isWeekdays = value.length === 5 && weekdays.every(day => value.includes(day));
     const isWeekend = value.length === 2 && weekend.every(day => value.includes(day));
 
-    if (isWeekdays) return 'Hafta İçi Her Gün';
-    if (isWeekend) return 'Hafta Sonu';
+    if (isWeekdays) return 'Every Day';
+    if (isWeekend) return 'Weekend';
 
     return value.map(dayIndex => DAYS_SHORT[dayIndex]).join(', ');
   }
 
   if (type === 'specific_dates') {
-    if (!value || value.length === 0) return 'Seçilmedi';
+    if (!value || value.length === 0) return 'Not selected';
     if (value.length === 1) return formatSpecificDate(value[0]);
-    if (value.length > 2) return `${value.length} gün seçildi`;
+    if (value.length > 2) return `${value.length} days selected`;
     return value.map(formatSpecificDate).join(' & ');
   }
 
-  return 'Seçilmedi';
+  return 'Not selected';
 };
 
 /**
  * Belirli bir ilacın, verilen tarihte aktif olup olmadığını kontrol eder.
- * @param {object} medication - İlaç objesi.
+ * @param {object} medication - Medication objesi.
  * @param {Date} date - Kontrol edilecek tarih.
  * @returns {boolean}
  */
@@ -59,7 +59,7 @@ const isMedicationForDate = (medication, date) => {
 
   const { type, value } = frequency;
 
-  // Haftanın gününü Pzt=0, Sal=1, ..., Paz=6 yap
+  // Haftanın gününü Mon=0, Tue=1, ..., Sun=6 yap
   const dayOfWeek = (date.getDay() + 6) % 7;
 
   switch (type) {
@@ -67,7 +67,7 @@ const isMedicationForDate = (medication, date) => {
       return true;
 
     case 'interval':
-      if (!createdAt) return false; // Başlangıç tarihi olmadan hesaplanamaz
+      if (!createdAt) return false; // Başlangıç tarihi olmadan hesaplanamaz (örneğin yeni eklenen ilacın)
       const startDate = new Date(createdAt);
       startDate.setHours(0, 0, 0, 0);
       const targetDate = new Date(date);
@@ -90,7 +90,7 @@ const isMedicationForDate = (medication, date) => {
   }
 };
 
-// Times normalizasyonu: Boş/eksik saatler için güvenli varsayılan
+// Times normalizasyonu: Boş/eksik saatler için güvenli varsayılan (sıralama ve gösterim için)
 const getNormalizedTimes = (med) => {
   try {
     if (Array.isArray(med.times)) {
@@ -104,7 +104,7 @@ const getNormalizedTimes = (med) => {
 
 /**
  * İlaç listesini anasayfa hatırlatıcı formatına çevirir.
- * @param {Array} medications - İlaç objeleri dizisi.
+ * @param {Array} medications - Medication objeleri dizisi.
  * @returns {{todayReminders: Array, upcomingReminders: Array}}
  */
 export const transformMedicationsToReminders = (medications) => {
@@ -115,7 +115,7 @@ export const transformMedicationsToReminders = (medications) => {
     return { todayReminders: [], upcomingReminders: [] };
   }
 
-  // Bugünkü hatırlatıcıları gruplamak için bir map kullan
+  // Bugünkü hatırlatıcıları gruplamak için bir map kullan (saatlere göre)  
   const todayRemindersMap = new Map();
 
   medications.forEach(med => {
@@ -191,24 +191,24 @@ export const transformMedicationsToReminders = (medications) => {
   return { todayReminders, upcomingReminders };
 };
 
-const dayOfWeekMap = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+const dayOfWeekMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const isMedicationForToday = (medication, today) => {
   const { frequency } = medication;
   if (!frequency) return false;
 
-  const todayDayOfWeek = dayOfWeekMap[today.getDay()];
+  const todayDayOfWeek = dayOfWeekMap[today.getDay()]; // Sun=0, Mon=1, ..., Sat=6
 
   switch (frequency.type) {
     case 'daily':
-      // Her X günde bir mantığı için bir başlangıç tarihi gerekir.
+      // Her X günde bir mantığı için bir başlangıç tarihi gerekir. (örneğin her 2 günde bir)
       // Şimdilik, basitçe her X günde birin bugün olup olmadığını kontrol edemeyiz
-      // Bu nedenle, 'value' 1 ise her gün kabul edelim.
+      // Bu nedenle, 'value' 1 ise her gün kabul edelim. (örneğin her 2 günde bir)
       // Daha gelişmiş bir mantık için ilacın eklenme tarihi saklanmalıdır.
       return frequency.value === 1;
     
     case 'weekly':
-      return frequency.value.includes(todayDayOfWeek);
+      return frequency.value.includes(todayDayOfWeek); // Sun=0, Mon=1, ..., Sat=6
 
     case 'specific_dates':
       const todayString = today.toISOString().split('T')[0];

@@ -44,7 +44,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
 
   const handleAdd = () => {
     if (!name.trim() || !date.trim()) {
-      showAlert('Hata', 'Lütfen isim ve tarih alanlarını doldurun.', 'warning');
+      showAlert('Error', 'Please fill in the name and date fields.', 'warning');
       return;
     }
 
@@ -77,8 +77,8 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
       const day = dateObject.getDate();
       const monthIndex = dateObject.getMonth();
       const monthNames = [
-        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
       ];
       setDate(`${day} ${monthNames[monthIndex]}`);
     }
@@ -109,7 +109,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
             </TouchableOpacity>
             <View style={styles.headerTitleContainer}>
                 <Ionicons name="gift-outline" size={20} color="#FF6A88" />
-                <Text style={styles.headerTitle}>Doğum Günü Ekle</Text>
+                <Text style={styles.headerTitle}>Add Birthday</Text>
             </View>
             <TouchableOpacity style={[styles.headerButton, styles.saveButton]} onPress={handleAdd}>
               <Ionicons name="checkmark" size={24} color="#FFFFFF" />
@@ -121,14 +121,14 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
             <View style={styles.form}>
             {/* İsim */}
             <View style={styles.inputSection}>
-                <Text style={styles.label}>İsim</Text>
+                <Text style={styles.label}>Name</Text>
                 <View style={styles.inputContainer}>
                     <Ionicons name="person-outline" size={22} color="#8e44ad" style={styles.inputIcon} />
                     <TextInput
                         style={styles.input}
                         value={name}
                         onChangeText={setName}
-                        placeholder="Örn: Ahmet Yılmaz"
+                        placeholder="Eg: John Doe"
                         placeholderTextColor="#b2bec3"
                     />
                 </View>
@@ -136,7 +136,7 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
 
             {/* Tarih */}
             <View style={styles.inputSection}>
-                <Text style={styles.label}>Doğum Günü Tarihi</Text>
+                <Text style={styles.label}>Birthday Date</Text>
                 <TouchableOpacity 
                     style={styles.inputContainer}
                     onPress={() => !selectedDate && setShowDatePicker(true)}
@@ -144,16 +144,16 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
                 >
                     <Ionicons name="calendar-outline" size={22} color="#27ae60" style={styles.inputIcon} />
                     <Text style={[styles.input, !date && { color: '#b2bec3' }]}>
-                        {date || 'Tarih seçin'}
+                        {date || 'Select Date'}
                     </Text>
                      {!selectedDate && <Ionicons name="chevron-forward" size={22} color="#636e72" />}
                 </TouchableOpacity>
-                 {selectedDate && <Text style={styles.infoText}>Tarih takvimden seçildi.</Text>}
+                 {selectedDate && <Text style={styles.infoText}>Date selected from calendar.</Text>}
             </View>
 
             {/* Kaç Gün Önce Hatırlatılsın */}
             <View style={styles.inputSection}>
-                <Text style={styles.label}>Kaç Gün Önce Hatırlatılsın?</Text>
+                <Text style={styles.label}>How Many Days Before Remind?</Text>
                 <View style={styles.reminderDaysContainer}>
                     {[0, 1, 3, 7, 14].map((days) => (
                         <TouchableOpacity
@@ -169,29 +169,29 @@ export default function AddBirthdayForm({ visible, onClose, onAdd, selectedDate 
                                 styles.reminderDayText,
                                 notificationDaysBefore === days && styles.reminderDayTextActive
                             ]}>
-                                {days === 0 ? 'Aynı Gün' : `${days} Gün Önce`}
+                                {days === 0 ? 'Same Day' : `${days} Days Before`}
                             </Text>
                         </TouchableOpacity>
                     ))}
                 </View>
                 <Text style={styles.infoText}>
                     {notificationDaysBefore === 0 
-                        ? 'Doğum günü sabah 9:00\'da hatırlatılacak' 
-                        : `${notificationDaysBefore} gün önce ve doğum günü sabah hatırlatılacak`
+                        ? 'Birthday will be reminded at 9:00 AM' 
+                        : `${notificationDaysBefore} days before and birthday will be reminded at 9:00 AM`
                     }
                 </Text>
             </View>
 
             {/* Notlar */}
             <View style={styles.inputSection}>
-                <Text style={styles.label}>Notlar (İsteğe bağlı)</Text>
+                <Text style={styles.label}>Notes (Optional)</Text>
                 <View style={[styles.inputContainer, { height: 120 }]}>
                   <Ionicons name="document-text-outline" size={22} color="#f39c12" style={styles.inputIcon} />
                   <TextInput
                     style={[styles.input, { textAlignVertical: 'top', paddingTop: spacing.md }]}
                     value={note}
                     onChangeText={setNote}
-                    placeholder="Hediye fikri: Kitap..."
+                    placeholder="Gift idea: Book..."
                     placeholderTextColor="#b2bec3"
                     multiline
                   />

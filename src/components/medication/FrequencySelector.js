@@ -24,32 +24,32 @@ const { width } = Dimensions.get('window');
 const FREQUENCY_OPTIONS = [
   {
     id: 'daily',
-    title: 'Her Gün',
-    description: 'Günlük kullanım',
+    title: 'Daily',
+    description: 'Daily usage',
     icon: 'calendar',
     gradient: ['#FF9A8B', '#FF6A88'],
     defaultValue: { type: 'daily', value: 1 }
   },
   {
     id: 'weekly',
-    title: 'Haftalık',
-    description: 'Belirli günlerde',
+    title: 'Weekly',
+    description: 'Specific days',
     icon: 'calendar-outline',
     gradient: ['#A8EDEA', '#74B9FF'],
     defaultValue: { type: 'weekly', value: [0, 1, 2, 3, 4] } // Hafta içi
   },
   {
     id: 'interval',
-    title: 'Aralıklı',
-    description: 'Her X günde bir',
+    title: 'Interval',
+    description: 'Every X days',
     icon: 'repeat',
     gradient: ['#D63031', '#E84393'],
     defaultValue: { type: 'interval', value: 2 }
   },
   {
     id: 'specific',
-    title: 'Belirli Tarihler',
-    description: 'Özel günlerde',
+    title: 'Specific Dates',
+    description: 'Specific days',
     icon: 'calendar-outline',
     gradient: ['#00B894', '#00CEC9'],
     defaultValue: { type: 'specific_dates', value: [] }
@@ -101,7 +101,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
       case 'interval':
         const interval = parseInt(intervalDays, 10);
         if (isNaN(interval) || interval < 1) {
-          showAlert('Hata', 'Lütfen geçerli bir gün sayısı girin', 'warning');
+          showAlert('Error', 'Please enter a valid number of days', 'warning');
           return;
         }
         selection = { type: 'interval', value: interval };
@@ -109,7 +109,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
         
       case 'weekly':
         if (weeklyDays.length === 0) {
-          showAlert('Hata', 'Lütfen en az bir gün seçin', 'warning');
+          showAlert('Error', 'Please select at least one day', 'warning');
           return;
         }
         selection = { type: 'weekly', value: weeklyDays.sort((a,b) => a - b) };
@@ -117,7 +117,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
         
       case 'specific':
         if (specificDates.length === 0) {
-          showAlert('Hata', 'Lütfen en az bir tarih seçin', 'warning');
+          showAlert('Error', 'Please select at least one date', 'warning');
           return;
         }
         selection = { 
@@ -179,7 +179,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
               style={styles.quickSelectButton}
               onPress={() => onQuickSelect(option.id)}
             >
-              <Text style={styles.quickSelectText}>Hızlı Seç</Text>
+              <Text style={styles.quickSelectText}>Quick Select</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -212,7 +212,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
-              <Text style={styles.title}>Tekrarlama Sıklığı</Text>
+              <Text style={styles.title}>Frequency</Text>
               <View style={styles.headerSpacer} />
             </View>
 
@@ -236,30 +236,30 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
               {/* Detail Settings */}
               {selectedOption === 'interval' && (
                 <View style={styles.detailContainer}>
-                  <Text style={styles.detailTitle}>Kaç günde bir?</Text>
+                  <Text style={styles.detailTitle}>How often?</Text>
                   <TouchableOpacity 
                     style={styles.intervalContainer} 
                     onPress={() => setShowNumberPicker(true)}
                   >
-                    <Text style={styles.intervalText}>Her</Text>
+                    <Text style={styles.intervalText}>Every</Text>
                     <View style={styles.intervalInput}>
                       <Text style={styles.intervalInputText}>{intervalDays}</Text>
                     </View>
-                    <Text style={styles.intervalText}>günde bir</Text>
+                    <Text style={styles.intervalText}>days</Text>
                   </TouchableOpacity>
                 </View>
               )}
 
               {selectedOption === 'weekly' && (
                 <View style={styles.detailContainer}>
-                  <Text style={styles.detailTitle}>Hangi günler?</Text>
+                  <Text style={styles.detailTitle}>Which days?</Text>
                   <WeekDayPicker selectedDays={weeklyDays} onDayPress={handleDayPress} />
                 </View>
               )}
 
               {selectedOption === 'specific' && (
                 <View style={styles.detailContainer}>
-                  <Text style={styles.detailTitle}>Hangi tarihler?</Text>
+                  <Text style={styles.detailTitle}>Which dates?</Text>
                   <MultiSelectCalendar 
                     selectedDates={specificDates}
                     onSelectionChange={setSpecificDates}
@@ -275,7 +275,7 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
                   colors={['#74B9FF', '#0984e3']}
                   style={styles.saveButtonGradient}
                 >
-                  <Text style={styles.saveButtonText}>Kaydet</Text>
+                  <Text style={styles.saveButtonText}>Save</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
@@ -287,8 +287,8 @@ export default function FrequencySelector({ visible, onClose, onSelect, currentF
         onClose={() => setShowNumberPicker(false)}
         onSelect={(value) => setIntervalDays(value)}
         initialValue={intervalDays}
-        title="Aralık Seçin"
-        label="Gün"
+        title="Select Interval"
+        label="Days"
       />
     </Modal>
   );

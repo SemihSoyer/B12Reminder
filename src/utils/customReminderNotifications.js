@@ -15,35 +15,35 @@ export async function scheduleCustomReminderNotification(reminder) {
     // 1. ADIM: Bildirim göndermeden önce izinleri kontrol et ve iste
     const hasPermission = await NotificationService.requestAndCheckPermissions();
     if (!hasPermission) {
-      console.error('❌ Bildirim izni yok. Zamanlama iptal edildi.');
+      console.error('❌ No permission. Scheduling cancelled.');
       return null;
     }
 
-    console.log('🔔 ÖZEL HATIRLATICI BİLDİRİM ZAMANLANIYOR...');
+    console.log('🔔 CUSTOM REMINDER REMINDER SCHEDULING...');
     console.log('   Reminder:', reminder);
 
     if (!reminder || !reminder.title || !reminder.date || !reminder.time) {
-      console.error('❌ Geçersiz hatırlatıcı verisi:', reminder);
+      console.error('❌ Invalid reminder data:', reminder);
       return null;
     }
 
     const { title, date, time } = reminder;
 
-    console.log('   📝 Başlık:', title);
-    console.log('   📅 Tarih:', date);
-    console.log('   ⏰ Saat:', time);
+    console.log('   📝 Title:', title);
+    console.log('   📅 Date:', date);
+    console.log('   ⏰ Time:', time);
 
     // Tarih ve saatten Date objesi oluştur
     const targetDate = NotificationService.createDateFromDateTime(date, time);
 
     // NULL kontrolü (artık hata durumunda null döndürülüyor)
     if (!targetDate) {
-      console.error('❌ Tarih oluşturulamadı! Date string ve time geçersiz.');
+      console.error('❌ Date not created! Date string and time are invalid.');
       return null;
     }
 
     if (!(targetDate instanceof Date) || isNaN(targetDate.getTime())) {
-      console.error('❌ Oluşturulan tarih objesi geçersiz:', targetDate);
+      console.error('❌ Created date object is invalid:', targetDate);
       return null;
     }
 
@@ -52,17 +52,17 @@ export async function scheduleCustomReminderNotification(reminder) {
     const minimumFutureTime = new Date(now.getTime() + 10000); // 10 saniye
 
     if (targetDate <= minimumFutureTime) {
-      console.error('❌ Tarih geçmiş veya çok yakın!');
-      console.error('   Şu an:', now.toLocaleString('tr-TR'));
-      console.error('   Hedef:', targetDate.toLocaleString('tr-TR'));
+      console.error('❌ Date is past or too close!');
+      console.error('   Now:', now.toLocaleString('tr-TR'));
+      console.error('   Target:', targetDate.toLocaleString('tr-TR'));
       return null;
     }
 
-    console.log('✅ Tarih validasyonu başarılı, bildirim servisi çağrılıyor...');
+    console.log('✅ Date validation successful, notification service called...');
 
     const notificationId = await NotificationService.scheduleNotification(
       {
-        title: '⏰ Hatırlatma',
+        title: '⏰ Reminder',
         body: title,
         data: { type: 'custom_reminder', reminderId: reminder.id },
       },
@@ -70,17 +70,17 @@ export async function scheduleCustomReminderNotification(reminder) {
     );
 
     if (notificationId) {
-      console.log('✅ ÖZ EL HATIRLATICI BİLDİRİMİ ZAMANLANADI!');
+      console.log('✅ CUSTOM REMINDER REMINDER SCHEDULED!');
       console.log('   ID:', notificationId);
-      console.log('   Başlık:', title);
-      console.log('   Tarih:', targetDate.toLocaleString('tr-TR'));
+      console.log('   Title:', title);
+      console.log('   Date:', targetDate.toLocaleString('tr-TR'));
     } else {
-      console.error('❌ Bildirim ID alınamadı - Zamanlama başarısız!');
+      console.error('❌ Notification ID not found - Scheduling failed!');
     }
 
     return notificationId;
   } catch (error) {
-    console.error('❌ ÖZEL HATIRLATICI BİLDİRİM HATA!');
+    console.error('❌ CUSTOM REMINDER REMINDER ERROR!');
     console.error('   Error:', error);
     console.error('   Reminder:', reminder);
     return null;
@@ -98,9 +98,9 @@ export async function cancelCustomReminderNotification(notificationId) {
 
   try {
     await NotificationService.cancelNotification(notificationId);
-    console.log('✅ Özel hatırlatıcı bildirimi iptal edildi');
+    console.log('✅ Custom reminder notification cancelled');
   } catch (error) {
-    console.error('❌ Özel hatırlatıcı bildirimi iptal hatası:', error);
+    console.error('❌ Custom reminder notification cancellation error:', error);
   }
 }
 
@@ -125,10 +125,10 @@ export async function rescheduleCustomReminderNotifications(reminders) {
       }
     }
 
-    console.log(`✅ ${reminders.length} özel hatırlatıcı için bildirimler yeniden planlandı`);
+    console.log(`✅ ${reminders.length} custom reminder reminders rescheduled`);
     return allNotificationIds;
   } catch (error) {
-    console.error('❌ Özel hatırlatıcı bildirimleri yeniden planlama hatası:', error);
+    console.error('❌ Custom reminder reminders rescheduling error:', error);
     return allNotificationIds;
   }
 }

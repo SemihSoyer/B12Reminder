@@ -17,11 +17,11 @@ export default function StatisticsCard({ menstrualData }) {
   const showRegularity = validCyclesCount >= 2;
   
   const getRegularityText = () => {
-    if (regularity === null) return 'Veri yetersiz';
-    if (regularity >= 80) return 'Çok düzenli';
-    if (regularity >= 60) return 'Düzenli';
-    if (regularity >= 40) return 'Orta düzenli';
-    return 'Düzensiz';
+    if (regularity === null) return 'Data insufficient';
+    if (regularity >= 80) return 'Very regular';
+    if (regularity >= 60) return 'Regular';
+    if (regularity >= 40) return 'Moderate';
+    return 'Irregular';
   };
 
   const getRegularityColor = () => {
@@ -36,7 +36,7 @@ export default function StatisticsCard({ menstrualData }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="stats-chart" size={20} color="#1a1a1a" />
-        <Text style={styles.headerTitle}>İstatistikler</Text>
+        <Text style={styles.headerTitle}>Statistics</Text>
       </View>
       
       <View style={styles.statsContainer}>
@@ -46,7 +46,7 @@ export default function StatisticsCard({ menstrualData }) {
             <Ionicons name="repeat" size={24} color="#74B9FF" />
           </View>
           <Text style={styles.statValue}>{menstrualData.averageCycleLength}</Text>
-          <Text style={styles.statLabel}>Ortalama Döngü</Text>
+          <Text style={styles.statLabel}>Average Cycle</Text>
           <Text style={styles.statUnit}>gün</Text>
         </View>
 
@@ -56,7 +56,7 @@ export default function StatisticsCard({ menstrualData }) {
             <Ionicons name="water" size={24} color="#E17055" />
           </View>
           <Text style={styles.statValue}>{menstrualData.averagePeriodLength}</Text>
-          <Text style={styles.statLabel}>Ortalama Regl</Text>
+          <Text style={styles.statLabel}>Average Period</Text>
           <Text style={styles.statUnit}>gün</Text>
         </View>
 
@@ -66,7 +66,7 @@ export default function StatisticsCard({ menstrualData }) {
             <Ionicons name="calendar" size={24} color="#00B894" />
           </View>
           <Text style={styles.statValue}>{menstrualData.cycles.length}</Text>
-          <Text style={styles.statLabel}>Kayıtlı Döngü</Text>
+          <Text style={styles.statLabel}>Recorded Cycle</Text>
           <Text style={styles.statUnit}>adet</Text>
         </View>
       </View>
@@ -74,7 +74,7 @@ export default function StatisticsCard({ menstrualData }) {
       {/* Düzenlilik */}
       {showRegularity && regularity !== null && (
         <View style={styles.regularityContainer}>
-          <Text style={styles.regularityLabel}>Döngü Düzenliliği</Text>
+          <Text style={styles.regularityLabel}>Cycle Regularity</Text>
           <View style={styles.regularityBar}>
             <View 
               style={[
@@ -97,7 +97,7 @@ export default function StatisticsCard({ menstrualData }) {
           <View style={styles.infoNote}>
             <Ionicons name="information-circle-outline" size={18} color="#74B9FF" />
             <Text style={styles.infoNoteText}>
-              Düzenlilik skorunu görmek için en az 2 tam döngü kaydetmelisiniz.
+              To see the regularity score, you need to record at least 2 complete cycles.
             </Text>
           </View>
         </View>

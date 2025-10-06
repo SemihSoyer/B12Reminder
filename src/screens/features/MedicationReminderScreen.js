@@ -68,7 +68,7 @@ export default function MedicationReminderScreen({ navigation }) {
         return;
       }
 
-      console.log(`🔍 ${intervalMedications.length} interval ilaç kontrol ediliyor...`);
+      console.log(`🔍 ${intervalMedications.length} interval medication checking...`);
 
       // Her bir ilacı kontrol et
       for (const med of intervalMedications) {
@@ -78,7 +78,7 @@ export default function MedicationReminderScreen({ navigation }) {
         });
       }
     } catch (error) {
-      console.error('❌ Bildirim kontrol hatası:', error);
+      console.error('❌ Notification check error:', error);
     }
   };
 
@@ -106,13 +106,13 @@ export default function MedicationReminderScreen({ navigation }) {
         
         // Başarı mesajını modal kapandıktan sonra göster
         setTimeout(() => {
-          showAlert('Başarılı!', `${savedMedication.name} eklendi.`, 'success');
+          showAlert('Success!', `${savedMedication.name} added.`, 'success');
         }, 300);
       } else {
-        showAlert('Hata', 'İlaç eklenirken bir sorun oluştu.', 'error');
+        showAlert('Error', 'Error adding medication.', 'error');
       }
     } catch (error) {
-      showAlert('Hata', 'İlaç eklenirken bir hata oluştu.', 'error');
+      showAlert('Error', 'Error adding medication.', 'error');
     }
   };
 
@@ -134,13 +134,13 @@ export default function MedicationReminderScreen({ navigation }) {
         
         // Başarı mesajını kısa bir gecikme ile göster
         setTimeout(() => {
-          showAlert('Silindi!', `${medicationToDelete.name} silindi.`, 'success');
+          showAlert('Deleted!', `${medicationToDelete.name} deleted.`, 'success');
         }, 200);
       } else {
-        showAlert('Hata', 'İlaç silinirken bir sorun oluştu.', 'error');
+        showAlert('Error', 'Error deleting medication.', 'error');
       }
     } catch (error) {
-        showAlert('Hata', 'İlaç silinirken bir hata oluştu.', 'error');
+        showAlert('Error', 'Error deleting medication.', 'error');
     }
   };
 
@@ -162,7 +162,7 @@ export default function MedicationReminderScreen({ navigation }) {
             >
               <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
             </TouchableOpacity>
-            <Text style={styles.title}>İlaç Hatırlatıcıları</Text>
+            <Text style={styles.title}>Medication Reminders</Text>
             <View style={styles.headerSpacer} />
           </View>
 
@@ -172,10 +172,10 @@ export default function MedicationReminderScreen({ navigation }) {
           {/* Content */}
           <View style={[styles.content, styles.scrollContent]}>
             <Text style={styles.sectionTitle}>
-              {hasTodayMedications ? 'Bugünkü İlaçların' : 'Bugün Planlanmış İlaç Yok'}
+              {hasTodayMedications ? 'Today\'s Medications' : 'No Medications Scheduled for Today'}
             </Text>
             {loading ? (
-              <EmptyState message="İlaçlar yükleniyor..." />
+              <EmptyState message="Medications loading..." />
             ) : hasTodayMedications ? (
               <MedicationList
                 medications={todayMedications}
@@ -183,8 +183,8 @@ export default function MedicationReminderScreen({ navigation }) {
               />
             ) : (
               <EmptyState
-                message="Bugün için planlanmış bir hatırlatıcınız bulunmuyor."
-                subMessage="Yeni bir ilaç ekleyerek başlayın!"
+                message="No medication reminders scheduled for today."
+                subMessage="Start by adding a new medication!"
               />
             )}
           </View>

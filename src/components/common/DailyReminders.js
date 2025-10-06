@@ -17,11 +17,11 @@ export default function DailyReminders({ reminders = [], onDelete }) {
   if (!hasReminders) {
     return (
       <View style={styles.container}>
-        <Text style={styles.sectionTitle}>Bugün</Text>
+        <Text style={styles.sectionTitle}>Today</Text>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>✨</Text>
-          <Text style={styles.emptyText}>Bugün hiçbir şeyi unutmadın!</Text>
-          <Text style={styles.emptySubtext}>Harika gidiyor</Text>
+          <Text style={styles.emptyText}>You didn't forget anything today!</Text>
+          <Text style={styles.emptySubtext}>Great going</Text>
         </View>
       </View>
     );

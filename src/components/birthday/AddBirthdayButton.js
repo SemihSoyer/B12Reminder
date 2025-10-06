@@ -28,7 +28,7 @@ export default function AddBirthdayButton({ onPress, style }) {
           color="#FFFFFF" 
           style={styles.buttonIcon}
         />
-        <Text style={styles.buttonText}>Doğum Günü Ekle</Text>
+        <Text style={styles.buttonText}>Add Birthday</Text>
       </LinearGradient>
     </TouchableOpacity>
   );

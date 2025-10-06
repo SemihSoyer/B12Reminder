@@ -21,14 +21,14 @@ export async function scheduleMedicationNotifications(medication) {
     // 1. ADIM: Bildirim göndermeden önce izinleri kontrol et ve iste
     const hasPermission = await NotificationService.requestAndCheckPermissions();
     if (!hasPermission) {
-      console.error('❌ Bildirim izni yok. İlaç hatırlatıcı zamanlama iptal edildi.');
+      console.error('❌ No permission. Medication reminder scheduling cancelled.');
       return [];
     }
 
     const { name, dosage, times, frequency } = medication;
 
     if (!times || times.length === 0) {
-      console.warn('İlaç için saat bilgisi yok:', name);
+      console.warn('No time information for medication:', name);
       return [];
     }
 
@@ -82,13 +82,13 @@ export async function scheduleMedicationNotifications(medication) {
         break;
 
       default:
-        console.warn('Bilinmeyen frequency tipi:', frequency.type);
+        console.warn('Unknown frequency type:', frequency.type);
     }
 
-    console.log(`📋 Toplam ${notificationIds.length} ilaç bildirimi zamanlandı:`, name);
+    console.log(`📋 Total ${notificationIds.length} medication reminder scheduled:`, name);
     return notificationIds;
   } catch (error) {
-    console.error('❌ İlaç bildirimleri zamanlama hatası:', error);
+    console.error('❌ Medication reminder scheduling error:', error);
     return notificationIds;
   }
 }
@@ -104,16 +104,16 @@ async function scheduleDailyNotification(name, dosage, time) {
 
     // Saat validasyonu
     if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-      console.error('❌ Geçersiz saat değeri:', time);
+      console.error('❌ Invalid time value:', time);
       return null;
     }
 
-    console.log('💊 Günlük ilaç bildirimi zamanlanıyor:', name, 'Saat:', time);
+    console.log('💊 Daily medication reminder scheduling:', name, 'Time:', time);
 
     return await NotificationService.scheduleRepeatingNotification(
       {
         title: name,
-        body: `${dosage} - İlaç alma zamanı`,
+        body: `${dosage} - Medication reminder time`,
         data: { type: 'medication', name, time },
       },
       {
@@ -123,7 +123,7 @@ async function scheduleDailyNotification(name, dosage, time) {
       }
     );
   } catch (error) {
-    console.error('❌ Günlük bildirim zamanlama hatası:', error);
+    console.error('❌ Daily reminder scheduling error:', error);
     return null;
   }
 }
@@ -139,17 +139,17 @@ async function scheduleWeeklyNotification(name, dosage, time, weekday) {
 
     // Saat validasyonu
     if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-      console.error('❌ Geçersiz saat değeri:', time);
+      console.error('❌ Invalid time value:', time);
       return null;
     }
 
-    console.log('💊 Haftalık ilaç bildirimi zamanlanıyor:', name, 'Gün:', weekday, 'Saat:', time);
+    console.log('💊 Weekly medication reminder scheduling:', name, 'Weekday:', weekday, 'Time:', time);
 
     // weekday: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday (Expo format)
     return await NotificationService.scheduleRepeatingNotification(
       {
         title: name,
-        body: `${dosage} - İlaç alma zamanı`,
+        body: `${dosage} - Medication reminder time`,
         data: { type: 'medication', name, time, weekday },
       },
       {
@@ -160,7 +160,7 @@ async function scheduleWeeklyNotification(name, dosage, time, weekday) {
       }
     );
   } catch (error) {
-    console.error('❌ Haftalık bildirim zamanlama hatası:', error);
+    console.error('❌ Weekly reminder scheduling error:', error);
     return null;
   }
 }
@@ -179,7 +179,7 @@ async function scheduleIntervalNotifications(name, dosage, time, intervalDays, m
 
     // Saat validasyonu
     if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-      console.error('❌ Geçersiz saat değeri:', time);
+      console.error('❌ Invalid time value:', time);
       return [];
     }
 
@@ -196,7 +196,7 @@ async function scheduleIntervalNotifications(name, dosage, time, intervalDays, m
       daysToSchedule = intervalDays * 2;  // Her 7+ günde → 2 döngü (2-4 bildirim)
     }
 
-    console.log(`💊 Interval ilaç bildirimleri zamanlanıyor: ${name}, Aralık: ${intervalDays} gün, Toplam: ${daysToSchedule} gün`);
+    console.log(`💊 Interval medication reminders scheduling: ${name}, Interval: ${intervalDays} days, Total: ${daysToSchedule} days`);
 
     for (let dayOffset = 0; dayOffset < daysToSchedule; dayOffset += intervalDays) {
       const targetDate = new Date(now);
@@ -210,7 +210,7 @@ async function scheduleIntervalNotifications(name, dosage, time, intervalDays, m
         const notificationId = await NotificationService.scheduleNotification(
           {
             title: name,
-            body: `${dosage} - İlaç alma zamanı`,
+            body: `${dosage} - Medication reminder time`,
             data: { 
               type: 'medication', 
               name, 
@@ -227,10 +227,10 @@ async function scheduleIntervalNotifications(name, dosage, time, intervalDays, m
       }
     }
 
-    console.log(`✅ ${name} için ${notificationIds.length} bildirim zamanlandı (${daysToSchedule} gün)`);
+    console.log(`✅ ${name} için ${notificationIds.length} bildirim zamanlandı (${daysToSchedule} days)`);
     return notificationIds;
   } catch (error) {
-    console.error('❌ Interval bildirim zamanlama hatası:', error);
+    console.error('❌ Interval reminder scheduling error:', error);
     return notificationIds;
   }
 }
@@ -246,7 +246,7 @@ async function scheduleSpecificDateNotification(name, dosage, time, dateString) 
 
     // Saat validasyonu
     if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-      console.error('❌ Geçersiz saat değeri:', time);
+      console.error('❌ Invalid time value:', time);
       return null;
     }
 
@@ -254,7 +254,7 @@ async function scheduleSpecificDateNotification(name, dosage, time, dateString) 
     
     // Tarih validasyonu
     if (isNaN(targetDate.getTime())) {
-      console.error('❌ Geçersiz tarih:', dateString);
+      console.error('❌ Invalid date:', dateString);
       return null;
     }
 
@@ -264,22 +264,22 @@ async function scheduleSpecificDateNotification(name, dosage, time, dateString) 
     const minimumFutureTime = new Date(now.getTime() + 10000); // 10 saniye
     
     if (targetDate <= minimumFutureTime) {
-      console.warn('⚠️ Geçmiş tarih veya çok yakın, atlanıyor:', targetDate.toLocaleString('tr-TR'));
+      console.warn('⚠️ Past date or too close, skipping:', targetDate.toLocaleString('tr-TR'));
       return null;
     }
 
-    console.log('💊 Belirli tarih için ilaç bildirimi:', name, targetDate.toLocaleString('tr-TR'));
+    console.log('💊 Specific date medication reminder scheduling:', name, targetDate.toLocaleString('tr-TR'));
 
     return await NotificationService.scheduleNotification(
       {
         title: name,
-        body: `${dosage} - İlaç alma zamanı`,
+        body: `${dosage} - Medication reminder time`,
         data: { type: 'medication', name, time, date: dateString },
       },
       targetDate
     );
   } catch (error) {
-    console.error('❌ Specific date notification error:', error);
+    console.error('❌ Specific date reminder scheduling error:', error);
     return null;
   }
 }
@@ -295,9 +295,9 @@ export async function cancelMedicationNotifications(notificationIds) {
 
   try {
     await NotificationService.cancelNotifications(notificationIds);
-    console.log(`✅ ${notificationIds.length} ilaç bildirimi iptal edildi`);
+    console.log(`✅ ${notificationIds.length} medication reminder cancelled`);
   } catch (error) {
-    console.error('❌ İlaç bildirimleri iptal hatası:', error);
+    console.error('❌ Medication reminders cancellation error:', error);
   }
 }
 
@@ -320,10 +320,10 @@ export async function rescheduleMedicationNotifications(medications) {
       allNotificationIds.push(...notificationIds);
     }
 
-    console.log(`✅ ${medications.length} ilaç için bildirimler yeniden planlandı`);
+    console.log(`✅ ${medications.length} medication reminders rescheduled`);
     return allNotificationIds;
   } catch (error) {
-    console.error('❌ İlaç bildirimleri yeniden planlama hatası:', error);
+    console.error('❌ Medication reminders rescheduling error:', error);
     return allNotificationIds;
   }
 }
@@ -343,10 +343,10 @@ async function rescheduleSingleMedication(medication) {
     // Yeni bildirimleri oluştur
     const newIds = await scheduleMedicationNotifications(medication);
     
-    console.log(`🔄 ${medication.name} için bildirimler yenilendi: ${newIds.length} bildirim`);
+    console.log(`🔄 ${medication.name} medication reminders rescheduled: ${newIds.length} reminder`);
     return newIds;
   } catch (error) {
-    console.error('❌ Tek ilaç yenileme hatası:', error);
+    console.error('❌ Single medication rescheduling error:', error);
     return [];
   }
 }
@@ -374,7 +374,7 @@ export async function refreshIfNeeded(medication, updateCallback) {
 
     // Bildirim sayısını kontrol et
     if (medNotifications.length === 0) {
-      console.log('⚠️ Hiç bildirim yok, yeniden oluşturuluyor:', medication.name);
+      console.log('⚠️ No reminders, recreating:', medication.name);
       const newIds = await rescheduleSingleMedication(medication);
       
       // Storage'ı güncelle
@@ -407,7 +407,7 @@ export async function refreshIfNeeded(medication, updateCallback) {
     const refreshThreshold = intervalDays <= 3 ? 7 : intervalDays;
 
     if (daysUntilNext < refreshThreshold) {
-      console.log(`🔄 ${medication.name} bildirimleri yenileniyor (${Math.floor(daysUntilNext)} gün kaldı)`);
+      console.log(`🔄 ${medication.name} medication reminders rescheduled (${Math.floor(daysUntilNext)} days left)`);
       const newIds = await rescheduleSingleMedication(medication);
       
       // Storage'ı güncelle
@@ -416,10 +416,10 @@ export async function refreshIfNeeded(medication, updateCallback) {
         await updateCallback(medication);
       }
     } else {
-      console.log(`✅ ${medication.name} bildirimleri güncel (${Math.floor(daysUntilNext)} gün kaldı)`);
+      console.log(`✅ ${medication.name} medication reminders updated (${Math.floor(daysUntilNext)} days left)`);
     }
   } catch (error) {
-    console.error('❌ Yenileme kontrolü hatası:', error);
+    console.error('❌ Refresh check error:', error);
   }
 }
 

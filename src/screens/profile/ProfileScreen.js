@@ -17,19 +17,19 @@ export default function ProfileScreen({ navigation }) {
   const generalSettings = [
     {
       icon: 'language-outline',
-      title: 'Dil',
-      subtitle: 'Uygulama dili',
-      value: 'Türkçe',
+      title: 'Language',
+      subtitle: 'App language',
+      value: 'English',
       type: 'action',
-      onPress: () => showAlert('Bilgi', 'Dil seçenekleri yakında eklenecek', 'info'),
+      onPress: () => showAlert('Info', 'Language options will be added soon', 'info'),
     },
   ];
 
   const accountSettings = [
     {
       icon: 'star-outline',
-      title: 'Abonelikler',
-      subtitle: 'Aboneliklerinizi yönetin',
+      title: 'Subscriptions',
+      subtitle: 'Manage your subscriptions',
       type: 'navigation',
       onPress: () => navigation.navigate('Subscription'),
     },
@@ -38,23 +38,23 @@ export default function ProfileScreen({ navigation }) {
   const appInfoSettings = [
     {
       icon: 'information-circle-outline',
-      title: 'Versiyon',
+      title: 'Version',
       value: '1.0.0',
       type: 'info',
     },
     {
       icon: 'book-outline',
-      title: 'Hakkında',
+      title: 'About',
       type: 'navigation',
-      onPress: () => showAlert('Hakkında', 'Bu uygulama harika bir hatırlatıcıdır.', 'info'),
+      onPress: () => showAlert('About', 'This app is a great reminder app.', 'info'),
     },
     {
       icon: 'help-circle-outline',
-      title: 'Yardım',
+      title: 'Help',
       type: 'navigation',
       onPress: () => showAlert(
-        'Yardım',
-        'Şikayet ve önerileriniz için: sunmateapplication@gmail.com',
+        'Help',
+        'For complaints and suggestions: sunmateapplication@gmail.com',
         'info'
       ),
     }
@@ -69,7 +69,7 @@ export default function ProfileScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerSpacer} />
-          <Text style={styles.title}>Ayarlar</Text>
+          <Text style={styles.title}>Settings</Text>
           <View style={styles.headerSpacer} />
         </View>
 
@@ -81,19 +81,19 @@ export default function ProfileScreen({ navigation }) {
         >
           {/* Hesap Ayarları */}
           <SettingsSection
-            title="Hesap"
+            title="Account"
             items={accountSettings}
           />
 
           {/* Genel Ayarlar */}
           <SettingsSection
-            title="Genel"
+            title="General"
             items={generalSettings}
           />
 
           {/* Uygulama Bilgileri */}
           <SettingsSection
-            title="Uygulama Bilgileri"
+            title="App Information"
             items={appInfoSettings}
           />
         </ScrollView>

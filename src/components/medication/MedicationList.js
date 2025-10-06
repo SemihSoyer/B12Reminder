@@ -9,16 +9,16 @@ import { showAlert } from '../ui/CustomAlert';
 const MedicationItem = ({ item, onDelete }) => {
   const handleDelete = () => {
     showAlert(
-      'İlacı Sil',
-      `${item.name} ilacını silmek istediğinizden emin misiniz?`,
+      'Medication Delete',
+      `${item.name} medication to delete?`,
       'warning',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => onDelete(item),
         },

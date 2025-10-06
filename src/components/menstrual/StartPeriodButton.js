@@ -28,7 +28,7 @@ export default function StartPeriodButton({ onPress, style }) {
           color="#FFFFFF" 
           style={styles.buttonIcon}
         />
-        <Text style={styles.buttonText}>Regl Başlat</Text>
+        <Text style={styles.buttonText}>Start Period</Text>
       </LinearGradient>
     </TouchableOpacity>
   );

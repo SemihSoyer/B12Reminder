@@ -45,8 +45,8 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
 
   const formatDateForDisplay = (date) => {
     const monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
     const day = date.getDate();
     const month = monthNames[date.getMonth()];
@@ -112,14 +112,14 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
       
       if (isToday) {
         showAlert(
-          'Geçersiz Saat', 
-          'Bugün için en az şu anki saatten 1 dakika sonrasına hatırlatıcı ekleyebilirsiniz.\n\nLütfen daha ileri bir saat seçin.', 
+          'Invalid Time', 
+          'You can only add a reminder at least 1 minute after the current time for today.\n\nPlease select a later time.', 
           'warning'
         );
       } else {
         showAlert(
-          'Geçersiz Tarih', 
-          'Geçmiş bir tarih seçtiniz. Lütfen bugün veya gelecek bir tarih seçin.', 
+          'Invalid Date', 
+          'You selected a past date. Please select a date for today or a future date.', 
           'warning'
         );
       }
@@ -170,7 +170,7 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
               >
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Yeni Hatırlatıcı</Text>
+              <Text style={styles.headerTitle}>New Custom Reminder</Text>
               <View style={styles.headerSpacer} />
             </View>
 
@@ -181,7 +181,7 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
             >
               {/* Title Input */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Hatırlatıcı Başlığı</Text>
+                <Text style={styles.label}>Custom Reminder Title</Text>
                 <View style={styles.inputContainer}>
                   <Ionicons
                     name="create-outline"
@@ -191,7 +191,7 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
                   />
                   <TextInput
                     style={styles.input}
-                    placeholder="Örn: Toplantı, Randevu, Alışveriş"
+                    placeholder="Eg: Meeting, Appointment, Shopping"
                     placeholderTextColor="#999"
                     value={title}
                     onChangeText={setTitle}
@@ -203,7 +203,7 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
 
               {/* Date Selection */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Tarih</Text>
+                <Text style={styles.label}>Date</Text>
                 <TouchableOpacity
                   style={styles.selectButton}
                   onPress={() => setShowDatePicker(true)}
@@ -224,7 +224,7 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
 
               {/* Time Selection */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Saat</Text>
+                <Text style={styles.label}>Time</Text>
                 <TouchableOpacity
                   style={styles.selectButton}
                   onPress={() => setShowTimePicker(true)}
@@ -245,11 +245,11 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
 
               {/* Note Input (Optional) */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Not (Opsiyonel)</Text>
+                <Text style={styles.label}>Note (Optional)</Text>
                 <View style={[styles.inputContainer, styles.textAreaContainer]}>
                   <TextInput
                     style={[styles.input, styles.textArea]}
-                    placeholder="Hatırlatıcınız için not ekleyin..."
+                    placeholder="Add a note for your custom reminder..."
                     placeholderTextColor="#999"
                     value={note}
                     onChangeText={setNote}
@@ -265,7 +265,7 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
               <View style={styles.infoBox}>
                 <Ionicons name="information-circle" size={20} color="#6C5CE7" />
                 <Text style={styles.infoText}>
-                  En fazla 10 özel hatırlatıcı ekleyebilirsiniz.
+                  You can only add up to 10 custom reminders.
                 </Text>
               </View>
             </ScrollView>
@@ -284,7 +284,7 @@ export default function AddCustomReminderForm({ visible, onClose, onAdd }) {
                   style={styles.submitGradient}
                 >
                   <Ionicons name="checkmark-circle" size={24} color="#FFFFFF" />
-                  <Text style={styles.submitText}>Hatırlatıcı Ekle</Text>
+                  <Text style={styles.submitText}>Add Custom Reminder</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

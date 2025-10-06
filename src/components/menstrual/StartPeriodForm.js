@@ -52,7 +52,7 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
     // Validasyon
     const length = parseInt(periodLength);
     if (isNaN(length) || length < 1 || length > 10) {
-      showAlert('Hata', 'Lütfen 1-10 arasında geçerli bir gün sayısı girin.', 'error');
+      showAlert('Error', 'Please enter a valid number of days between 1 and 10.', 'error');
       return;
     }
 
@@ -63,7 +63,7 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
     selected.setHours(0, 0, 0, 0);
 
     if (selected > today) {
-      showAlert('Hata', 'Gelecek bir tarih seçemezsiniz.', 'error');
+      showAlert('Error', 'You cannot select a future date.', 'error');
       return;
     }
 
@@ -73,16 +73,16 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
 
     if (selected < sixMonthsAgo) {
       showAlert(
-        'Uyarı',
-        '6 aydan eski tarih seçtiniz. Devam etmek istediğinizden emin misiniz?',
+        'Warning',
+        'You selected a date 6 months ago. Are you sure you want to continue?',
         'warning',
         [
           {
-            text: 'İptal',
+            text: 'Cancel',
             style: 'cancel',
           },
           {
-            text: 'Devam Et',
+            text: 'Continue',
             onPress: () => submitData(length),
           },
         ]
@@ -137,7 +137,7 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
               >
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Regl Dönemi Başlat</Text>
+              <Text style={styles.headerTitle}>Start Period</Text>
               <View style={styles.headerSpacer} />
             </View>
 
@@ -150,13 +150,13 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
               <View style={styles.infoBox}>
                 <Ionicons name="information-circle" size={20} color="#00B894" />
                 <Text style={styles.infoText}>
-                  Son regl döneminizin başladığı tarihi seçin
+                  Select the date of your last period
                 </Text>
               </View>
 
               {/* Tarih Seçimi */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Regl Başlangıç Tarihi</Text>
+                <Text style={styles.label}>Period Start Date</Text>
                 <TouchableOpacity
                   style={styles.selectButton}
                   onPress={() => setShowDatePicker(true)}
@@ -177,7 +177,7 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
 
               {/* Regl Süresi */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Regl Süresi (Kaç gün sürdü?)</Text>
+                <Text style={styles.label}>Period Length (How many days?)</Text>
                 <View style={styles.inputContainer}>
                   <Ionicons
                     name="time-outline"
@@ -187,23 +187,23 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
                   />
                   <TextInput
                     style={styles.input}
-                    placeholder="Örn: 5"
+                    placeholder="Eg: 5"
                     placeholderTextColor="#999"
                     value={periodLength}
                     onChangeText={setPeriodLength}
                     keyboardType="number-pad"
                     maxLength={2}
                   />
-                  <Text style={styles.unitText}>gün</Text>
+                  <Text style={styles.unitText}>days</Text>
                 </View>
                 <Text style={styles.helperText}>
-                  Ortalama 3-7 gün arasında değişir
+                  Average 3-7 days
                 </Text>
               </View>
 
               {/* Hızlı Seçim Butonları */}
               <View style={styles.quickSelectSection}>
-                <Text style={styles.quickSelectLabel}>Hızlı Seçim</Text>
+                <Text style={styles.quickSelectLabel}>Quick Select</Text>
                 <View style={styles.quickSelectButtons}>
                   {['3', '4', '5', '6', '7'].map((days) => (
                     <TouchableOpacity
@@ -231,8 +231,8 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
               {/* Bilgi Notu */}
               <View style={styles.noteBox}>
                 <Text style={styles.noteText}>
-                  💡 İpucu: Regl sürenizi tam olarak hatırlamıyorsanız, 
-                  ortalama 5 gün seçebilirsiniz.
+                    💡 Tip: If you don't remember your period length exactly, 
+                  you can select 5 days as average.
                 </Text>
               </View>
             </ScrollView>
@@ -251,7 +251,7 @@ export default function StartPeriodForm({ visible, onClose, onSubmit }) {
                   style={styles.submitGradient}
                 >
                   <Ionicons name="checkmark-circle" size={24} color="#FFFFFF" />
-                  <Text style={styles.submitText}>Kaydet ve Başlat</Text>
+                  <Text style={styles.submitText}>Save and Start</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

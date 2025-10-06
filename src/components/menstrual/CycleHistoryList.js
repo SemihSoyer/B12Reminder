@@ -29,14 +29,14 @@ export default function CycleHistoryList({ cycles, onDelete }) {
         <View style={styles.cycleDetails}>
           {item.periodLength && (
             <Text style={styles.cycleDetail}>
-              {item.periodLength} gün
+              {item.periodLength} days
             </Text>
           )}
           {item.cycleLength && (
             <>
               <View style={styles.separator} />
               <Text style={styles.cycleDetail}>
-                Döngü: {item.cycleLength} gün
+                Cycle: {item.cycleLength} days
               </Text>
             </>
           )}
@@ -57,7 +57,7 @@ export default function CycleHistoryList({ cycles, onDelete }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="time-outline" size={20} color="#1a1a1a" />
-        <Text style={styles.headerTitle}>Geçmiş Döngüler</Text>
+        <Text style={styles.headerTitle}>Cycle History</Text>
       </View>
       
       <View style={styles.listContainer}>

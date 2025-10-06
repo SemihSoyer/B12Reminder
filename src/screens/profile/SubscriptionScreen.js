@@ -26,13 +26,13 @@ export default function SubscriptionScreen({ navigation }) {
           >
             <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
           </TouchableOpacity>
-          <Text style={styles.title}>Abonelikler</Text>
+          <Text style={styles.title}>Subscriptions</Text>
           <View style={styles.headerSpacer} />
         </View>
 
         {/* Content */}
         <View style={styles.content}>
-          <Text style={styles.placeholderText}>Abonelik bilgileri yakında burada olacak.</Text>
+          <Text style={styles.placeholderText}>Subscription information will be here soon.</Text>
         </View>
       </SafeAreaView>
     </LinearGradient>

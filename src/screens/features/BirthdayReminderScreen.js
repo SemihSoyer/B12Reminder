@@ -47,7 +47,7 @@ export default function BirthdayReminderScreen({ navigation }) {
       setBirthdays(sortedBirthdays);
     } catch (error) {
       console.error('Error loading birthdays:', error);
-      showAlert('Hata', 'Doğum günleri yüklenirken bir hata oluştu.', 'error');
+      showAlert('Error', 'Error loading birthdays.', 'error');
     } finally {
       setLoading(false);
     }
@@ -100,16 +100,16 @@ export default function BirthdayReminderScreen({ navigation }) {
         setTimeout(() => {
           showAlert(
             'Başarılı!',
-            `${newBirthday.name} için doğum günü hatırlatıcısı eklendi.`,
+            `${newBirthday.name} birthday reminder added.`,
             'success'
           );
         }, 300);
       } else {
-        showAlert('Hata', 'Doğum günü eklenirken bir hata oluştu.', 'error');
+        showAlert('Error', 'Error adding birthday.', 'error');
       }
     } catch (error) {
       console.error('Error adding birthday:', error);
-      showAlert('Hata', 'Doğum günü eklenirken bir hata oluştu.', 'error');
+      showAlert('Error', 'Error adding birthday.', 'error');
     }
   };
 
@@ -132,16 +132,16 @@ export default function BirthdayReminderScreen({ navigation }) {
         setTimeout(() => {
           showAlert(
             'Silindi!',
-            `${birthday.name} için doğum günü hatırlatıcısı silindi.`,
+            `${birthday.name} birthday reminder deleted.`,
             'success'
           );
         }, 200);
       } else {
-        showAlert('Hata', 'Doğum günü silinirken bir hata oluştu.', 'error');
+        showAlert('Error', 'Error deleting birthday.', 'error');
       }
     } catch (error) {
       console.error('Error deleting birthday:', error);
-      showAlert('Hata', 'Doğum günü silinirken bir hata oluştu.', 'error');
+      showAlert('Error', 'Error deleting birthday.', 'error');
     }
   };
 
@@ -171,7 +171,7 @@ export default function BirthdayReminderScreen({ navigation }) {
               >
                 <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
               </TouchableOpacity>
-                <Text style={styles.title}>Doğum Günü Hatırlatıcıları</Text>
+                <Text style={styles.title}>Birthday Reminders</Text>
                 <View style={styles.headerSpacer} />
               </View>
           </View>
@@ -191,7 +191,7 @@ export default function BirthdayReminderScreen({ navigation }) {
             {/* Doğum Günü Listesi */}
             <View style={styles.listSection}>
               <Text style={styles.sectionTitle}>
-                {hasBirthdays ? 'Kayıtlı Doğum Günleri' : 'Doğum Günleri'}
+                {hasBirthdays ? 'Registered Birthdays' : 'Birthdays'}
               </Text>
               {hasBirthdays ? (
                 <BirthdayList 

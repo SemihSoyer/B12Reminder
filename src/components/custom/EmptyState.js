@@ -12,7 +12,7 @@ export default function EmptyState() {
     <View style={styles.container}>
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyIcon}>⚡</Text>
-        <Text style={styles.emptyTitle}>Henüz Hatırlatıcı Yok</Text>
+        <Text style={styles.emptyTitle}>No Custom Reminders Yet</Text>
         <Text style={styles.emptySubtitle}>
           İstediğiniz her şey için özel{'\n'}
           hatırlatıcılar oluşturun!

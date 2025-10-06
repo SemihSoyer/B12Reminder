@@ -13,10 +13,10 @@ export default function EmptyState() {
     <View style={styles.container}>
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyIcon}>🎂</Text>
-        <Text style={styles.emptyTitle}>Henüz Doğum Günü Yok</Text>
+        <Text style={styles.emptyTitle}>No Birthday Yet</Text>
         <Text style={styles.emptySubtitle}>
-          Sevdiklerinizin doğum günlerini ekleyerek{'\n'}
-          önemli günleri kaçırmayın!
+          Add your loved ones' birthdays to{'\n'}
+          avoid missing important days!
         </Text>
       </View>
     </View>

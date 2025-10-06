@@ -51,7 +51,7 @@ export default function CustomRemindersScreen({ navigation }) {
       await cleanupOrphanedNotifications(sortedReminders);
     } catch (error) {
       console.error('Error loading custom reminders:', error);
-      showAlert('Hata', 'Hatırlatıcılar yüklenirken bir hata oluştu.', 'error');
+      showAlert('Error', 'Error loading custom reminders.', 'error');
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,7 @@ export default function CustomRemindersScreen({ navigation }) {
     try {
       // Maksimum 10 hatırlatıcı kontrolü
       if (reminders.length >= 10) {
-        showAlert('Limit Aşıldı', 'En fazla 10 özel hatırlatıcı ekleyebilirsiniz.', 'warning');
+        showAlert('Limit Exceeded', 'You can only add up to 10 custom reminders.', 'warning');
         return;
       }
 
@@ -110,7 +110,7 @@ export default function CustomRemindersScreen({ navigation }) {
       const savedReminder = await CustomReminderService.addReminder(newReminder);
       
       if (!savedReminder) {
-        showAlert('Hata', 'Hatırlatıcı eklenirken bir hata oluştu.', 'error');
+        showAlert('Error', 'Error adding custom reminder.', 'error');
         return;
       }
 
@@ -140,33 +140,33 @@ export default function CustomRemindersScreen({ navigation }) {
                     if (notif.trigger.type === 'date') {
                       try {
                         const triggerDate = new Date(notif.trigger.value);
-                        console.log(`       Tetiklenme: ${triggerDate.toLocaleString('tr-TR')}`);
+                        console.log(`       Trigger: ${triggerDate.toLocaleString('tr-TR')}`);
                         const now = new Date();
                         const diffSeconds = Math.floor((triggerDate.getTime() - now.getTime()) / 1000);
                         console.log(`       Kalan: ${Math.floor(diffSeconds / 3600)}s ${Math.floor((diffSeconds % 3600) / 60)}d`);
                       } catch (e) {
-                        console.log(`       Tarih parse hatası: ${e.message}`);
+                        console.log(`       Date parse error: ${e.message}`);
                       }
                     }
                   }
                 });
               } else {
-                console.warn('⚠️ HİÇ ZAMANLANMIŞ BİLDİRİM YOK!');
-                console.warn('   Bu, bildirimin anında tetiklenip silindiği anlamına gelir.');
+                console.warn('⚠️ NO SCHEDULED NOTIFICATION!');
+                console.warn('   This means the notification was triggered and deleted immediately.');
               }
               
               // Bu bildirimi bul
               const thisNotification = allScheduled.find(n => n.identifier === notificationId);
               if (thisNotification) {
-                console.log('✅ Bu bildirim listede bulundu!');
+                console.log('✅ This notification is listed!');
               } else {
-                console.error('❌ Bu bildirim listede BULUNAMADI!');
+                console.error('❌ This notification is not listed!');
                 console.error('   ID:', notificationId);
               }
             }
           })
           .catch(error => {
-            console.error('Bildirim zamanlama hatası:', error);
+            console.error('Notification scheduling error:', error);
           });
       }
       
@@ -180,17 +180,17 @@ export default function CustomRemindersScreen({ navigation }) {
       setTimeout(() => {
         showAlert(
           'Başarılı!',
-          `"${newReminder.title}" hatırlatıcısı eklendi.`,
+          `"${newReminder.title}" custom reminder added.`,
           'success'
         );
       }, 300);
       
     } catch (error) {
       console.error('Error adding custom reminder:', error);
-      if (error.message === 'Maksimum 10 hatırlatıcı ekleyebilirsiniz.') {
-        showAlert('Limit Aşıldı', error.message, 'warning');
+      if (error.message === 'You can only add up to 10 custom reminders.') {
+        showAlert('Limit Exceeded', error.message, 'warning');
       } else {
-        showAlert('Hata', 'Hatırlatıcı eklenirken bir hata oluştu.', 'error');
+        showAlert('Error', 'Error adding custom reminder.', 'error');
       }
     }
   };
@@ -214,16 +214,16 @@ export default function CustomRemindersScreen({ navigation }) {
         setTimeout(() => {
           showAlert(
             'Silindi!',
-            `"${reminder.title}" hatırlatıcısı silindi.`,
+            `"${reminder.title}" custom reminder deleted.`,
             'success'
           );
         }, 200);
       } else {
-        showAlert('Hata', 'Hatırlatıcı silinirken bir hata oluştu.', 'error');
+        showAlert('Error', 'Error deleting custom reminder.', 'error');
       }
     } catch (error) {
       console.error('Error deleting custom reminder:', error);
-      showAlert('Hata', 'Hatırlatıcı silinirken bir hata oluştu.', 'error');
+      showAlert('Error', 'Error deleting custom reminder.', 'error');
     }
   };
 
@@ -249,13 +249,13 @@ export default function CustomRemindersScreen({ navigation }) {
               >
                 <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
               </TouchableOpacity>
-              <Text style={styles.title}>Özel Hatırlatıcılar</Text>
+              <Text style={styles.title}>Custom Reminders</Text>
               <View style={styles.headerSpacer} />
             </View>
             {hasReminders && (
               <View style={styles.counterContainer}>
                 <Text style={styles.counterText}>
-                  {reminders.length}/10 Hatırlatıcı
+                  {reminders.length}/10 Custom Reminder
                 </Text>
               </View>
             )}
@@ -273,9 +273,9 @@ export default function CustomRemindersScreen({ navigation }) {
                 <Ionicons name="bulb" size={24} color="#6C5CE7" />
               </View>
               <View style={styles.infoTextContainer}>
-                <Text style={styles.infoTitle}>İstediğiniz Her Şey İçin</Text>
+                <Text style={styles.infoTitle}>For Everything You Want</Text>
                 <Text style={styles.infoSubtitle}>
-                  Özel hatırlatıcılar oluşturarak önemli işlerinizi kaçırmayın!
+                  Create custom reminders to avoid missing important tasks!
                 </Text>
               </View>
             </View>
@@ -283,11 +283,11 @@ export default function CustomRemindersScreen({ navigation }) {
             {/* Reminder List */}
             <View style={styles.listSection}>
               <Text style={styles.sectionTitle}>
-                {hasReminders ? 'Hatırlatıcılarım' : 'Henüz Hatırlatıcı Yok'}
+                {hasReminders ? 'My Reminders' : 'No Custom Reminders Yet'}
               </Text>
               {loading ? (
                 <View style={styles.loadingContainer}>
-                  <Text style={styles.loadingText}>Yükleniyor...</Text>
+                  <Text style={styles.loadingText}>Loading...</Text>
                 </View>
               ) : hasReminders ? (
                 <CustomReminderList 
@@ -304,7 +304,7 @@ export default function CustomRemindersScreen({ navigation }) {
               <View style={styles.warningCard}>
                 <Ionicons name="warning" size={20} color="#E17055" />
                 <Text style={styles.warningText}>
-                  Maksimum hatırlatıcı sayısına ulaştınız. Yeni eklemek için önce bir hatırlatıcı silin.
+                  You have reached the maximum number of custom reminders. Please delete one before adding a new one.
                 </Text>
               </View>
             )}
@@ -317,7 +317,7 @@ export default function CustomRemindersScreen({ navigation }) {
               disabled={isAtLimit}
             />
             {isAtLimit && (
-              <Text style={styles.limitText}>Maksimum 10 hatırlatıcı limiti</Text>
+              <Text style={styles.limitText}>Maximum 10 custom reminder limit</Text>
             )}
           </View>
         </SafeAreaView>

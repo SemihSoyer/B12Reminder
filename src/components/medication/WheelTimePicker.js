@@ -18,10 +18,10 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0
 
 // Hızlı saat seçimi presetleri
 const TIME_PRESETS = [
-  { time: '07:00', label: 'Sabah', icon: 'sunny-outline', gradient: ['#FF9A8B', '#FF6A88'] },
-  { time: '12:00', label: 'Öğle', icon: 'partly-sunny-outline', gradient: ['#A8EDEA', '#74B9FF'] },
-  { time: '18:00', label: 'Akşam', icon: 'moon-outline', gradient: ['#D63031', '#E84393'] },
-  { time: '22:00', label: 'Gece', icon: 'bed-outline', gradient: ['#6C5CE7', '#A29BFE'] },
+  { time: '07:00', label: 'Morning', icon: 'sunny-outline', gradient: ['#FF9A8B', '#FF6A88'] },
+  { time: '12:00', label: 'Lunch', icon: 'partly-sunny-outline', gradient: ['#A8EDEA', '#74B9FF'] },
+  { time: '18:00', label: 'Evening', icon: 'moon-outline', gradient: ['#D63031', '#E84393'] },
+  { time: '22:00', label: 'Night', icon: 'bed-outline', gradient: ['#6C5CE7', '#A29BFE'] },
 ];
 
 export default function WheelTimePicker({ visible, onClose, onTimeSelect, initialTime = '09:00' }) {
@@ -66,14 +66,14 @@ export default function WheelTimePicker({ visible, onClose, onTimeSelect, initia
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
-              <Text style={styles.title}>Saat Seçin</Text>
+              <Text style={styles.title}>Select Time</Text>
               <View style={styles.headerSpacer} />
             </View>
 
             <ScrollView style={styles.contentScroll} showsVerticalScrollIndicator={false}>
               {/* Hızlı Seçim Presetleri */}
               <View style={styles.presetsContainer}>
-                <Text style={styles.sectionTitle}>Hızlı Seçim</Text>
+                <Text style={styles.sectionTitle}>Quick Select</Text>
                 <View style={styles.presetGrid}>
                   {TIME_PRESETS.map((preset) => (
                     <TouchableOpacity
@@ -97,13 +97,13 @@ export default function WheelTimePicker({ visible, onClose, onTimeSelect, initia
 
               {/* Manuel Saat Seçimi */}
               <View style={styles.manualContainer}>
-                <Text style={styles.sectionTitle}>Manuel Seçim</Text>
+                <Text style={styles.sectionTitle}>Manual Select</Text>
                 <View style={styles.timeDisplayContainer}>
                   <Text style={styles.timeDisplay}>{hour}:{minute}</Text>
                 </View>
                 <View style={styles.pickerRow}>
                   <View style={styles.pickerWrapper}>
-                    <Text style={styles.pickerLabel}>Saat</Text>
+                    <Text style={styles.pickerLabel}>Hour</Text>
                     <Picker
                       selectedValue={hour}
                       onValueChange={(itemValue) => setHour(itemValue)}
@@ -119,7 +119,7 @@ export default function WheelTimePicker({ visible, onClose, onTimeSelect, initia
                     <Text style={styles.separator}>:</Text>
                   </View>
                   <View style={styles.pickerWrapper}>
-                    <Text style={styles.pickerLabel}>Dakika</Text>
+                    <Text style={styles.pickerLabel}>Minute</Text>
                     <Picker
                       selectedValue={minute}
                       onValueChange={(itemValue) => setMinute(itemValue)}
@@ -142,7 +142,7 @@ export default function WheelTimePicker({ visible, onClose, onTimeSelect, initia
                   colors={['#74B9FF', '#0984e3']}
                   style={styles.selectButtonGradient}
                 >
-                  <Text style={styles.selectButtonText}>Seçimi Onayla</Text>
+                  <Text style={styles.selectButtonText}>Confirm Selection</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

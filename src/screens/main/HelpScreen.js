@@ -10,8 +10,8 @@ export default function HelpScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Yardım ve Destek</Text>
-        <Text style={styles.subtitle}>Yardım özellikleri buraya gelecek</Text>
+        <Text style={styles.title}>Help and Support</Text>
+        <Text style={styles.subtitle}>Help features will be here</Text>
       </View>
     </SafeAreaView>
   );

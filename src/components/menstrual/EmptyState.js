@@ -15,10 +15,10 @@ export default function EmptyState() {
         <View style={styles.iconCircle}>
           <Ionicons name="calendar-outline" size={48} color="#00B894" />
         </View>
-        <Text style={styles.emptyTitle}>Regl Takibine Başlayın</Text>
+        <Text style={styles.emptyTitle}>Start Tracking Your Cycle</Text>
         <Text style={styles.emptySubtitle}>
-          Son regl tarihinizi ekleyerek döngünüzü{'\n'}
-          takip etmeye başlayabilirsiniz.
+          Add your last period date to start tracking your cycle{'\n'}
+          tracking your cycle.
         </Text>
       </View>
     </View>

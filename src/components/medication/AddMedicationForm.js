@@ -36,21 +36,21 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
     const errors = [];
     
     if (!name.trim()) {
-      errors.push('İlaç adı gereklidir');
+      errors.push('Medication name is required');
     } else if (name.trim().length < 2) {
-      errors.push('İlaç adı en az 2 karakter olmalıdır');
+      errors.push('Medication name must be at least 2 characters');
     }
     
     if (!dosage.trim()) {
-      errors.push('Doz bilgisi gereklidir');
+      errors.push('Dosage information is required');
     }
     
     if (times.length === 0 || times.some(t => !t.trim())) {
-      errors.push('En az bir saat belirtmelisiniz');
+      errors.push('You must specify at least one time');
     }
     
     if (!validateFrequency(frequency)) {
-      errors.push('Geçerli bir tekrarlama sıklığı seçin');
+      errors.push('Select a valid frequency');
     }
     
     return errors;
@@ -60,7 +60,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
     const errors = validateForm();
     
     if (errors.length > 0) {
-      showAlert('Hata', errors.join('\n'), 'warning');
+      showAlert('Error', errors.join('\n'), 'warning');
       return;
     }
 
@@ -107,7 +107,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
   const handleTimeChange = (newTime) => {
     // Aynı saatin zaten var olup olmadığını kontrol et
     if (times.includes(newTime) && times[editingTimeIndex] !== newTime) {
-      showAlert('Uyarı', 'Bu saat zaten eklenmiş. Lütfen farklı bir saat seçin.', 'warning');
+      showAlert('Warning', 'This time is already added. Please select a different time.', 'warning');
       return;
     }
 
@@ -120,7 +120,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
 
   const addTimeField = () => {
     if (times.length >= 6) {
-      showAlert('Limit', 'Maksimum 6 saat ekleyebilirsiniz.', 'info');
+      showAlert('Limit', 'You can only add up to 6 times.', 'info');
       return;
     }
 
@@ -162,19 +162,19 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
   const removeTimeField = (indexToRemove) => {
     // En az bir saat kalmalı.
     if (times.length <= 1) {
-      showAlert('Uyarı', 'En az bir kullanım saati gereklidir.', 'warning');
+      showAlert('Warning', 'At least one usage time is required.', 'warning');
       return;
     }
 
     // Kullanıcıdan onay al.
     showAlert(
-      'Saati Sil',
+      'Time Delete',
       `'${times[indexToRemove]}' saatini silmek istediğinizden emin misiniz?`,
       'warning',
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           // CustomAlert'e yaptığımız düzeltme sayesinde bu onPress artık güvenli bir şekilde çalışacak.
           onPress: () => {
@@ -217,7 +217,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
               </TouchableOpacity>
               <View style={styles.headerTitleContainer}>
                 <Ionicons name="medical-outline" size={20} color="#E17055" />
-                <Text style={styles.title}>İlaç Ekle</Text>
+                <Text style={styles.title}>Add Medication</Text>
               </View>
               <TouchableOpacity style={[styles.headerButton, styles.saveButton]} onPress={handleAdd}>
                 <Ionicons name="checkmark" size={24} color="#FFFFFF" />
@@ -227,14 +227,14 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
             <ScrollView contentContainerStyle={styles.form}>
               {/* İlaç Adı */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>İlaç Adı</Text>
+                <Text style={styles.label}>Medication Name</Text>
                 <View style={styles.inputContainer}>
                   <Ionicons name="medical-outline" size={22} color="#E17055" style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
                     value={name}
                     onChangeText={handleNameChange}
-                    placeholder="Örn: Vitamin B12, Parol 500mg"
+                    placeholder="Eg: Vitamin B12, Parol 500mg"
                     placeholderTextColor="#b2bec3"
                   />
                 </View>
@@ -242,14 +242,14 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
 
               {/* Dozaj */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Dozaj</Text>
+                <Text style={styles.label}>Dosage</Text>
                  <View style={styles.inputContainer}>
                     <Ionicons name="options-outline" size={22} color="#6c5ce7" style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       value={dosage}
                       onChangeText={setDosage}
-                      placeholder="Örn: 1 Tablet"
+                      placeholder="Eg: 1 dose"
                       placeholderTextColor="#b2bec3"
                     />
                   </View>
@@ -257,7 +257,7 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
 
               {/* Kullanım Saatleri */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Kullanım Saatleri</Text>
+                <Text style={styles.label}>Usage Times</Text>
                 {times.map((time, index) => (
                   <View key={index} style={styles.timeRow}>
                     <TouchableOpacity onPress={() => openTimePicker(index)} style={styles.timeInputContainer}>
@@ -282,12 +282,12 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
                 ))}
                 <TouchableOpacity onPress={addTimeField} style={styles.addButton}>
                   <Ionicons name="add-circle-outline" size={24} color="#0984e3" />
-                  <Text style={styles.addButtonText}>Başka bir saat ekle</Text>
+                  <Text style={styles.addButtonText}>Add another time</Text>
                 </TouchableOpacity>
                 
                 {times.length >= 6 && (
                   <Text style={styles.limitText}>
-                    Maksimum 6 saat ekleyebilirsiniz
+                    You can only add up to 6 times
                   </Text>
                 )}
               </View>
@@ -295,11 +295,11 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
               {/* Tekrarlama Sıklığı */}
               <View style={styles.inputSection}>
                 <View style={styles.labelContainer}>
-                  <Text style={styles.label}>Tekrarlama Sıklığı</Text>
+                  <Text style={styles.label}>Frequency</Text>
                   {showSmartSuggestion && (
                     <View style={styles.smartBadge}>
                       <Ionicons name="bulb" size={14} color="#FFFFFF" />
-                      <Text style={styles.smartBadgeText}>Akıllı Öneri</Text>
+                      <Text style={styles.smartBadgeText}>Smart Suggestion</Text>
                     </View>
                   )}
                 </View>
@@ -312,14 +312,14 @@ export default function AddMedicationForm({ visible, onClose, onAdd }) {
               
               {/* Notlar */}
               <View style={styles.inputSection}>
-                <Text style={styles.label}>Notlar (İsteğe bağlı)</Text>
+                <Text style={styles.label}>Notes (Optional)</Text>
                 <View style={[styles.inputContainer, { height: 100 }]}>
                   <Ionicons name="document-text-outline" size={22} color="#fab1a0" style={styles.inputIcon} />
                   <TextInput
                     style={[styles.input, { textAlignVertical: 'top', paddingTop: spacing.sm }]}
                     value={note}
                     onChangeText={setNote}
-                    placeholder="Yemekten sonra al..."
+                    placeholder="After eating..."
                     placeholderTextColor="#b2bec3"
                     multiline
                   />

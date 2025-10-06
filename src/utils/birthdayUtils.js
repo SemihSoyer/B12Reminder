@@ -2,10 +2,10 @@
  * Doğum günü hatırlatıcıları için yardımcı fonksiyonlar
  */
 
-// Türkçe ay isimleri
+// English month names
 export const MONTH_NAMES = [
-  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
 /**
@@ -38,7 +38,7 @@ export const calculateDaysLeft = (birthdayDateString) => {
     
     return diffDays;
   } catch (error) {
-    console.error('Tarih hesaplama hatası:', error);
+    console.error('Date calculation error:', error);
     return 0;
   }
 };
@@ -53,11 +53,11 @@ export const convertBirthdaysToReminders = (birthdays) => {
   
   return birthdays.map(birthday => ({
     icon: '🎂',
-    title: `${birthday.name}'in Doğum Günü`,
+    title: `${birthday.name}'s Birthday`,
     time: '00:00', // Varsayılan saat
     date: birthday.date,
     daysLeft: birthday.daysLeft,
-    category: 'Doğum Günü',
+    category: 'Birthday',
     categoryColor: '#FF6A88',
     gradientColors: ['#FECACA', '#FED7E2']
   }));
@@ -140,7 +140,7 @@ export const transformBirthdaysToReminders = (birthdays) => {
         originalId: birthday.id, // Orijinal ID'yi ekliyoruz
         reminderType: 'birthday',
         time: 'Bugün',
-        title: `${birthday.name}'in doğum günü!`,
+        title: `${birthday.name}'s birthday!`,
         iconConfig: { 
           name: 'gift', 
           color: '#FF6A88', 
@@ -155,7 +155,7 @@ export const transformBirthdaysToReminders = (birthdays) => {
         originalId: birthday.id, // Orijinal ID'yi ekliyoruz
         reminderType: 'birthday',
         time: `${birthday.date}`, // Orijinal tarihi gösterelim
-        title: `${birthday.name}'in doğum günü`,
+        title: `${birthday.name}'s birthday`,
         details: `${birthday.daysLeft} gün kaldı`,
         iconConfig: { 
           name: 'gift', 

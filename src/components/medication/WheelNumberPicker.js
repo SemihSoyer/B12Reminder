@@ -28,8 +28,8 @@ export default function WheelNumberPicker({
   initialValue = 2,
   minValue = 1,
   maxValue = 60,
-  title = "Aralık Seçin",
-  label = "Gün"
+  title = "Select Interval",
+  label = "Days"
 }) {
   const [selectedValue, setSelectedValue] = useState(initialValue);
 
@@ -70,7 +70,7 @@ export default function WheelNumberPicker({
             <ScrollView style={styles.contentScroll} showsVerticalScrollIndicator={false}>
               {/* Hızlı Seçim Kartları */}
               <View style={styles.presetsContainer}>
-                <Text style={styles.sectionTitle}>Hızlı Seçim</Text>
+                <Text style={styles.sectionTitle}>Quick Select</Text>
                 <View style={styles.presetGrid}>
                   {QUICK_PRESETS.map((preset) => (
                     <TouchableOpacity
@@ -96,10 +96,10 @@ export default function WheelNumberPicker({
 
               {/* Manuel Seçim */}
               <View style={styles.manualContainer}>
-                <Text style={styles.sectionTitle}>Manuel Seçim</Text>
+                <Text style={styles.sectionTitle}>Manual Select</Text>
                 <View style={styles.currentValueDisplay}>
                   <Text style={styles.currentValueText}>
-                    Her <Text style={styles.currentValueNumber}>{selectedValue}</Text> günde bir
+                    Every <Text style={styles.currentValueNumber}>{selectedValue}</Text> days
                   </Text>
                 </View>
                 <View style={styles.pickerContainer}>
@@ -124,7 +124,7 @@ export default function WheelNumberPicker({
                   colors={['#74B9FF', '#0984e3']}
                   style={styles.selectButtonGradient}
                 >
-                  <Text style={styles.selectButtonText}>Seçimi Onayla</Text>
+                  <Text style={styles.selectButtonText}>Confirm Selection</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

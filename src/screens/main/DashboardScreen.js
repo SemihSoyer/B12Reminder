@@ -71,7 +71,7 @@ export default function DashboardScreen({ navigation }) {
           setUpcomingReminders(allUpcoming);
 
         } catch (error) {
-          console.error("Hatırlatıcılar yüklenirken hata oluştu:", error);
+          console.error("Error loading reminders:", error);
         }
       };
 
@@ -80,16 +80,16 @@ export default function DashboardScreen({ navigation }) {
   );
 
   const handleDeleteReminder = (id, type) => {
-    let title = 'Hatırlatıcıyı Sil';
+    let title = 'Delete Reminder';
     if (type === 'birthday') {
-      title = 'Doğum Gününü Sil';
+      title = 'Delete Birthday';
     } else if (type === 'medication') {
-      title = 'İlacı Sil';
+      title = 'Delete Medication';
     } else if (type === 'custom') {
-      title = 'Özel Hatırlatıcıyı Sil';
+      title = 'Delete Custom Reminder';
     }
     
-    const message = `Bu hatırlatıcıyı kalıcı olarak silmek istediğinizden emin misiniz?`;
+    const message = `Are you sure you want to permanently delete this reminder?`;
 
     showAlert(
       title,
@@ -97,11 +97,11 @@ export default function DashboardScreen({ navigation }) {
       'warning',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -116,8 +116,8 @@ export default function DashboardScreen({ navigation }) {
               setTodayReminders(prev => prev.filter(r => r.originalId !== id));
               setUpcomingReminders(prev => prev.filter(r => r.originalId !== id));
             } catch (error) {
-              console.error("Hatırlatıcı silinirken hata oluştu:", error);
-              showAlert('Hata', 'Silme işlemi sırasında bir sorun oluştu.', 'error');
+              console.error("Error deleting reminder:", error);
+              showAlert('Error', 'An error occurred while deleting the reminder.', 'error');
             }
           },
         },

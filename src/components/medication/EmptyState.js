@@ -7,9 +7,9 @@ export default function EmptyState({ message, subMessage }) {
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>💊</Text>
-      <Text style={styles.title}>{message || 'Henüz İlaç Eklenmemiş'}</Text>
+      <Text style={styles.title}>{message || 'No Medications Yet'}</Text>
       <Text style={styles.subtitle}>
-        {subMessage || 'İlk ilaç hatırlatıcını ekleyerek tedavini takip etmeye başla.'}
+        {subMessage || 'Start tracking your medication by adding your first medication.'}
       </Text>
     </View>
   );

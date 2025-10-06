@@ -52,20 +52,20 @@ export default function InfoModal({ visible, onClose }) {
     {
       icon: 'calendar',
       color: '#FF6B9D',
-      title: 'Regl Takibi',
-      description: 'Dönemlerinizi kaydedin, sonraki tarihi tahmin edin',
+      title: 'Cycle Tracking',
+      description: 'Save your periods, predict the next date',
     },
     {
       icon: 'heart',
       color: '#00B894',
-      title: 'Verimli Dönem',
-      description: 'Verimli dönemlerinizi otomatik hesaplayın',
+      title: 'Efficient Period',
+      description: 'Efficient periods automatically calculated',
     },
     {
       icon: 'stats-chart',
       color: '#A29BFE',
-      title: 'İstatistikler',
-      description: 'Döngü düzeninizi ve ortalamalarınızı görün',
+      title: 'Statistics',
+      description: 'View your cycle regularity and averages',
     },
   ];
 
@@ -103,9 +103,9 @@ export default function InfoModal({ visible, onClose }) {
             <View style={styles.headerIcon}>
               <Ionicons name="heart-circle" size={48} color="#FFFFFF" />
             </View>
-            <Text style={styles.headerTitle}>Regl Takibi</Text>
+            <Text style={styles.headerTitle}>Cycle Tracking</Text>
             <Text style={styles.headerSubtitle}>
-              Sağlığınızı takip edin, düzenli kalın! 🌸
+              Track your health, stay regular! 🌸
             </Text>
           </LinearGradient>
 
@@ -114,7 +114,7 @@ export default function InfoModal({ visible, onClose }) {
             style={styles.content}
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.sectionTitle}>Bu sayfada neler yapabilirsiniz?</Text>
+            <Text style={styles.sectionTitle}>What can you do on this page?</Text>
             
             {features.map((feature, index) => (
               <View key={index} style={styles.featureCard}>
@@ -132,7 +132,7 @@ export default function InfoModal({ visible, onClose }) {
             <View style={styles.stepsSection}>
               <View style={styles.stepsHeader}>
                 <Ionicons name="rocket" size={18} color="#FF6B9D" />
-                <Text style={styles.stepsTitle}>Hızlı Başlangıç</Text>
+                <Text style={styles.stepsTitle}>Quick Start</Text>
               </View>
               
               <View style={styles.step}>
@@ -140,7 +140,7 @@ export default function InfoModal({ visible, onClose }) {
                   <Text style={styles.stepNumberText}>1</Text>
                 </View>
                 <Text style={styles.stepText}>
-                  <Text style={styles.stepBold}>Regl Başlat</Text> butonuna tıklayın
+                  <Text style={styles.stepBold}>Start Period</Text> button to start
                 </Text>
               </View>
 
@@ -149,7 +149,7 @@ export default function InfoModal({ visible, onClose }) {
                   <Text style={styles.stepNumberText}>2</Text>
                 </View>
                 <Text style={styles.stepText}>
-                  Son regl <Text style={styles.stepBold}>başlangıç tarihinizi</Text> seçin
+                  Select your <Text style={styles.stepBold}>last period start date</Text>
                 </Text>
               </View>
 
@@ -158,7 +158,7 @@ export default function InfoModal({ visible, onClose }) {
                   <Text style={styles.stepNumberText}>3</Text>
                 </View>
                 <Text style={styles.stepText}>
-                  Regl <Text style={styles.stepBold}>süresini girin</Text> (kaç gün sürdü)
+                  Enter your <Text style={styles.stepBold}>period length</Text> (how many days)
                 </Text>
               </View>
             </View>
@@ -167,7 +167,7 @@ export default function InfoModal({ visible, onClose }) {
             <View style={styles.privacyNote}>
               <Ionicons name="shield-checkmark" size={16} color="#00B894" />
               <Text style={styles.privacyText}>
-                Tüm verileriniz cihazınızda güvenle saklanır
+                All your data is securely stored on your device
               </Text>
             </View>
           </ScrollView>
@@ -185,7 +185,7 @@ export default function InfoModal({ visible, onClose }) {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.buttonText}>Anladım, Başlayalım!</Text>
+                <Text style={styles.buttonText}>I understand, let's start!</Text>
                 <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
               </LinearGradient>
             </TouchableOpacity>

@@ -3,20 +3,20 @@
  */
 
 /**
- * Tarih formatlarını işler
+ * Formats date strings
  */
 export const formatDate = (dateString) => {
   try {
     const date = new Date(dateString);
     const day = date.getDate();
     const monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
     const month = monthNames[date.getMonth()];
     return `${day} ${month}`;
   } catch (error) {
-    console.error('Tarih formatlama hatası:', error);
+    console.error('Date formatting error:', error);
     return dateString;
   }
 };
@@ -65,7 +65,7 @@ export const transformCustomRemindersToReminders = (customReminders) => {
         reminderType: 'custom',
         time: formatDate(reminder.date),
         title: reminder.title,
-        details: `${reminder.daysLeft} gün kaldı`,
+        details: `${reminder.daysLeft} days left`,
         iconConfig: { 
           name: 'notifications', 
           color: '#FD79A8', 
@@ -92,19 +92,19 @@ export const validateReminder = (reminder) => {
   const errors = {};
 
   if (!reminder.title || reminder.title.trim().length === 0) {
-    errors.title = 'Lütfen hatırlatıcı başlığı girin';
+    errors.title = 'Please enter a reminder title';
   }
 
   if (reminder.title && reminder.title.length > 50) {
-    errors.title = 'Başlık en fazla 50 karakter olabilir';
+    errors.title = 'Title must be less than 50 characters';
   }
 
   if (!reminder.date) {
-    errors.date = 'Lütfen tarih seçin';
+    errors.date = 'Please select a date';
   }
 
   if (!reminder.time) {
-    errors.time = 'Lütfen saat seçin';
+    errors.time = 'Please select a time';
   }
 
   return {

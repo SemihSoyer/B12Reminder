@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 
-const DAYS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function WeekDayPicker({ selectedDays, onDayPress }) {
   return (

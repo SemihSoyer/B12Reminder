@@ -27,8 +27,8 @@ export default function WheelDatePicker({
 
   // Türkçe ay isimleri
   const monthNames = [
-    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
   // Seçili aya göre günleri oluştur
@@ -91,17 +91,17 @@ export default function WheelDatePicker({
             onPress={handleCancel}
             activeOpacity={0.7}
           >
-            <Text style={styles.cancelText}>İptal</Text>
+            <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
           
-          <Text style={styles.title}>Doğum Tarihi Seç</Text>
+          <Text style={styles.title}>Select Birthday Date</Text>
           
           <TouchableOpacity 
             style={styles.confirmButton}
             onPress={handleConfirm}
             activeOpacity={0.7}
           >
-            <Text style={styles.confirmText}>Tamam</Text>
+            <Text style={styles.confirmText}>Confirm</Text>
           </TouchableOpacity>
         </View>
 
@@ -117,7 +117,7 @@ export default function WheelDatePicker({
           <View style={styles.pickersRow}>
             {/* Day Picker */}
             <View style={styles.pickerWrapper}>
-              <Text style={styles.pickerLabel}>Gün</Text>
+              <Text style={styles.pickerLabel}>Day</Text>
               <View style={styles.pickerBorder}>
                 <Picker
                   selectedValue={selectedDay}
@@ -138,7 +138,7 @@ export default function WheelDatePicker({
 
             {/* Month Picker */}
             <View style={styles.pickerWrapper}>
-              <Text style={styles.pickerLabel}>Ay</Text>
+              <Text style={styles.pickerLabel}>Month</Text>
               <View style={styles.pickerBorder}>
                 <Picker
                   selectedValue={selectedMonth}
@@ -162,7 +162,7 @@ export default function WheelDatePicker({
         {/* Info */}
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>
-            Doğum yılı otomatik olarak her yıl güncellenir
+            Birthday year is automatically updated every year
           </Text>
         </View>
         </LinearGradient>

@@ -15,7 +15,7 @@ export default function AddMedicationButton({ onPress }) {
         style={styles.button}
       >
         <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-        <Text style={styles.text}>İlaç Ekle</Text>
+        <Text style={styles.text}>Add Medication</Text>
       </LinearGradient>
     </TouchableOpacity>
   );

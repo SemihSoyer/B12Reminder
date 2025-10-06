@@ -16,16 +16,16 @@ import { formatDate } from '../../utils/customReminderUtils';
 export default function CustomReminderList({ reminders = [], onDelete }) {
   const handleDeletePress = (item) => {
     showAlert(
-      'Hatırlatıcıyı Sil',
-      `"${item.title}" hatırlatıcısını silmek istediğinizden emin misiniz?`,
+      'Custom Reminder Delete',
+      `"${item.title}" custom reminder to delete?`,
       'warning',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => onDelete && onDelete(item),
         },
@@ -47,7 +47,7 @@ export default function CustomReminderList({ reminders = [], onDelete }) {
             <Text style={styles.itemTime}>{item.time}</Text>
             <View style={styles.separator} />
             <Text style={styles.daysText}>
-              {item.daysLeft === 0 ? 'Bugün!' : `${item.daysLeft} gün kaldı`}
+              {item.daysLeft === 0 ? 'Today!' : `${item.daysLeft} days left`}
             </Text>
           </View>
           {item.note && item.note.trim() && (

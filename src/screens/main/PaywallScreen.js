@@ -11,7 +11,7 @@ export default function PaywallScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Premium</Text>
-        <Text style={styles.subtitle}>Premium özellikleri buraya gelecek</Text>
+        <Text style={styles.subtitle}>Premium features will be here</Text>
       </View>
     </SafeAreaView>
   );

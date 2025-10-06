@@ -29,7 +29,7 @@ export default function AddCustomReminderButton({ onPress, style, disabled }) {
           color="#FFFFFF" 
           style={styles.buttonIcon}
         />
-        <Text style={styles.buttonText}>Hatırlatıcı Ekle</Text>
+        <Text style={styles.buttonText}>Add Custom Reminder</Text>
       </LinearGradient>
     </TouchableOpacity>
   );

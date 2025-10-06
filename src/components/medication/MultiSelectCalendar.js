@@ -5,10 +5,10 @@ import { FONT_STYLES } from '../../constants/fonts';
 import { spacing } from '../../constants/responsive';
 
 const MONTH_NAMES = [
-  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
-const DAYS_OF_WEEK = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 // Tarihleri YYYY-MM-DD formatına çevirir (Timezone sorununu önler)
 const formatDate = (date) => {

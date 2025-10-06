@@ -10,17 +10,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { FONT_STYLES } from '../../constants/fonts';
 import { spacing, fontSizes, getResponsiveValue } from '../../constants/responsive';
 
-export default function MonthlyCalendar({ birthdays = [], medications = [], onDateSelect }) {
+export default function MonthlyCalendar({ birthdays = [], medications = [], customReminders = [], onDateSelect }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Türkçe ay isimleri
+  // English month names
   const monthNames = [
-    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  // Türkçe gün isimleri
-  const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+  // English day names
+  const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
   // Önceki aya git
   const goToPreviousMonth = () => {
@@ -48,7 +48,7 @@ export default function MonthlyCalendar({ birthdays = [], medications = [], onDa
     
     // İlk günün haftanın hangi günü olduğunu bul (Pazartesi = 0)
     let startDay = firstDay.getDay() - 1;
-    if (startDay === -1) startDay = 6; // Pazar için düzeltme
+    if (startDay === -1) startDay = 6; // Sun için düzeltme
     
     const daysInMonth = lastDay.getDate();
     const days = [];
@@ -171,9 +171,30 @@ export default function MonthlyCalendar({ birthdays = [], medications = [], onDa
     return medications.filter(med => isMedicationForDate(med, date)).length;
   };
 
-  // Etkinlik noktaları gösterimi (doğum günü + ilaç)
-  const renderEventIndicators = (birthdayCount, medicationCount, isToday = false) => {
-    const totalCount = birthdayCount + medicationCount;
+  // Bu tarihte kaç özel hatırlatıcı var kontrol et
+  const getCustomReminderCount = (date) => {
+    if (!customReminders || !Array.isArray(customReminders)) {
+      return 0;
+    }
+
+    return customReminders.filter(reminder => {
+      if (!reminder || !reminder.date) return false;
+      
+      try {
+        const reminderDate = new Date(reminder.date);
+        const targetDate = new Date(date);
+        reminderDate.setHours(0, 0, 0, 0);
+        targetDate.setHours(0, 0, 0, 0);
+        return reminderDate.getTime() === targetDate.getTime();
+      } catch (error) {
+        return false;
+      }
+    }).length;
+  };
+
+  // Etkinlik noktaları gösterimi (doğum günü + ilaç + özel hatırlatıcı)
+  const renderEventIndicators = (birthdayCount, medicationCount, customReminderCount, isToday = false) => {
+    const totalCount = birthdayCount + medicationCount + customReminderCount;
     if (totalCount === 0) return null;
     
     const dots = [];
@@ -202,6 +223,20 @@ export default function MonthlyCalendar({ birthdays = [], medications = [], onDa
             isToday ? styles.todayEventDot : styles.eventDot, 
             styles.medicationDot,
             isToday && { backgroundColor: '#4A90E2' }
+          ]}
+        />
+      );
+    }
+    
+    // Özel hatırlatıcı noktaları (mor)
+    for (let i = 0; i < Math.min(customReminderCount, 2); i++) {
+      dots.push(
+        <View
+          key={`custom-${i}`}
+          style={[
+            isToday ? styles.todayEventDot : styles.eventDot, 
+            styles.customReminderDot,
+            isToday && { backgroundColor: '#A29BFE' }
           ]}
         />
       );
@@ -259,7 +294,8 @@ export default function MonthlyCalendar({ birthdays = [], medications = [], onDa
             const isCurrentDay = isToday(dayObj.date);
             const birthdayCount = getBirthdayCount(dayObj.date);
             const medicationCount = getMedicationCount(dayObj.date);
-            const hasAnyEvent = birthdayCount > 0 || medicationCount > 0;
+            const customReminderCount = getCustomReminderCount(dayObj.date);
+            const hasAnyEvent = birthdayCount > 0 || medicationCount > 0 || customReminderCount > 0;
             
             // Diğer ayların günlerini gösterme
             if (!dayObj.isCurrentMonth) {
@@ -284,22 +320,14 @@ export default function MonthlyCalendar({ birthdays = [], medications = [], onDa
                     <Text style={[styles.dayText, styles.todayText]}>
                       {dayObj.day}
                     </Text>
-                    {hasAnyEvent && renderEventIndicators(birthdayCount, medicationCount, true)}
+                    {hasAnyEvent && renderEventIndicators(birthdayCount, medicationCount, customReminderCount, true)}
                   </View>
                 ) : hasAnyEvent ? (
-                  <View style={[
-                    styles.dayButton, 
-                    birthdayCount > 0 && medicationCount > 0 ? styles.mixedEventDay :
-                    birthdayCount > 0 ? styles.birthdayDay : styles.medicationDay
-                  ]}>
-                    <Text style={[
-                      styles.dayText, 
-                      birthdayCount > 0 && medicationCount > 0 ? styles.mixedEventText :
-                      birthdayCount > 0 ? styles.birthdayText : styles.medicationText
-                    ]}>
+                  <View style={styles.dayButton}>
+                    <Text style={styles.dayText}>
                       {dayObj.day}
                     </Text>
-                    {renderEventIndicators(birthdayCount, medicationCount)}
+                    {renderEventIndicators(birthdayCount, medicationCount, customReminderCount)}
                   </View>
                 ) : (
                   <View style={styles.dayButton}>
@@ -465,5 +493,8 @@ const styles = StyleSheet.create({
   },
   medicationDot: {
     backgroundColor: '#4A90E2',
+  },
+  customReminderDot: {
+    backgroundColor: '#A29BFE',
   },
 });

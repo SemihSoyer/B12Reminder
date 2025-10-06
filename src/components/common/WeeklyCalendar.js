@@ -12,7 +12,7 @@ export default function WeeklyCalendar() {
   const [weekDays, setWeekDays] = useState([]);
 
   // Türkçe gün isimleri
-  const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   // Haftanın günlerini hesapla ve otomatik güncelle
   useEffect(() => {

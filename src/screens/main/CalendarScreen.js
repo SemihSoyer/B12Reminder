@@ -19,9 +19,10 @@ import { spacing, fontSizes, getResponsiveValue } from '../../constants/responsi
 import MonthlyCalendar from '../../components/birthday/MonthlyCalendar';
 
 // Services & Utils
-import { BirthdayService, MedicationService } from '../../utils/storage';
+import { BirthdayService, MedicationService, CustomReminderService } from '../../utils/storage';
 import { transformBirthdaysToReminders } from '../../utils/birthdayUtils';
 import { transformMedicationsToReminders } from '../../utils/medicationUtils';
+import { transformCustomRemindersToReminders } from '../../utils/customReminderUtils';
 
 export default function CalendarScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -44,14 +45,16 @@ export default function CalendarScreen({ navigation }) {
       
       // İlaç verilerini al
       const medications = await MedicationService.getAllMedications();
-      const { todayReminders: medicationToday } = transformMedicationsToReminders(medications);
+      
+      // Özel hatırlatıcıları al
+      const customReminders = await CustomReminderService.getAllReminders();
       
       // Tüm etkinlikleri birleştir
       const combinedEvents = [
         ...birthdays.map(birthday => ({
           ...birthday,
           type: 'birthday',
-          color: '#FF6B6B',
+          color: '#FF6A88',
           icon: 'gift-outline'
         })),
         ...medications.map(med => ({
@@ -59,12 +62,18 @@ export default function CalendarScreen({ navigation }) {
           type: 'medication',
           color: '#4A90E2',
           icon: 'medkit-outline'
+        })),
+        ...customReminders.map(reminder => ({
+          ...reminder,
+          type: 'custom',
+          color: '#A29BFE',
+          icon: 'notifications-outline'
         }))
       ];
       
       setAllEvents(combinedEvents);
     } catch (error) {
-      console.error('Etkinlikler yüklenirken hata:', error);
+      console.error('Error loading events:', error);
     } finally {
       setLoading(false);
     }
@@ -73,17 +82,28 @@ export default function CalendarScreen({ navigation }) {
   const handleDateSelect = (date) => {
     setSelectedDate(date);
     
-    // Seçilen tarihteki etkinlikleri filtrele
+    // Filter events for the selected date
     const eventsForDate = allEvents.filter(event => {
       if (event.type === 'birthday') {
-        // Doğum günü formatı: "15 Ocak"
+        // Birthday format: "15 January"
         const day = date.getDate();
-        const month = date.toLocaleDateString('tr-TR', { month: 'long' });
+        const monthNames = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        const month = monthNames[date.getMonth()];
         const expectedDate = `${day} ${month}`;
         return event.date === expectedDate;
       } else if (event.type === 'medication') {
-        // İlaç kontrolü - seçilen tarihte alınması gereken mi?
+        // Medication check - should be taken on the selected date?
         return isMedicationForSelectedDate(event, date);
+      } else if (event.type === 'custom') {
+        // Custom reminder check - same date?
+        const reminderDate = new Date(event.date);
+        const selectedDateOnly = new Date(date);
+        selectedDateOnly.setHours(0, 0, 0, 0);
+        reminderDate.setHours(0, 0, 0, 0);
+        return reminderDate.getTime() === selectedDateOnly.getTime();
       }
       return false;
     });
@@ -129,7 +149,7 @@ export default function CalendarScreen({ navigation }) {
 
   const formatSelectedDate = (date) => {
     if (!date) return '';
-    return date.toLocaleDateString('tr-TR', { 
+    return date.toLocaleDateString('en-US', { 
       day: 'numeric', 
       month: 'long', 
       year: 'numeric' 
@@ -149,14 +169,15 @@ export default function CalendarScreen({ navigation }) {
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Takvim</Text>
-            <Text style={styles.subtitle}>Tüm hatırlatıcılarınız</Text>
+            <Text style={styles.title}>Calendar</Text>
+            <Text style={styles.subtitle}>All reminders</Text>
           </View>
 
           {/* Calendar */}
           <MonthlyCalendar 
             birthdays={allEvents.filter(e => e.type === 'birthday')}
             medications={allEvents.filter(e => e.type === 'medication')}
+            customReminders={allEvents.filter(e => e.type === 'custom')}
             onDateSelect={handleDateSelect}
           />
 
@@ -164,11 +185,15 @@ export default function CalendarScreen({ navigation }) {
           <View style={styles.legendContainer}>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, styles.legendBirthdayDot]} />
-              <Text style={styles.legendText}>Doğum Günleri</Text>
+              <Text style={styles.legendText}>Birthdays</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, styles.legendMedicationDot]} />
-              <Text style={styles.legendText}>İlaç Hatırlatıcıları</Text>
+              <Text style={styles.legendText}>Medication</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, styles.legendCustomDot]} />
+              <Text style={styles.legendText}>Custom</Text>
             </View>
           </View>
 
@@ -211,10 +236,17 @@ export default function CalendarScreen({ navigation }) {
                       </View>
                       <View style={styles.eventDetails}>
                         <Text style={styles.eventTitle}>
-                          {event.type === 'birthday' ? `${event.name}'in doğum günü` : event.name}
+                          {event.type === 'birthday' 
+                            ? `${event.name}'s birthday` 
+                            : event.type === 'custom'
+                            ? event.title
+                            : event.name}
                         </Text>
-                        {event.type === 'medication' && (
+                        {event.type === 'medication' && event.dosage && (
                           <Text style={styles.eventSubtitle}>{event.dosage}</Text>
+                        )}
+                        {event.type === 'custom' && event.time && (
+                          <Text style={styles.eventSubtitle}>{event.time}</Text>
                         )}
                       </View>
                     </View>
@@ -223,7 +255,7 @@ export default function CalendarScreen({ navigation }) {
               ) : (
                 <View style={styles.noEventsContainer}>
                   <Text style={styles.noEventsText}>
-                    Bu tarihte herhangi bir etkinlik yok
+                    There are no events on this date
                   </Text>
                 </View>
               )}
@@ -268,11 +300,13 @@ const styles = StyleSheet.create({
   },
   legendContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: spacing.md,
-    paddingHorizontal: spacing.lg,
-    gap: getResponsiveValue(spacing.md, spacing.lg, spacing.xl),
+    paddingHorizontal: spacing.md,
+    gap: getResponsiveValue(spacing.sm, spacing.md, spacing.lg),
+    rowGap: spacing.xs,
   },
   legendItem: {
     flexDirection: 'row',
@@ -280,9 +314,9 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   legendDot: {
-    width: getResponsiveValue(6, 8, 10),
-    height: getResponsiveValue(6, 8, 10),
-    borderRadius: getResponsiveValue(3, 4, 5),
+    width: getResponsiveValue(6, 7, 8),
+    height: getResponsiveValue(6, 7, 8),
+    borderRadius: getResponsiveValue(3, 3.5, 4),
   },
   legendBirthdayDot: {
     backgroundColor: '#FF6A88',
@@ -290,10 +324,13 @@ const styles = StyleSheet.create({
   legendMedicationDot: {
     backgroundColor: '#4A90E2',
   },
+  legendCustomDot: {
+    backgroundColor: '#A29BFE',
+  },
   legendText: {
     ...FONT_STYLES.bodySmall,
     color: '#666',
-    fontSize: fontSizes.small,
+    fontSize: getResponsiveValue(11, 12, 13),
   },
   modalOverlay: {
     flex: 1,

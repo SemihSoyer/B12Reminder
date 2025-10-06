@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -108,7 +107,7 @@ export default function MenstrualTrackingScreen({ navigation }) {
       }
     } catch (error) {
       console.error('Error loading menstrual data:', error);
-      showAlert('Hata', 'Veriler yüklenirken bir sorun oluştu.', 'error');
+      showAlert('Error', 'An error occurred while loading the data.', 'error');
     } finally {
       setLoading(false);
     }
@@ -125,29 +124,29 @@ export default function MenstrualTrackingScreen({ navigation }) {
       
       setTimeout(() => {
         showAlert(
-          'Başarılı!',
-          'Regl döneminiz kaydedildi.',
+          'Success!',
+          'Your period has been recorded.',
           'success'
         );
       }, 300);
     } catch (error) {
       console.error('Error starting period:', error);
-      showAlert('Hata', 'Regl kaydedilirken bir sorun oluştu.', 'error');
+      showAlert('Error', 'An error occurred while recording the period.', 'error');
     }
   };
 
   const handleDeleteCycle = (cycle) => {
     showAlert(
-      'Döngüyü Sil',
-      'Bu döngü kaydını silmek istediğinizden emin misiniz?',
+      'Delete Cycle',
+      'Are you sure you want to delete this cycle record?',
       'warning',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -155,11 +154,11 @@ export default function MenstrualTrackingScreen({ navigation }) {
               await loadData();
               
               setTimeout(() => {
-                showAlert('Silindi!', 'Döngü kaydı silindi.', 'success');
+                showAlert('Deleted!', 'Cycle record deleted.', 'success');
               }, 200);
             } catch (error) {
               console.error('Error deleting cycle:', error);
-              showAlert('Hata', 'Silme işlemi sırasında bir sorun oluştu.', 'error');
+              showAlert('Error', 'An error occurred while deleting the cycle.', 'error');
             }
           },
         },
@@ -169,11 +168,12 @@ export default function MenstrualTrackingScreen({ navigation }) {
 
   // Debug: Tüm verileri temizle
   const handleResetAllData = () => {
-    Alert.alert(
-      '⚠️ Tüm Verileri Sil',
-      'Tüm regl takip verileri silinecek. Bu işlem geri alınamaz!',
+    showAlert(
+      '⚠️ Delete All Data',
+      'All menstrual tracking data will be deleted. This action cannot be undone!',
+      'warning',
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
           text: 'Sil',
           style: 'destructive',
@@ -182,7 +182,7 @@ export default function MenstrualTrackingScreen({ navigation }) {
             if (success) {
               await loadData();
               setTimeout(() => {
-                showAlert('Başarılı', 'Tüm veriler temizlendi', 'success');
+                showAlert('Success', 'All data has been cleared', 'success');
               }, 200);
             }
           },
@@ -211,7 +211,7 @@ export default function MenstrualTrackingScreen({ navigation }) {
             >
               <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
             </TouchableOpacity>
-            <Text style={styles.title}>Regl Takibi</Text>
+            <Text style={styles.title}>Cycle Tracking</Text>
             
             {/* Header Right Buttons */}
             <View style={styles.headerRightButtons}>
@@ -274,11 +274,11 @@ export default function MenstrualTrackingScreen({ navigation }) {
                 <View style={styles.infoCard}>
                   <View style={styles.infoHeader}>
                     <Ionicons name="information-circle" size={20} color="#00B894" />
-                    <Text style={styles.infoTitle}>Tahminler Hakkında</Text>
+                    <Text style={styles.infoTitle}>About Predictions</Text>
                   </View>
                   <Text style={styles.infoText}>
-                    Gösterilen tarihler geçmiş döngülerinize göre tahminidir.
-                    Her kadının döngüsü farklıdır ve değişkenlik gösterebilir.
+                    The displayed dates are predictions based on your past cycles.
+                    Each woman's cycle is different and can vary.
                   </Text>
                 </View>
               </>

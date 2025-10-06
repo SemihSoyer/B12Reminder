@@ -16,16 +16,16 @@ export default function UpcomingReminders({ reminders = [], onDelete }) {
 
   const handleDelete = (reminder) => {
     showAlert(
-      'Hatırlatıcıyı Sil',
-      `${reminder.title} hatırlatıcısını silmek istediğinizden emin misiniz?`,
+      'Delete Reminder',
+      `${reminder.title} reminder to delete?`,
       'warning',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => onDelete(reminder.originalId, reminder.reminderType),
         },

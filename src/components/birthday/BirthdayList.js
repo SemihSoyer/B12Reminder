@@ -16,16 +16,16 @@ import { showAlert } from '../ui/CustomAlert';
 export default function BirthdayList({ birthdays = [], onDelete }) {
   const handleDeletePress = (item) => {
     showAlert(
-      'Doğum Günü Sil',
-      `${item.name} için doğum günü hatırlatıcısını silmek istediğinizden emin misiniz?`,
+      'Delete Birthday',
+      `${item.name} birthday reminder to delete?`,
       'warning',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => onDelete && onDelete(item),
         },
@@ -45,7 +45,7 @@ export default function BirthdayList({ birthdays = [], onDelete }) {
             <Text style={styles.itemDate}>{item.date}</Text>
             <View style={styles.separator} />
             <Text style={styles.daysText}>
-              {item.daysLeft === 0 ? 'Bugün!' : `${item.daysLeft} gün kaldı`}
+              {item.daysLeft === 0 ? 'Today!' : `${item.daysLeft} days left`}
             </Text>
           </View>
           {item.note && item.note.trim() && (

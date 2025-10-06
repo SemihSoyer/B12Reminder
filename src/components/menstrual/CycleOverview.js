@@ -15,34 +15,34 @@ export default function CycleOverview({ nextPeriodDate, currentPhase }) {
   
   const getMessage = () => {
     if (!nextPeriodDate || daysUntil === null) {
-      return 'Regl takibine başlamak için son regl tarihinizi ekleyin';
+      return 'Add your last period date to start tracking your cycle';
     }
     
     if (daysUntil === 0) {
-      return 'Bugün regl başlangıcı bekleniyor';
+      return 'Today\'s period is expected';
     }
     
     if (daysUntil === 1) {
-      return 'Yarın regl başlangıcı bekleniyor';
+      return 'Tomorrow\'s period is expected';
     }
     
     if (daysUntil === -1) {
-      return 'Regl 1 gün gecikmiş';
+      return 'Period is 1 day late';
     }
     
     if (daysUntil < 0) {
-      return `Regl ${Math.abs(daysUntil)} gün gecikmiş`;
+      return `Period is ${Math.abs(daysUntil)} days late`;
     }
     
     if (daysUntil === 2) {
-      return 'Sonraki regl 2 gün içinde';
+      return 'Next period is expected in 2 days';
     }
     
     if (daysUntil <= 7) {
-      return `Sonraki regl ${daysUntil} gün içinde`;
+      return `Next period is expected in ${daysUntil} days`;
     }
     
-    return `Sonraki regl ${daysUntil} gün sonra`;
+    return `Next period is expected in ${daysUntil} days`;
   };
 
   return (
@@ -60,7 +60,7 @@ export default function CycleOverview({ nextPeriodDate, currentPhase }) {
               <Ionicons name="calendar" size={32} color="#FFFFFF" />
             </View>
             <View style={styles.textContainer}>
-              <Text style={styles.title}>Döngü Durumu</Text>
+              <Text style={styles.title}>Cycle Status</Text>
               <Text style={styles.message}>{getMessage()}</Text>
             </View>
           </View>
@@ -70,7 +70,7 @@ export default function CycleOverview({ nextPeriodDate, currentPhase }) {
             <View style={styles.dateInfo}>
               <View style={styles.dateItem}>
                 <Ionicons name="calendar-outline" size={16} color="rgba(255, 255, 255, 0.9)" />
-                <Text style={styles.dateLabel}>Sonraki Regl</Text>
+                <Text style={styles.dateLabel}>Next Period</Text>
               </View>
               <Text style={styles.dateValue}>
                 {formatDateForDisplay(nextPeriodDate)}
@@ -86,7 +86,7 @@ export default function CycleOverview({ nextPeriodDate, currentPhase }) {
               </View>
               <Text style={styles.phaseText}>{currentPhase.description}</Text>
               {currentPhase.dayOfCycle && (
-                <Text style={styles.dayText}>Döngü Günü: {currentPhase.dayOfCycle}</Text>
+                <Text style={styles.dayText}>Cycle Day: {currentPhase.dayOfCycle}</Text>
               )}
             </View>
           )}

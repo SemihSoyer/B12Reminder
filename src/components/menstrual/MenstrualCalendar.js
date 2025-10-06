@@ -22,11 +22,11 @@ export default function MenstrualCalendar({
   const [currentDate, setCurrentDate] = useState(new Date());
   
   const monthNames = [
-    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
   
-  const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const goToPreviousMonth = () => {
     setCurrentDate(prev => {
@@ -175,11 +175,11 @@ export default function MenstrualCalendar({
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: '#E17055' }]} />
-          <Text style={styles.legendText}>Regl Dönemi</Text>
+          <Text style={styles.legendText}>Period Phase</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: '#00B894' }]} />
-          <Text style={styles.legendText}>Verimli Dönem</Text>
+          <Text style={styles.legendText}>Efficient Period</Text>
         </View>
       </View>
     </View>
