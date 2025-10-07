@@ -8,23 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		372A3BC4B5927E0E2CAD3B3E /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 23A2B2B703A33A6006EA078A /* PrivacyInfo.xcprivacy */; };
+		2F45ED88C64FE73AD791E550 /* libPods-B12Reminder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 986100DE88EC90C8EF0903C4 /* libPods-B12Reminder.a */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		7A948E2C8E5A68BF9FB489C2 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516B221A059583AB12CAA047 /* ExpoModulesProvider.swift */; };
-		7C3E176E3051FB5C91FA76A4 /* libPods-B12Reminder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4078FE780E4107CE2D89C3E2 /* libPods-B12Reminder.a */; };
+		6F72B4271C36AA9E41D1C5DA /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F6D519EC9A3827CE6943DBC /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		E455772C8368406BD3C4CAAC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 90CB3719B4FE31E51DCAC2E3 /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		10543E0725D58953F8197FB5 /* Pods-B12Reminder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-B12Reminder.release.xcconfig"; path = "Target Support Files/Pods-B12Reminder/Pods-B12Reminder.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* B12Reminder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = B12Reminder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = B12Reminder/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = B12Reminder/Info.plist; sourceTree = "<group>"; };
-		23A2B2B703A33A6006EA078A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = B12Reminder/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		2A761881A124412B212C8E0C /* Pods-B12Reminder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-B12Reminder.debug.xcconfig"; path = "Target Support Files/Pods-B12Reminder/Pods-B12Reminder.debug.xcconfig"; sourceTree = "<group>"; };
-		4078FE780E4107CE2D89C3E2 /* libPods-B12Reminder.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-B12Reminder.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		516B221A059583AB12CAA047 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-B12Reminder/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		63CAF3AC082799CE97B0794C /* Pods-B12Reminder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-B12Reminder.release.xcconfig"; path = "Target Support Files/Pods-B12Reminder/Pods-B12Reminder.release.xcconfig"; sourceTree = "<group>"; };
+		6F6D519EC9A3827CE6943DBC /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-B12Reminder/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		90CB3719B4FE31E51DCAC2E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = B12Reminder/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		986100DE88EC90C8EF0903C4 /* libPods-B12Reminder.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-B12Reminder.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A06AE1558623FFF3C8A97EFC /* Pods-B12Reminder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-B12Reminder.debug.xcconfig"; path = "Target Support Files/Pods-B12Reminder/Pods-B12Reminder.debug.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = B12Reminder/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -37,13 +37,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C3E176E3051FB5C91FA76A4 /* libPods-B12Reminder.a in Frameworks */,
+				2F45ED88C64FE73AD791E550 /* libPods-B12Reminder.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		08EF02B982FE6BB46839E45B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A06AE1558623FFF3C8A97EFC /* Pods-B12Reminder.debug.xcconfig */,
+				63CAF3AC082799CE97B0794C /* Pods-B12Reminder.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		13B07FAE1A68108700A75B9A /* B12Reminder */ = {
 			isa = PBXGroup;
 			children = (
@@ -53,7 +62,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				23A2B2B703A33A6006EA078A /* PrivacyInfo.xcprivacy */,
+				90CB3719B4FE31E51DCAC2E3 /* PrivacyInfo.xcprivacy */,
 			);
 			name = B12Reminder;
 			sourceTree = "<group>";
@@ -62,17 +71,9 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				4078FE780E4107CE2D89C3E2 /* libPods-B12Reminder.a */,
+				986100DE88EC90C8EF0903C4 /* libPods-B12Reminder.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		739E45EA6CAD03EFB12A1F42 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				D67B47ADB58721BF92731D41 /* B12Reminder */,
-			);
-			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -89,8 +90,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				892FB12594A19517EAB5CDF3 /* Pods */,
-				739E45EA6CAD03EFB12A1F42 /* ExpoModulesProviders */,
+				08EF02B982FE6BB46839E45B /* Pods */,
+				B886E073C5A1CF8D46CFBE8E /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -105,13 +106,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		892FB12594A19517EAB5CDF3 /* Pods */ = {
+		B886E073C5A1CF8D46CFBE8E /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				2A761881A124412B212C8E0C /* Pods-B12Reminder.debug.xcconfig */,
-				10543E0725D58953F8197FB5 /* Pods-B12Reminder.release.xcconfig */,
+				E4C23A364ADF11836738166B /* B12Reminder */,
 			);
-			path = Pods;
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -123,10 +123,10 @@
 			path = B12Reminder/Supporting;
 			sourceTree = "<group>";
 		};
-		D67B47ADB58721BF92731D41 /* B12Reminder */ = {
+		E4C23A364ADF11836738166B /* B12Reminder */ = {
 			isa = PBXGroup;
 			children = (
-				516B221A059583AB12CAA047 /* ExpoModulesProvider.swift */,
+				6F6D519EC9A3827CE6943DBC /* ExpoModulesProvider.swift */,
 			);
 			name = B12Reminder;
 			sourceTree = "<group>";
@@ -139,13 +139,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "B12Reminder" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				4AADD4FE6C81C8C91BA44DED /* [Expo] Configure project */,
+				6DB64AEC307600E3D1D23866 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				BB35822C11A77F231989A902 /* [CP] Embed Pods Frameworks */,
+				1E4688CE8B2D1DF3AD5C14E7 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -195,7 +195,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				372A3BC4B5927E0E2CAD3B3E /* PrivacyInfo.xcprivacy in Resources */,
+				E455772C8368406BD3C4CAAC /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,7 +241,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4AADD4FE6C81C8C91BA44DED /* [Expo] Configure project */ = {
+		1E4688CE8B2D1DF3AD5C14E7 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-B12Reminder/Pods-B12Reminder-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-B12Reminder/Pods-B12Reminder-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6DB64AEC307600E3D1D23866 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -278,9 +300,12 @@
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXNotifications/ExpoNotifications_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/ExpoDevice/ExpoDevice_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/ExpoFileSystem/ExpoFileSystem_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/PurchasesHybridCommon/PurchasesHybridCommon.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RNCAsyncStorage/RNCAsyncStorage_resources.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RevenueCat/RevenueCat.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RevenueCatUI/RevenueCat_RevenueCatUI.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -290,35 +315,16 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoNotifications_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoDevice_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoFileSystem_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PurchasesHybridCommon.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNCAsyncStorage_resources.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RevenueCat.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RevenueCat_RevenueCatUI.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-B12Reminder/Pods-B12Reminder-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BB35822C11A77F231989A902 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-B12Reminder/Pods-B12Reminder-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-B12Reminder/Pods-B12Reminder-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -329,7 +335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				7A948E2C8E5A68BF9FB489C2 /* ExpoModulesProvider.swift in Sources */,
+				6F72B4271C36AA9E41D1C5DA /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,7 +344,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2A761881A124412B212C8E0C /* Pods-B12Reminder.debug.xcconfig */;
+			baseConfigurationReference = A06AE1558623FFF3C8A97EFC /* Pods-B12Reminder.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -375,7 +381,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 10543E0725D58953F8197FB5 /* Pods-B12Reminder.release.xcconfig */;
+			baseConfigurationReference = 63CAF3AC082799CE97B0794C /* Pods-B12Reminder.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

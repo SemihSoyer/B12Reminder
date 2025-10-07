@@ -7,6 +7,7 @@ import { REQUIRED_FONTS } from './src/constants/fonts';
 import AppNavigator from './src/navigation/AppNavigator';
 import CustomAlert from './src/components/ui/CustomAlert';
 import { NotificationService } from './src/utils/notificationService';
+import RevenueCatService from './src/utils/revenueCatService';
 
 // Splash screen'i manuel kontrol et
 SplashScreen.preventAutoHideAsync();
@@ -33,6 +34,11 @@ export default function App() {
   // Notification permissions'ı başlangıçta kaydet
   useEffect(() => {
     NotificationService.requestAndCheckPermissions();
+  }, []);
+
+  // RevenueCat'i başlat
+  useEffect(() => {
+    RevenueCatService.initialize();
   }, []);
 
   if (!fontsLoaded) {
