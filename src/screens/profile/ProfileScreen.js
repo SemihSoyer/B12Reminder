@@ -58,7 +58,18 @@ export default function ProfileScreen({ navigation }) {
         'info'
       ),
     }
-  ]
+  ];
+
+  // Developer/Test settings (only in development)
+  const developerSettings = __DEV__ ? [
+    {
+      icon: 'flask-outline',
+      title: 'Test Onboarding',
+      subtitle: 'View onboarding screens',
+      type: 'navigation',
+      onPress: () => navigation.navigate('Onboarding'),
+    },
+  ] : [];
 
   return (
     <LinearGradient
@@ -96,6 +107,14 @@ export default function ProfileScreen({ navigation }) {
             title="App Information"
             items={appInfoSettings}
           />
+
+          {/* Developer Settings (only in development) */}
+          {__DEV__ && developerSettings.length > 0 && (
+            <SettingsSection
+              title="Developer"
+              items={developerSettings}
+            />
+          )}
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
